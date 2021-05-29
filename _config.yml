@@ -10,6 +10,8 @@ baseurl: ''
 # the HTML language tag › https://www.w3.org/International/questions/qa-choosing-language-tags
 lang: en-US
 
+remote_theme: cotes2020/jekyll-theme-chirpy
+
 # Change to your timezone › http://www.timezoneconverter.com/cgi-bin/findzone/findzone
 timezone: Asia/Shanghai
 
