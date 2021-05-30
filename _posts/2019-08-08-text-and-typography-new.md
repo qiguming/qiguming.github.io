@@ -2,7 +2,7 @@
 title: Text and Typography
 author: Cotes Chung
 date: 2019-08-08 11:33:00 +0800
-categories: [Blogging, Demo]
+categories: [ML, DNN]
 tags: [typography]
 math: true
 mermaid: true
@@ -18,9 +18,7 @@ This post is to show Markdown syntax rendering on [**Chirpy**](https://github.co
 # H1 - heading
 
 <h2 data-toc-skip>H2 - heading</h2>
-
 <h3 data-toc-skip>H3 - heading</h3>
-
 <h4>H4 - heading</h4>
 ---
 <br>

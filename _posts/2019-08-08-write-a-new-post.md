@@ -80,6 +80,14 @@ mermaid: true
 
 Then you can use it like other markdown language: surround the graph code with ```` ```mermaid ```` and ```` ``` ````.
 
+```yml
+---
+mermaid: true
+---
+```
+
+
+
 ## Images
 
 ### Preview image
