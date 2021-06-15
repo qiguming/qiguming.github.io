@@ -255,5 +255,139 @@ $$
 
 [^RZL17]: 
 
+### 13.2.4 案例模型
 
+$\textrm{MLPs}$ 可以对很多类型的数据进行分类和回归，接下来我们将给出一些案例。
+
+#### 13.2.4.1 MLP用于表格数据分类
+
+图 $\textrm{13.3}$给出了一个包含两个隐藏层的 $\textrm{MLP}$ 示意图，将该$\textrm{MLP}$应用于$\textrm{1.2.1.1}$节中的表格鸢尾花数据集，该数据集具有 $\textrm{4}$ 个特征和 $\textrm{3}$ 个类别。 该模型具有如下形式
+
+
+$$
+\begin{align}
+p(y|\mathbf{x};\mathbf{\theta})=& {\rm{Cat}}(y|f_3(\mathbf{x};\mathbf{\theta})) \tag{13.17}\\
+f_3(\mathbf{x};\mathbf{\theta})=&\mathcal{S}(\mathbf{W}_3f_2(\mathbf{x};\mathbf{\theta})+\mathbf{b}_3) \tag{13.18} \\
+f_2(\mathbf{x};\mathbf{\theta})=&\varphi_2(\mathbf{W}_2f_1(\mathbf{x};\mathbf{\theta})+\mathbf{b}_2) \tag{13.19} \\
+f_1(\mathbf{x};\mathbf{\theta})=&\varphi_1(\mathbf{W}_1f_0(\mathbf{x};\mathbf{\theta})+\mathbf{b}_1) \tag{13.19} \\
+f_0(\mathbf{x};\mathbf{\theta})=&\mathbf{x} \tag{13.21}
+\end{align}
+$$
+
+
+其中 $\mathbf{\theta}=(\mathbf{W}_3,\mathbf{b}_3,\mathbf{W}_2,\mathbf{b}_2,\mathbf{W}_1,\mathbf{b}_1)$ 为模型中的参数，对应于 $\textrm{3}$ 组可调节权重的连接边。我们看到最终（输出）层的激活函数为 $\textrm{softmax}$ 函数，$\textrm{softmax}$ 函数是分类分布的反向连接函数。对于隐藏层，我们可以自由选择所需的不同形式的激活函数，正如我们在第 $\textrm{13.2.3}$ 节中所讨论的。
+
+#### 13.2.4.2 MLP用于图像分类
+
+要将 $\textrm{MLP}$ 应用于图像分类，我们需要将 $\textrm{2d}$ 输入“**展开**”（$\textrm{flatten}$）为 $\textrm{1d}$ 向量。 然后，我们可以使用类似于第$\textrm{13.2.4.1}$ 节中所述的前馈网络。 例如，考虑构建一个 $\textrm{MLP}$ 以对 $\textrm{MNIST}$ 数字进行分类（第$\textrm{3.7.2}$ 节）。 这些数字表示为 $28\times28 = 784$ 维向量。 如果我们使用 $\textrm{2}$ 个具有$\textrm{128}$个单位的隐藏层，和 $\textrm{1}$ 个包含 $\textrm{10}$ 个输出单元的$\textrm{softmax}$ 层，将得到如图$\textrm{13.4}$ 所示的模型。
+
+我们在图 $\textrm{13.5}$ 中展示了一些该模型的预测结果。 我们对训练集仅训练两个“**周期**”（$\textrm{epochs}$, 遍历数据集的次数），但是该模型已经具备较好的性能，测试集的准确率为 $\textrm{97.1％}$。 此外，错误的预测案例似乎也是可以理解的，例如将 $\textrm{9}$ 误认为是 $\textrm{3}$。训练更多的时间可以进一步提高测试的准确性。
+
+在第 $\textrm{14}$ 章中，我们讨论了另一种称为卷积神经网络的模型，该模型更适用于图像数据的处理。 通过利用与图像数据相关的空间结构的先验知识，它可以获得更好的性能，并使用更少的参数。相比之下，$\textrm{MLP}$ 对输入的排列具有不变性。 换句话说，我们可以随机地对像素进行排列，并且可以获得相同的结果（前提是我们对所有的输入使用相同的随机排列算法）。
+
+#### 13.2.4.3 MLP用于电影评论的情感分析
+
+[Maa+11][^Maa11]的 $\textrm{IMDB}$ 电影评论数据集（$\textrm{IMDB}$ 代表“互联网电影数据库”。）被称为 “文本分类的 $\textrm{MNIST}$”。该数据集包含 $\textrm{25k}$ 带有标签的样本用于训练，而 $\textrm{25k}$的样本用于测试。 每个样本都有一个二进制标签，代表积极或消极的评分。 此任务称为（二进制）**情感分析** （$\textrm{sentiment analysis}$）。 例如，以下是训练集中的两个样本：
+
+```markdown
+1. this film was just brilliant casting location scenery story direction everyone’s really suited the part they played robert \<UNK\> is an amazing actor ...
+2. big hair big boobs bad music and a giant safety pin these are the words to best describe this terrible movie i love cheesy horror movies and i’ve seen hundreds...
+```
+
+> 1. this film was just brilliant casting location scenery story direction everyone’s really suited the part they played robert \<UNK\> is an amazing actor ...
+> 2. big hair big boobs bad music and a giant safety pin these are the words to best describe this terrible movie i love cheesy horror movies and i’ve seen hundreds...
+
+毫不奇怪，第一个样本被标记为正例，第二个标记为负例。
+
+[^Maa11]: 
+
+我们可以设计一个 $\textrm{MLP}$ 来进行情感分析，如下所示。假设输入是一个包含 $T$ 个符号的序列 $\mathbf{x}_{1:T}$，其中 $\mathbf{x}_t$ 是一个长度为 $V$ 的 $\textrm{one-hot}$ 向量，其中 $V$ 为词语料库的大小。我们将此视为无序的单词袋（第$\textrm{10.4.3.1}$ 节）。模型的第一层为 $E\times V$  的嵌入矩阵 $\mathbf{W}_1$，该层将每一个稀疏的 $V$ 维向量映射到一个稠密的 $E$ 维向量 ${\rm{e}}_t=\mathbf{W}_1\mathbf{x}_t$（见$\textrm{19.5}$ 节学习更多关于词嵌入的细节）。接着我们使用 **全局平均池化**（$\textrm{global average pooling}$）将 $T\times D$ 的序列嵌入向量转化为一个固定长度的向量 ${\rm{\bar{\mathbf{e}}}}=\frac{1}{T}\sum_{t=1}^T{\rm{\mathbf{e}}}_t$。接着我们将该向量传入一个非线性隐藏层，计算一个 $K$ 维向量 $\mathbf{h}$，并将其传入最后的线性 $\textrm{logistic}$ 层。 综上所述，模型定义如下：
+
+
+$$
+\begin{align}
+p(y|\mathbf{x};\mathbf{\theta}) = & {\rm{Ber}}(y|\sigma(\mathbf{w}_3^{\rm{T}}\mathbf{h}+b_3)) \tag{13.22} \\
+\mathbf{h}= & \varphi(\mathbf{W}_2{\rm{\bar{\mathbf{e}}}}+\mathbf{b}_2) \tag{13.23} \\
+{\bar{\mathbf{e}}}=& \frac{1}{T}\sum_{t=1}^T\mathbf{e}_t \tag{13.24} \\
+\mathbf{e}_t=& \mathbf{W}_1\mathbf{x}_t \tag{13.25}
+\end{align}
+$$
+
+
+如果我们使用的语料库大小为 $V = 1000$，嵌入向量维度为 $E = 16$，隐藏层的维度为$\textrm{16}$，则得到的模型如图 $\textrm{13.6}$ 所示。 模型在验证集的准确度为 $\textrm{86％}$。
+
+我们看到模型中大多数参数都分布在嵌入矩阵中，这可能会导致过拟合问题。 幸运的是，正如我们在第 $\textrm{19.5}$ 节中讨论的那样，我们可以执行词嵌入模型的无监督预训练，然后我们只需要微调此特定标记任务的输出层参数即可。
+
+#### 13.2.4.4 MLP用于异方差回归
+
+我们还可以使用 $\textrm{MLP}$ 进行回归。 图 $\textrm{13.7}$ 显示了如何为异方差 （$\textrm{heteroskedastic}$）非线性回归任务建立模型。 （术语“异方差”仅表示预测的输出方差与输入有关，如第$\textrm{3.3.3}$节中所述。）该函数具有两个输出，分别表示 $f_\mu(\mathbf{x})=\mathbb{E}[y|\mathbf{x},\mathbf{\theta}]$ 和 $f_\sigma(\mathbf{x})=\sqrt{\mathbb{V}[y|\mathbf{x},\mathbf{\theta}]}$。如图$\textrm{13.7}$所示，通过使用一个共享的**主干网络**（$\textrm{backbone}$）和两个输出**头**（$\textrm{heads}$）， 我们可以在这两个函数之间共享大多数层（因此也可以共享参数）。对于 $\mu$ 头，我们使用一个线性激活函数 $\varphi(a)=a$。对于 $\sigma$ 头，我们使用 $\textrm{softplus}$ 激活函数 $\varphi(a)=\sigma_{+}(a)$。如果我们使用线性头和一个非线性主干网络，整个模型定义为
+$$
+p(y|\mathbf{x},\mathbf{\theta})=\mathcal{N}(y|\mathbf{w}_\mathbf{\mu}^{\rm{T}}f(\mathbf{x};\mathbf{w}_{\rm{shared}}), \sigma_{+}(\mathbf{w}_{\mathbf{\sigma}}^{\rm{T}}f(\mathbf{x};\mathbf{w}_{\rm{shared}})))\tag{13.26}
+$$
+图$\textrm{13.8}$ 显示了这种模型在某些数据集上的优势，在该数据集中，预测的期望值随时间线性增长，并且随季节波动，与此同时，数据的方差呈二次方增加趋势。（这是 **随机波动率模型** （$\textrm{stochastic volatility model}$）的一个简单示例；它可以用于对财务数据以及地球的全球温度进行建模，其中地球温度的（由于气候变化）均值和方差不断增加。）我们发现 将输出方差 $\sigma^2$ 视为固定（与输入无关）参数的回归模型置信度有时会比较低，因为模型需要适应整体的噪声水平，并且无法适应输入空间中每个点的噪声水平。
+
+### 13.2.5 深度的重要性
+
+研究表明包含一个隐藏层的 $\textrm{MLP}$ 是一个**通用函数逼近器**（$\textrm{universal function approximator}$），这意味着只要给定足够的隐藏单元，$\textrm{MLP}$ 就可以逼近任何平滑函数，并达到任何所需的精度水平[HSW89][^HSW89]; [cyb89][^cyb89]; [Hor91][^Hor91]。直观地讲，这样做的原因是每个隐藏的单元都可以指定一个半平面，并且这些单元的足够大的组合可以“划分”空间的任何区域，我们可以将其与任何响应相关联（这在分段使用时最容易看到 线性激活函数，如图13.9所示。
+
+但是，实验和理论上的各种论证（例如[Has87][^Has87]; [Mon+14][^Mon14]; [Rag+17][^Gag17]; [Pog+17][^Pog17]）都表明，深层网络比浅层网络更有效。 原因是更高的层次可以利用先前的层次所学习的功能。 也就是说，该功能是以组合或分层的方式定义的。 例如，假设我们要对 $\textrm{DNA}$ 字符串进行分类，并且正类与正则表达式$\textrm{* AA ?? CGCG ?? AA *}$相关联。 尽管我们可以将其与单个隐藏层模型配合使用，但是从直观上来说，如果模型首先学会使用第 $\textrm{1}$ 层中的隐藏单元来检测 $\textrm{AA}$ 和 $\textrm{CG}$ “基元”，然后使用这些功能来定义一个简单的模型，则将更容易学习 第 $\textrm{2}$ 层中的线性分类器，类似于我们如何解决第 $\textrm{13.2.1}$ 节中的 $\textrm{XOR}$ 问题。
+
+[^HSW89]: 
+[^cyb89]: 
+[^Hor91]: 
+[^Has87]: 
+[^Mon14]: 
+[^Rag17]: 
+[^Pog17]: 
+
+#### 13.2.5.1 深度学习革命
+
+尽管 $\textrm{DNN}$ 背后的思想可以追溯到几十年前，但直到 $\textrm{2010}$ 年代，它们才开始被广泛使用。 突破性的时刻发生在$\textrm{2012}$ 年，当时[KSH12][^KSH12]表明深层的 $\textrm{CNN}$ 可以在具有挑战性的 $\textrm{ImageNet}$ 图像分类基准上显着提高性能，将错误率从一年的$\textrm{26％}$降低到$\textrm{16％}$（见图$\textrm{14.14b}$）； 与之前每年约减少$\textrm{2％}$的进度相比，这是一个巨大的飞跃。 大约在同一时间，[DHK13][^DHK13]表明，在各种语音识别任务上，深度神经网络可以大大优于现有技术。
+
+$\textrm{DNN}$ 的使用中的“爆炸”有几个促成因素。 一是便宜的$\textrm{GPU}$（图形处理单元）的可用性。 它们最初是为了加快视频游戏的图像渲染速度而开发的，但是它们也可以大大减少适合大型 $\textrm{CNN}$ 的时间，而大型 $\textrm{CNN}$ 涉及类似的矩阵矢量计算。 另一个是大型标记数据集的增长，这使我们能够在不过度拟合的情况下将具有许多参数的复杂函数逼近器拟合。 （例如，$\textrm{ImageNet}$ 具有$\textrm{130}$ 万个带标签的图像，并用于拟合具有数百万个参数的模型。）的确，如果将深度学习系统视为“火箭”，那么大型数据集就被称为燃料。
+
+由于$\textrm{DNN}$取得了巨大的经验成功，许多公司开始对该技术产生兴趣。 这导致开发了高质量的开源软件库，例如$\textrm{Tensorflow}$（由 $\textrm{Google}$ 开发），$\textrm{PyTorch}$（由 $\textrm{Facebook}$ 开发）和 $\textrm{MXNet}$（由亚马逊开发）。 这些库支持复杂的微分函数的自动微分（请参阅第 $\textrm{13.3}$ 节）和基于可伸缩的基于梯度的优化（请参见第 $\textrm{5.4}$ 节）。 在本书的各个地方，我们将使用其中的一些库来实现各种模型，而不仅仅是 $\textrm{DNN}$。
+
+有关“深度学习革命”历史的更多详细信息，请参见[Sej18][^Sej18]。
+
+[^KSH12]: 
+[^DHK13]: 
+[^Sej18]: 
+
+### 13.2.6 与生物学的联系
+
+在本节中，我们讨论了上文讨论过的各种神经网络（称为人工神经网络或 $\textrm{ANN}$）与实际神经网络之间的联系。 真正的生物大脑如何工作的细节非常复杂（例如，参见[Kan+12][^Kan12]），但是我们可以给出一个简单的“卡通”。
+
+我们首先考虑单个神经元的模型。 对于第一近似，我们可以说神经元 $k$ 是否发射，用 $h_{k} \in\{0,1\}$ 表示，取决于其输入的活动（用$\mathbf{x} \in \mathbb{R}^{D}$表示）以及传入连接的强度（我们用$\mathbf{w}_{k} \in \mathbb{R}^{D}$表示）。 我们可以使用$a_{k}=\mathbf{w}_{k}^{\top} \mathbf{x}$来计算输入的加权和。 这些权重可以看作是将输入$x_d$ 连接到神经元$h_k$的“电线”。 这些类似于真实神经元中的树突（见图$\textrm{13.10}$）。然后将该加权总和与阈值$b_k$进行比较，如果激活超过阈值，则神经元触发； 这类似于神经元发出电输出或动作电位。 因此，我们可以使用 $h_{k}(\mathbf{x})=H\left(\mathbf{w}_{k}^{\top} \mathbf{x}-b_{k}\right)$ 来建模神经元的行为，其中 $H(a)=\mathbb{I}(a>0)$ 是$\textrm{Heaviside}$函数。 这称为神经元的$\textrm{McCulloch-Pitts}$模型，并于$\textrm{1943}$年提出[MP43][^MP43]。
+
+[^Kan12]: 
+[^MP43]: 
+
+
+
+我们可以将多个这样的神经元组合在一起以构成一个人工神经网络。 结果有时被视为大脑的模型。 但是，人工神经网络在许多方面与生物大脑不同，包括以下方面：
+
+- 大多数 $\textrm{ANN}$ 使用反向传播来修改其连接强度（请参阅第$\textrm{13.3}$节）。 但是，真正的大脑不会使用反向传播，因为无法沿着轴突向后发送信息[Ben+15b][^Ben15b]; [BS16][^BS16]；[KH19][^KH19]。 相反，他们使用本地更新规则来调整突触强度。
+- 大多数$\textrm{ANN}$都是严格的前馈，但是真实的大脑有很多反馈连接。 可以相信，这种反馈的作用类似于先验，可以与来自感官系统的自下而上的可能性结合起来，计算出世界上隐藏状态的后验，然后可以将其用于最佳决策（例如，参见[Doy+07][^Doy07]）。
+- 大多数人工神经网络使用简化的神经元，该神经元由经过非线性处理的加权总和组成，但实际的生物神经元具有复杂的树状树结构（见图$\textrm{13.10}$），具有复杂的时空动态。
+- 大多数人工神经网络的大小和连接数均小于生物大脑（见图$\textrm{13.11}$）。 当然，在各种新型硬件加速器（例如$\textrm{GPU}$和$\textrm{TPU}$（张量处理单元）等）的推动下，人工神经网络每周都会变得越来越大。但是，即使人工神经网络在单元数量上与生物大脑相匹配，这种比较也具有误导性，因为 生物神经元的处理能力远高于人工神经元（见上文）。
+- 大多数ANN被设计为对单个函数建模，例如将图像映射到标签，或将单词序列映射到另一个单词序列。 相比之下，生物大脑是非常复杂的系统，由多个专门的交互模块组成，这些模块实现不同种类的功能或行为，例如感知，控制，记忆，语言等（请参见[Sha88][^Sha88]; [Kan+12][^Kan12]）。
+
+[^Ben15b]: 
+[^BS16]: 
+[^KH19]: 
+[^Doy07]: 
+[^Sha88]: 
+[^Kan12]: 
+
+当然，我们正在努力建立逼真的生物大脑模型（例如，蓝脑计划[Mar06][^Mar06]; [Yon19][^Yon19]）。但是，一个有趣的问题是，以这种详细程度研究大脑是否对“解决$\textrm{AI}$”有用？通常认为，生物大脑的低级细节并不重要，我们的目标是否是建造“智能机器”，就像飞机不会拍打自己的飞机一样。 翅膀。但是，大概“ $\textrm{AI}$”将遵循与智能生物代理类似的“智能定律”，就像飞机和鸟类遵循相同的空气动力学定律一样。 不幸的是，我们尚不知道什么是“智力法则”，或者甚至是否存在这样的法则。在本书中，我们假设任何智能主体都应遵循信息处理和贝叶斯决策理论的基本原理，这是在不确定性下做出决策的最佳方法（请参见第 $\textrm{8.4.2}$ 节）。 当然，生物因子受到许多约束（例如，计算，生态），这通常需要算法“捷径”才能获得最佳解决方案。这可以解释人们在日常推理中使用的许多启发式方法。[KST82][^KST82]; [GTA00][^GTA00]; [Gri20][^Gri20]。随着我们希望机器解决的任务变得越来越困难，我们也许能够从神经科学和认知科学的其他领域获得见识（例如，参见[MWK16][^MWK16]; [Has+17][^Has17]; [Lak+17][^Lak17]）。
+
+[^Mar06]: 
+[^Yon19]: 
+[^KST82]: 
+[^GTA00]: 
+[^Gri20]: 
+[^MWK16]: 
+[^Has17]: 
+[^Lak17]: 
 
