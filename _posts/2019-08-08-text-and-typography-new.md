@@ -72,7 +72,7 @@ f(\mathbf{x};\mathbf{\theta})=\mathbb{I}(\mathbf{w}^{\rm{T}}\mathbf{x}+b\ge0)=H(
 $$
 其中 $H(a)$ 表示 **单位阶跃函数**（$\textrm{heaviside step function}$）， 又被称为 **线性阈值函数** ($\textrm{linear threshold function}$）。由于感知机的决策边界依然是线性的，所以其表达能力十分有限。$\textrm{1969}$ 年，$\textrm{Marvin Minsky}$ 和 $\textrm{Seymour Papert}$ 出版了一本名为 $\textrm{《 Perceptrons》}$ [MP69][^MP69] 的著名著作，其中他们给出了许多感知机无法解决的模式识别的问题。 在讨论如何解决问题之前，我们首先举一个具体的例子。
 
-``` M. Minsky and S. Papert. Perceptrons. MIT Press, 1969.``` 
+[^MP69]: M. Minsky and S. Papert. Perceptrons. MIT Press, 1969.
 
 
 
@@ -139,7 +139,9 @@ $$
 
 我们在第 $\textrm{13.2.1}$ 节中讨论的 $\textrm{MLP}$ 被定义为多个感知机的叠加，每个感知机都包含不可微的 $\textrm{Heaviside}$ 函数。 这使得这种模型很难训练，这就是为什么它们从未被广泛使用的原因。然而，如果我们将阶跃函数 $H:\mathbb{R}\rightarrow \{0,1\}$ 替换为一个可微的 **激活函数** （$\textrm{activation function}$）$\varphi:\mathbb{R} \rightarrow \mathbb{R}$ 。更精确地讲，我们将每一层 $l$ 的隐藏单元 $\mathbf{z}_l$ 定义为通过激活函数逐元素传递的上一层隐藏单元的线性变换：
 
-> More precisely, we define the hidden units $\mathbf{z}_l$ at each layer $l$ to be a linear transformation of the hidden units at the previous layer passed elementwise through this activation function.
+```markdown
+More precisely, we define the hidden units $\mathbf{z}_l$ at each layer $l$ to be a linear transformation of the hidden units at the previous layer passed elementwise through this activation function.
+```
 
 
 $$
@@ -156,9 +158,9 @@ $$
 
 如式 (\ref{eq:13.5}) 中所示，如果我们现在将 $L$ 个诸如此类的激活函数叠加在一起。然后我们可以使用链式规则，计算输出关于每一层中的参数的梯度，也称为**反向传播** （$\textrm{backpropagation}$），如我们在第 $\textrm{13.3}$ 节中所解释的。 （这对于任何一种可微的激活函数都是正确的，尽管某些类型的函数要比其他类型的函数更适用，正如我们在第 $\textrm{13.2.3}$ 节中讨论的那样。）然后，我们可以将梯度传递给优化器，从而最小化某些训练目标，正如我们在 $\textrm{13.4}$ 节讨论的那样。 因此，术语“$\textrm{ MLP}$”几乎总是指可微的模型，而不是指具有不可微分线性阈值单位的历史版本。
 
-> 不可微: non-differentiable
-
-
+```markdown
+不可微: non-differentiable
+```
 
 | $\textrm{Name}$                    | $\textrm{Definition}$                                        | $\textrm{Range}$     | $\textrm{Reference}$            |
 | ---------------------------------- | ------------------------------------------------------------ | -------------------- | ------------------------------- |
@@ -181,6 +183,77 @@ $$
 ![activations](/assets/img/figures/activations.png)
 
 图 $\textrm{13.2}$：$\textrm{(a)}$ 对于 $sigmoid$ 函数而言，当输入在 $0$ 附近时，输出与输入呈线性关系，但对于较大的正值或负值输入，则输出存在饱和区。图形由程序 生成。 $\textrm{(b)}$ 一些常用的非饱和激活函数的可视化。图形由程序 生成。
+
+### 13.2.3 激活函数
+
+我们可以在每一层使用任何一种可微的激活函数。然而，如果我们使用 *线性* （$\textrm{linear}$）激活函数  $\varphi_l(a)=c_la$，那整个模型将退化为一个常规的线性模型。以式  (\ref{eq:13.5})为例，该模型将退化为：
+
+
+$$
+f(\mathbf{x};\mathbf{\theta})=\mathbf{W}_Lc_L(\mathbf{W}_{L-1}c_{L-1}(...(\mathbf{W}_1\mathbf{x})...)) \propto \mathbf{W}_L\mathbf{W}_{L-1}...\mathbf{W}_1\mathbf{x}=\mathbf{W}^\prime\mathbf{x} \tag{13.11}
+$$
+
+
+在上式中，为了符号上的简洁性，我们丢弃了偏置项。基于上述原因，使用非线性激活函数就显得十分重要。
+
+在神经网络的早期发展阶段，一个常见的选择是使用 $\textrm{S}$ 型 ($\textrm{logistic}$) 激活函数，该函数可以看做是单位阶跃函数的平滑近似版本。然而，如图 $\textrm{13.2a}$ 所示，对于较大的正值输入，$\textrm{S}$ 形函数存在饱和值 $\textrm{1}$；对于较大的负值输入，$\textrm{S}$ 形函数存在饱和值 $\textrm{0}$。 $\textrm{tanh}$ 激活函数具有相似的形状，但其饱和值分别为 $\textrm{-1}$ 和 $\textrm{+1}$。 在这些饱和区域，输出关于输入的斜率将接近于零。因此，如我们在第 $\textrm{13.4.2}$  节中所讨论的，来自深层网络的任何梯度信号都将“消失”。
+
+要想成功训练一个非常深的神经网络模型，一个关键因素是使用 **非饱和激活函数** （$\textrm{non-saturating activation functions}$）。几种不同的激活函数如表 $\textrm{13.2}$ 所示。其中最常用的是 **整流线性单元** （$\textrm{rectifled linear unit, ReLU}$）。定义为
+
+
+$$
+{\rm{ReLU}}(a)=\max(a,0)=a\mathbb{I}(a>0) \tag{13.12}
+$$
+
+
+该 $\textrm{ReLU}$ 函数简单地将负值输入置零，并保持正值输入保持不变。如 $\textrm{13.3.3.2}$ 节所介绍的，这种形式至少保证对于正值输入，梯度的值为 $\textrm{1}$，从而避免了梯度的消失。
+
+不幸的是，对于负值输入，$\textrm{ReLU}$的梯度依然为 $\textrm{0}$，因此，该单元将永远无法获得任何反馈信号来帮助其摆脱当前的参数设置 （**译者注：**即无法逃离负值区域）； 这被称为 “**垂死ReLU**” ($\textrm{dying ReLU}$) 问题。
+
+一种简单的解决方法是使用[MHN13][^MHN13]中提出的 **泄漏ReLU** （$\textrm{leaky ReLU}$）。 定义为
+
+
+$$
+{\rm{LReLU}}(a;\alpha)=\max(\alpha a,a) \tag{13.13}
+$$
+
+其中 $0 \lt \alpha \lt 1$。该函数对于正值输入的斜率为 $\textrm{1}$，对于负值输入的斜率为 $\alpha$， 所以可以确保当输入为负值时，依然可以有信号可以从更深的网络层中反传回来。如果我们允许参数 $\alpha$ 可以学习，而非固定， $\textrm{leaky ReLU}$ 将被称为 **参数化ReLU** （$\textrm{parametric ReLU}$）。
+
+另一个广泛的选择是 [CUH16][^CUH16] 中提出的 $\textrm{ELU}$，定义为
+
+
+$$
+{\rm{ELU}}(a;\alpha) = \begin{cases}
+\alpha(e^a-1) & \text{if } a\le0\\
+a & \text{if } a \gt 0
+\end{cases} \tag{13.14}
+$$
+
+[^ CUH16]: 
+
+与 $\textrm{leaky ReLU}$ 相比，它具有平滑函数的优点。
+
+在[Kla+17][^Kla+17]中提出了一种 $\textrm{ELU}$ 的轻微变体，称为 $\textrm{SELU}$（自规范化$\textrm{ELU}$）。 形式为
+
+
+$$
+{\rm{SELU}}(a;\alpha,\lambda)=\lambda{\rm{ELU}}(a;\alpha) \tag{13.15}
+$$
+
+[^ Kla+17]: 
+
+出乎意料的是，他们证明了通过为 $\alpha$ 和 $\lambda$ 设置精心选择的值，即使不使用 $\textrm{batchnorm}$ 技术（见$\textrm{13.4.5}$节），也可以确保通过激活函数来确保每个网络层的输出是被标准化的（假设输入也已标准化）。 这可以促进模型的拟合。
+
+作为手动发现良好的激活函数的替代方法，我们可以使用黑盒优化方法来对激活函数空间进行搜索。 [RZL17][^RZL17]使用这种方法发现了称为 $\mathrm{swish}$ 的函数，该函数在某些图像分类数据集上似乎表现很好。该函数定义为
+
+
+$$
+{\rm{swish}}(a;\beta)=a\sigma(\beta a)\tag{13.16}
+$$
+
+有关这些函数的可视化对比，请参见图$\textrm{13.2b}$。 我们看到，它们主要是在处理负输入的方式上存在差异。
+
+[^RZL17]: 
 
 This post is to show Markdown syntax rendering on [**Chirpy**](https://github.com/cotes2020/jekyll-theme-chirpy/fork), you can also use it as an example of writing. Now, let's start looking at text and typography.
 
