@@ -6,7 +6,7 @@ categories: [ML, DNN]
 tags: [typography]
 math: true
 mermaid: true
-comments: treu
+comments: true
 ---
 
 本章我们将开始讨论深度学习，深度学习可以用于提取非结构化数据的判别特征。
@@ -22,6 +22,14 @@ $$
 f(\mathbf{x};\pmb{\theta})=\mathbf{Wx} + \mathbf{b} \tag{13.2}
 $$
 表示关于输入的一个线性（仿射）变换函数， 其中 $\mathbf{W}$ 被称为 **权重** ($\textrm{weights}$)，$\mathbf{b}$ 被称为 **偏置** ($\textrm{biases}$)。
+
+```markdown
+线性回归：linear regression
+逻辑回归: logistic regression
+指数族分布：exponential family distribution;
+逆连接函数：inverse link function;
+线性(仿射)变换：linear(affine) transformation.
+```
 
 ------
 
@@ -45,12 +53,6 @@ $$
 特征变换： feature transformation
 特征提取器： feature extractor
 ```
-
-
-
-> 特征变换： feature transformation
->
-> 特征提取器： feature extractor
 
 ------
 
