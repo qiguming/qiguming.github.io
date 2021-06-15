@@ -289,7 +289,7 @@ $$
 
 [Maa+11][^Maa11]的 $\textrm{IMDB}$ 电影评论数据集（$\textrm{IMDB}$ 代表“互联网电影数据库”。）被称为 “文本分类的 $\textrm{MNIST}$”。该数据集包含 $\textrm{25k}$ 带有标签的样本用于训练，而 $\textrm{25k}$的样本用于测试。 每个样本都有一个二进制标签，代表积极或消极的评分。 此任务称为（二进制）**情感分析** （$\textrm{sentiment analysis}$）。 例如，以下是训练集中的两个样本：
 
-```markdown
+```xml
 1. this film was just brilliant casting location scenery story direction everyone’s really suited the part they played robert <UNK> is an amazing actor ...
 2. big hair big boobs bad music and a giant safety pin these are the words to best describe this terrible movie i love cheesy horror movies and i’ve seen hundreds...
 ```
