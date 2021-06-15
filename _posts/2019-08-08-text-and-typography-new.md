@@ -6,6 +6,7 @@ categories: [ML, DNN]
 tags: [typography]
 math: true
 mermaid: true
+comments: treu
 ---
 
 本章我们将开始讨论深度学习，深度学习可以用于提取非结构化数据的判别特征。
