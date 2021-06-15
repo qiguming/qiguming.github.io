@@ -40,6 +40,13 @@ f(\mathbf{x};\pmb{\theta})=f_L(f_{L-1}(...(f_1(\mathbf{x}))...)) \label{eq:13.5}
 $$
 其中 $f_l(\mathbf{x})=f(\mathbf{x};\pmb{\theta}_l)$ 为第 $l$ 层的函数。这便是 **深度神经网络** ($\textrm{deep neural networks, DNNs}$) 背后的关键思想。
 
+```markdown
+特征变换： feature transformation
+特征提取器： feature extractor
+```
+
+
+
 > 特征变换： feature transformation
 >
 > 特征提取器： feature extractor
