@@ -79,6 +79,32 @@ $$
 
 图 $\textrm{13.1}$：$\textrm{(a)}$ 抑或函数无法实现线性可分，但基于单位阶跃函数构建的两层模型可以将数据分开。程序由 $xor-heaviside.py$ 生成。 $\textrm{(b)}$ 包含一个隐藏层的神经网络，其中的权重由人工设计，该网络实现了抑或函数。 $h_1$ 表示 $AND$ 函数，$h_2$ 表示 $OR$ 函数。 偏置项表示为常数节点（值为 $\textrm{1}$）的连接权重。
 
+```python
+import numpy as np
+# Show that 2 layer MLP (with manually chosen weights) can solve the XOR problem
+# xor-heaviside.py
+import numpy as np
+import matplotlib.pyplot as plt
+def heaviside(z):
+    return (z >= 0).astype(z.dtype)
+def mlp_xor(x1, x2, activation=heaviside):
+    return activation(-activation(x1 + x2 - 1.5) + activation(x1 + x2 - 0.5) - 0.5)
+x1s = np.linspace(-0.2, 1.2, 100)
+x2s = np.linspace(-0.2, 1.2, 100)
+x1, x2 = np.meshgrid(x1s, x2s)
+
+z1 = mlp_xor(x1, x2, activation=heaviside)
+z2 = mlp_xor(x1, x2, activation=sigmoid)
+
+plt.figure()
+plt.contourf(x1, x2, z1)
+plt.plot([0, 1], [0, 1], "gs", markersize=20)
+plt.plot([0, 1], [1, 0], "r^", markersize=20)
+plt.title("Activation function: heaviside", fontsize=14)
+plt.grid(True)
+plt.show()
+```
+
 
 
 ### 13.2.1 抑或问题
