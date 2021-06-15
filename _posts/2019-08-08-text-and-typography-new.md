@@ -233,14 +233,14 @@ $$
 
 与 $\textrm{leaky ReLU}$ 相比，它具有平滑函数的优点。
 
-在[Kla+17][^Kla+17]中提出了一种 $\textrm{ELU}$ 的轻微变体，称为 $\textrm{SELU}$（自规范化$\textrm{ELU}$）。 形式为
+在[Kla+17][^Kla17]中提出了一种 $\textrm{ELU}$ 的轻微变体，称为 $\textrm{SELU}$（自规范化$\textrm{ELU}$）。 形式为
 
 
 $$
 {\rm{SELU}}(a;\alpha,\lambda)=\lambda{\rm{ELU}}(a;\alpha) \tag{13.15}
 $$
 
-[^Kla+17]: 
+[^Kla17]: 
 
 出乎意料的是，他们证明了通过为 $\alpha$ 和 $\lambda$ 设置精心选择的值，即使不使用 $\textrm{batchnorm}$ 技术（见$\textrm{13.4.5}$节），也可以确保通过激活函数来确保每个网络层的输出是被标准化的（假设输入也已标准化）。 这可以促进模型的拟合。
 
