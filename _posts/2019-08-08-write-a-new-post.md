@@ -169,7 +169,9 @@ The parsing result will automatically add the CDN prefix `https://cdn.com` befor
 
 ## Pinned Posts
 
-You can pin one or more posts to the top of the home page, and the fixed posts are sorted in reverse order according to their release date. Enable by:
+You can pin one[^1] or more posts to the top of the home page, and the fixed posts are sorted in reverse order according to their release date. Enable by:
+
+[^1]: text
 
 ```yaml
 ---
