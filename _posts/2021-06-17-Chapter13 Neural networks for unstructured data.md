@@ -432,8 +432,6 @@ $\textrm{DNN}$ 的“爆发”有几个促成因素。 一是便宜的$\textrm{G
 >
 > > Of course, biological agents are subject to many constraints (e.g., computational, ecological) which often require algorithmic “shortcuts” to the optimal solution; this can explain many of the heuristics that people use in everyday reasoning [KST82; GTA00; Gri20]. As the tasks we want our machines to solve become harder, we may be able to gain insights from other areas of neuroscience and cognitive science (see e.g., [MWK16; Has+17; Lak+17]).
 
-
-
 [^Mar06]: 
 [^Yon19]: 
 [^KST82]: 
@@ -443,3 +441,464 @@ $\textrm{DNN}$ 的“爆发”有几个促成因素。 一是便宜的$\textrm{G
 [^Has17]: 
 [^Lak17]: 
 
+## 13.3 反向传播
+
+在本节，我们将介绍著名的 **反向传播算法**（$\textrm{backpropagation algorithm}$），正如第 $\textrm{13.4}$ 节讨论的，该算法可用于计算损失函数关于网络每一层参数的梯度，并将该梯度传递给基于梯度的优化算法。
+反向传播算法最初由[BH69][^BH69]提出，同时在[Wer74][^Wer74]中被独立发现。 但是，该算法引起“主流”机器学习社区的注意，还要归功于[RHW86][^RHW86]。 关于该算法的更多历史记录，请参考  $\textrm{Wikipedia page}$[^3]。
+为了方便分析，我们首先假设计算图是一个简单的类似于 $\textrm{MLP}$ 的线性链，该线性链中的每一层都是一个线性映射函数。 在这种情况下，反向传播等价于链式法则的重复使用（参考式（$\textrm{B.42}$））。 但是，正如我们在第 $\textrm{13.3.4}$ 节中将要讨论的，该方法可以推广到任意的有向无环图（$\textrm{DAG}$）模型。 整个反向传播算法的过程通常被称为 **自动微分**（$\textrm{automatic differentiation, autodiff}$）。
+
+[^BH69]: 
+[^Wer74]: 
+[^RHW86]: 
+
+[^3]: https://en.wikipedia.org/wiki/Backpropagation#History
+
+### 13.3.1 前向与反向模式微分
+
+考虑一个形式为 $\mathbf{o}=\mathbf{f}(\mathbf{x})$ 的映射函数，其中 $\mathbf{x}\in \mathbb{R}^n$, $\mathbf{o}\in \mathbb{R}^m$。假设函数 $\mathbf{f}$ 由多个子函数组合而成：
+$$
+\mathbf{f}=\mathbf{f}_4 \circ \mathbf{f}_3 \circ \mathbf{f}_2 \circ \mathbf{f}_1 \tag{13.27}
+$$
+其中 $\mathbf{f}_1:\mathbb{R}^n \rightarrow \mathbb{R}^{m_1}$, $\mathbf{f}_2:\mathbb{R}^{m_1} \rightarrow \mathbb{R}^{m_2}$, $\mathbf{f}_3:\mathbb{R}^{m_2} \rightarrow \mathbb{R}^{m_3}$, $\mathbf{f}_4:\mathbb{R}^{m_3} \rightarrow \mathbb{R}^{m}$。 为了得到最终的结果 $\mathbf{o}=\mathbf{f}(\mathbf{x})$,  需要依次计算中间过程 $\mathbf{x}_2=\mathbf{f}_1(\mathbf{x})$, $\mathbf{x}_3=\mathbf{f}_2(\mathbf{x}_2)$, $\mathbf{x}_4=\mathbf{f}_3(\mathbf{x}_3)$, $\mathbf{o}=\mathbf{f}_4(\mathbf{x}_4)$。
+
+我们可以使用链式法则计算雅各比 （$\textrm{Jacobian}$） $\mathbf{J}_\mathbf{f}(\mathbf{x})=\frac{\partial \mathbf{o}}{\partial \mathbf{x}}\in \mathbb{R}^{m\times n}$：
+$$
+\begin{align}
+\frac{\partial \mathbf{o}}{\partial \mathbf{x}} = & \frac{\partial \mathbf{o}}{\partial \mathbf{x}_4}\frac{\partial \mathbf{x}_4}{\partial \mathbf{x}_3}\frac{\partial \mathbf{x}_3}{\partial \mathbf{x}_2}\frac{\partial \mathbf{x}_2}{\partial \mathbf{x}} = \frac{\partial \mathbf{f}_4(\mathbf{x}_4)}{\partial \mathbf{x}_4}\frac{\partial \mathbf{f}_3(\mathbf{x}_3)}{\partial \mathbf{x}_3}\frac{\partial \mathbf{f}_2(\mathbf{x}_2)}{\partial \mathbf{x}_2}\frac{\partial \mathbf{f}_1(\mathbf{x})}{\partial \mathbf{x}} \tag{13.28} \\
+= & \mathbf{J}_{\mathbf{f}_4}(\mathbf{x}_4)\mathbf{J}_{\mathbf{f}_3}(\mathbf{x}_3)\mathbf{J}_{\mathbf{f}_2}(\mathbf{x}_2)\mathbf{J}_{\mathbf{f}_1}(\mathbf{x}_1) \tag{13.29}
+\end{align}
+$$
+我们现在讨论如何高效地计算雅各比 $\mathbf{J}_\mathbf{f}(\mathbf{x})$。回顾雅各比的定义：
+$$
+\mathbf{J}_\mathbf{f}(\mathbf{x}) = \frac{\partial \mathbf{f}(\mathbf{x})}{\partial \mathbf{x}}= 
+\begin{pmatrix}
+\frac{\partial f_1}{\partial x_1} & \cdots & \frac{\partial f_1}{\partial x_n} \\
+\vdots & \ddots & \vdots \\
+\frac{\partial f_m}{\partial x_1} & \cdots & \frac{\partial f_m}{\partial x_n}
+\end{pmatrix} 
+=
+\begin{pmatrix}
+\nabla f_1(\mathbf{x})^{\rm{T}} \\
+\vdots \\
+\nabla f_m(\mathbf{x})^{\rm{T}}
+\end{pmatrix}
+=
+\begin{pmatrix}
+\frac{\partial \mathbf{f}}{\partial x_1}, & \cdots, \frac{\partial \mathbf{f}}{\partial x_n}
+\end{pmatrix}
+ \in \mathbb{R}^{m\times n} \tag{13.30}
+$$
+其中 $\nabla f_i(\mathbf{x})^{\rm{T}} \in \mathbb{R} ^ {1 \times n}$ 为第 $i$ 行 （ $i = 1:m$ ） ，$\frac{\partial \mathbf{f}}{\partial x_j} \in \mathbb{R}^m$ 为第 $j$ 列 （$j = 1:n$）。值得注意的是， 当 $m = 1$ 时， 梯度表示为 $\nabla \mathbf{f}(\mathbf{x})$ ，其形状与 $\mathbf{x}$ 相同，即是一个列向量，然而，此时 $\mathbf{J}_{\mathbf{f}}(\mathbf{x})$ 是一个行向量，在这种情况下，我们令 $\nabla \mathbf{f}(\mathbf{x}) = \mathbf{J}_{\mathbf{f}}(\mathbf{x})^ {\rm{T}} $。
+
+我们可以通过向量雅各比乘（$\textrm{vector Jacobian product，VJP}$）$\mathbf{e}_i^{\rm{T}}\mathbf{J}_\mathbf{f}(\mathbf{x})$ 从 $\mathbf{J}_\mathbf{f}(\mathbf{x})$ 中提取第 $i$ 行，其中 $\mathbf{e}_i \in \mathbb{R}^m$ 表示单位基向量。类似地，我们可以使用雅各比向量乘（$\textrm{Jacobian vector product, JVP}$）$\mathbf{J}_\mathbf{f}(\mathbf{x})\mathbf{e}_j$ 从 $\mathbf{J}_\mathbf{f}(\mathbf{x})$ 中提取第 $j$ 列，其中 $\mathbf{e}_j \in \mathbb{R}^n$。 因此 $\mathbf{J}_\mathbf{f}(\mathbf{x})$ 的计算可以退化为 $\textrm{n}$ 个 $\textrm{JVPs}$ 或 $\textrm{m}$ 个 $\textrm{VJPs}$。
+
+如果 $n \lt m$，计算 $\mathbf{J}_\mathbf{f}(\mathbf{x})$ 的高效方法是，对每一列 $j=1:n$ 使用 $\textrm{JVPs}$， 并在计算的过程中使用从右到左的计算顺序。右乘列向量的形式为：
+$$
+\mathbf{J}_{\mathbf{f}}(\mathbf{x}) \mathbf{v}=\underbrace{\mathbf{J}_{\mathbf{f}_{4}}\left(\mathbf{x}_{4}\right)}_{m \times m_{3}} \underbrace{\mathbf{J}_{\mathrm{f}_{3}}\left(\mathbf{x}_{3}\right)}_{m_{3} \times m_{2}} \underbrace{\mathbf{J}_{\mathrm{f}_{2}}\left(\mathbf{x}_{2}\right)}_{m_{2} \times m_{1}} \underbrace{\mathbf{J}_{\mathbf{f}_{1}}\left(\mathbf{x}_{1}\right)}_{m_{1} \times n} \underbrace{\mathbf{v}}_{n \times 1} \tag{13.31}
+$$
+上式可以通过**前向模式微分**（$\textrm{forward mode differentiation}$）得到；算法 $\textrm{5}$ 给出了伪代码。假设 $m=1$，同时 $n=m_1=m_2=m_3$，计算 $\mathbf{J}_\mathbf{f}(\mathbf{x})$ 的时间复杂度为 $O(n^3)$。
+
+
+
+> $\textrm{Algorithm 5}$: 前向模式微分
+>
+> 1. $\mathbf{x}_{1}:=\mathbf{x}$
+>
+> 2. $\mathbf{v}_{j}:=\mathbf{e}_{j} \in \mathbb{R}^{n}$ for $j=1: n$
+>
+> 3. $\textbf{for}$ $k=1:K$ $\textbf{do}$
+>
+> 4. > $\mathbf{x}_{k+1}=\mathbf{f}_{k}\left(\mathbf{x}_{k}\right)$
+>
+> 5. > $\mathbf{v}_{j}:=\mathbf{J}_{\mathbf{f}_{k}}\left(\mathbf{x}_{k}\right) \mathbf{v}_{j}$ for $j=1: n$
+>
+> 6. $\textrm{Return}$ $\mathbf{o}=\mathbf{x}_{K+1},\left[\mathbf{J}_{\mathbf{f}}(\mathbf{x})\right]_{:, j}=\mathbf{v}_{j}$ $\textrm{for}$ $j=1: n$
+
+
+
+如果 $n \gt m$ （比如说，输出是一个标量），高效的计算方式是，对每一行 $i = 1 : m$ 使用 $\textrm{VJPs}$， 并采用从左到右的计算方式。左乘行向量 $\mathbf{u}^{\rm{T}}$ 的形式为
+$$
+\mathbf{u}^{\top} \mathbf{J}_{\mathbf{f}}(\mathbf{x})=\underbrace{\mathbf{u}^{\top}}_{1 \times m} \underbrace{\mathbf{J}_{\mathrm{f}_{4}}\left(\mathbf{x}_{4}\right)}_{m \times m_{3}} \underbrace{\mathbf{J}_{\mathbf{f}_{3}}\left(\mathbf{x}_{3}\right)}_{m_{3} \times m_{2}} \underbrace{\mathbf{J}_{\mathbf{f}_{2}}\left(\mathbf{x}_{2}\right)}_{m_{2} \times m_{1}} \underbrace{\mathbf{J}_{\mathbf{f}_{1}}\left(\mathbf{x}_{1}\right)}_{m_{1} \times n} \tag{13.32}
+$$
+上式可以通过使用**反向模式微分** （$\textrm{reverse mode differentiation}$）。算法 $6$ 给出了伪代码。假设 $m = 1$， 同时 $n = m_1=m_2=m_3$，其计算复杂度为 $O(n^2)$。
+
+
+
+>$\textrm{Algorithm 6}$: 反向模式微分
+>
+>1. $\mathbf{x}_{1}:=\mathbf{x}$
+>
+>2. $\textbf{for}$ $k=1:K$ $\textbf{do}$
+>
+>3. > $\mathbf{x}_{k+1}=\mathbf{f}_{k}\left(\mathbf{x}_{k}\right)$
+>
+>4. $\mathbf{u}_{i}:=\mathbf{e}_{i} \in \mathbb{R}^{m}$ $\textrm{for}$ $i=1: m$
+>
+>5. $\textbf{for}$ $k=K:1$ $\textbf{do}$
+>
+>6. > $\mathbf{u}_{i}^{\top}:=\mathbf{u}_{i}^{\top} \mathbf{J}_{\mathbf{f}_{k}}\left(\mathbf{x}_{k}\right)$ $\textbf{for}$ $i=1: m$
+>
+>7. $\textrm{Return}$ $\mathbf{o}=\mathbf{x}_{K+1},\left[\mathbf{J}_{\mathbf{f}}(\mathbf{x})\right]_{i,:}=\mathbf{u}_{i}^{\top}$ $\textrm{for}$  $i=1: m$
+
+
+
+### 13.3.2 用于多层感知机的反向模式微分
+
+在之前的章节中，我们仅仅考虑了一个简单的线性链式前馈网络，其中的每一层都不包含可学习的参数。本节，每一层网络层包含参数 $\mathbf{\theta}_1,...,\mathbf{\theta}_4$，如图 $13.12$ 所示。我们集中讨论最终输出为标量的情况：$\mathcal{L}:\mathbb{R}^n\rightarrow \mathbb{R}$。举例来说，考虑作用于包含一个隐藏层的  $\textrm{MLP}$ 的 $l_2$ 损失函数：
+$$
+\mathcal{L}((\mathbf{x}, \mathbf{y}), \boldsymbol{\theta})=\frac{1}{2}\left\|\mathbf{y}-\mathbf{W}_{2} \varphi\left(\mathbf{W}_{1} \mathbf{x}\right)\right\|_{2}^{2} \tag{13.33}
+$$
+我们可以将上式表示为如下的前馈网络模型：
+$$
+\begin{align}
+\mathcal{L} &=\mathbf{f}_{4} \circ \mathbf{f}_{3} \circ \mathbf{f}_{2} \circ \mathbf{f}_{1}  \tag{13.34} \\ 
+\mathbf{x}_{2} &=\mathbf{f}_{1}\left(\mathbf{x}, \boldsymbol{\theta}_{1}\right)=\mathbf{W}_{1} \mathbf{x} \tag{13.35} \\
+\mathbf{x}_{3} &=\mathbf{f}_{2}\left(\mathbf{x}_{2}, \emptyset\right)=\varphi\left(\mathbf{x}_{2}\right) \tag{13.36} \\
+\mathbf{x}_{4} &=\mathbf{f}_{3}\left(\mathbf{x}_{3}, \boldsymbol{\theta}_{3}\right)=\mathbf{W}_{2} \mathbf{x}_{3} \tag{13.37} \\
+\mathcal{L} &=\mathbf{f}_{4}\left(\mathbf{x}_{4}, \mathbf{y}\right)=\frac{1}{2}\left\|\mathbf{x}_{4}-\mathbf{y}\right\|^{2} \tag{13.38}
+\end{align}
+$$
+我们用符号 $\mathbf{f}_k(\mathbf{x}_k,\boldsymbol{\theta}_k)$ 表示层 $k$ 的函数，其中 $\mathbf{x}_k$ 为上一层的输出， $\boldsymbol{\theta}_k$ 表示该层的可选参数。
+
+在这个例子中，最后层的输出为一个标量，因为它对应于一个损失函数 $\mathcal{L}\in \mathbb{R}$。所以使用反向模式微分计算梯度向量的效率更高。
+
+我们首先讨论如何计算标量输出关于每一层中参数的梯度。我们可以使用矢量微积分直接计算 $\frac{\partial L}{\partial \boldsymbol{\theta}_{4}}$。对于中间项，我们使用链式法则：
+$$
+\begin{align}
+\frac{\partial \mathcal{L}}{\partial \boldsymbol{\theta}_{3}}&=\frac{\partial \mathcal{L}}{\partial \mathbf{x}_{4}} \frac{\partial \mathbf{x}_{4}}{\partial \boldsymbol{\theta}_{3}} \tag{13.39}\\
+\frac{\partial \mathcal{L}}{\partial \boldsymbol{\theta}_{2}}&=\frac{\partial \mathcal{L}}{\partial \mathbf{x}_{4}} \frac{\partial \mathbf{x}_{4}}{\partial \mathbf{x}_{3}} \frac{\partial \mathbf{x}_{3}}{\partial \boldsymbol{\theta}_{2}} \tag{13.40} \\
+\frac{\partial \mathcal{L}}{\partial \boldsymbol{\theta}_{1}}&=\frac{\partial \mathcal{L}}{\partial \mathbf{x}_{4}} \frac{\partial \mathbf{x}_{4}}{\partial \mathbf{x}_{3}} \frac{\partial \mathbf{x}_{3}}{\partial \mathbf{x}_{2}} \frac{\partial \mathbf{x}_{2}}{\partial \boldsymbol{\theta}_{1}} \tag{13.41}
+\end{align}
+$$
+其中 $\frac{\partial \mathcal{L}}{\partial \boldsymbol{\theta}_{k}}=\left(\nabla_{\boldsymbol{\theta}_{k}} \mathcal{L}\right)^{\top}$ 是一个 $d_k$ 维的行向量，$d_k$ 为层 $k$ 的参数数量。我们发现这些值可以通过递归方式进行计算，即将 $k$ 层的梯度行向量与大小为 $n_{k} \times n_{k-1}$ 的雅各比 $\frac{\partial \mathbf{x}_{k}}{\partial \mathbf{x}_{k-1}}$ 相乘，其中 $n_k$ 为层 $k$ 的隐藏节点的数量。算法 $7$ 给出了伪代码。
+
+
+
+> $\textrm{Algorithm 7}$: 含 $K$ 层的 $\textrm{MLP}$ 的反向传播算法
+>
+> 1. $\textrm{// Forward pass}$
+>
+> 2. $\mathbf{x}_{1}:=\mathbf{x}$
+>
+> 3. $\textbf{for}$ $k=1:K$ $\textbf{do}$
+>
+> 4. > $\mathbf{x}_{k+1}=\mathbf{f}_{k}\left(\mathbf{x}_{k}, \pmb{\theta}_k\right)$
+>
+> 5. $\textrm{// Backward pass}$
+>
+> 6. $\mathbf{u}_{K+1} := \mathbf{1}$
+>
+> 7. $\textbf{for}$ $k=K:1$ $\textbf{do}$
+>
+> 8. > $\mathbf{g}_{k}:=\mathbf{u}_{k+1}^{\top} \frac{\partial \mathbf{f}_{k}\left(\mathbf{x}_{k}, \boldsymbol{\theta}_{k}\right)}{\partial \boldsymbol{\theta}_{k}}$
+>
+> 9. > $\mathbf{u}_{k}^{\top}:=\mathbf{u}_{k+1}^{\top} \frac{\partial \mathbf{f}_{k}\left(\mathbf{x}_{k}, \boldsymbol{\theta}_{k}\right)}{\partial \mathbf{x}_{k}}$
+>
+> 10. $\textrm{// Output}$
+>
+> 11. $\textrm{Return}$ $\mathcal{L}=\mathrm{x}_{K+1}, \nabla_{\mathbf{x}} \mathcal{L}=\mathbf{u}_{1},\left\{\nabla_{\boldsymbol{\theta}_{k}} \mathcal{L}=\mathrm{g}_{k}: k=1: K\right\}$
+
+
+
+该算法计算出损失关于每一层参数的梯度。同时还计算了损失关于输入的梯度 $\nabla_{\mathbf{x}} \mathcal{L} \in \mathbb{R}^{n}$ ，其中 $n$ 表述输入的维度。后一项对于参数的学习并不需要，但对于生成输入的模型来说却是有用的（见 $ 14.5$ 节）。
+
+剩下的部分就是如何计算相关层的向量雅各比乘（$\textrm{VJP}$）。其中的细节取决于每一层函数的具体形式。我们在下文讨论一些具体的例子。
+
+### 13.3.3 常规层的向量雅各比乘
+
+回顾形式为 $\mathbf{f}:\mathbb{R}^n\rightarrow \mathbb{R}^m$ 的网络层的雅各比矩阵：
+$$
+\mathbf{J}_{\mathbf{f}}(\mathbf{x})=\frac{\partial \mathbf{f}(\mathbf{x})}{\partial \mathbf{x}}=\left(\begin{array}{ccc}
+\frac{\partial f_{1}}{\partial x_{1}} & \cdots & \frac{\partial f_{1}}{\partial x_{n}} \\
+\vdots & \ddots & \vdots \\
+\frac{\partial f_{m}}{\partial x_{1}} & \cdots & \frac{\partial f_{m}}{\partial x_{n}}
+\end{array}\right)=\left(\begin{array}{c}
+\nabla f_{1}(\mathbf{x})^{\top} \\
+\vdots \\
+\nabla f_{m}(\mathbf{x})^{\top}
+\end{array}\right)=\left(\frac{\partial \mathbf{f}}{\partial x_{1}}, \cdots, \frac{\partial \mathbf{f}}{\partial x_{n}}\right) \in \mathbb{R}^{m \times n} \tag{13.42}
+$$
+其中 $\nabla f_{i}(\mathbf{x})^{\top} \in \mathbb{R}^{n}$ 表示第 $i$ 行 （$i = 1:m$），$\frac{\partial \mathbf{f}}{\partial x_{j}} \in \mathbb{R}^{m}$ 为第 $j$ 列（$j=1:n$）。本节，我们将描述如何计算常规层的 $\textrm{VJP}$ $\mathbf{u}^{\top} \mathbf{J}_{\mathbf{f}}(\mathbf{x})$ 。
+
+#### 13.3.3.1 交叉熵层
+
+考虑一个交叉熵损失层，其输入为 $\textrm{logits}$ $\mathbf{x}$ 和真实标签 $\mathbf{y}$， 损失层返回一个标量：
+$$
+z=f(\mathbf{x})=\text { CrossEntropyWithLogits }(\mathbf{y}, \mathbf{x})=-\sum_{c} y_{c} \log p_{c} \tag{13.43}
+$$
+其中 $\mathbf{p}=\mathcal{S}(\mathbf{x})=\frac{e^{x_{c}}}{\sum_{c^{\prime}=1}^{C} e^{x_{c^{\prime}}}}$ 表示预测的类别概率值， $\mathbf{y}$ 为标签的 $\textrm{one-hot}$ 编码。（所以 $\mathbf{p}$ 和 $\mathbf{y}$ 都是 维度为 $C$ 的概率单纯形。）关于输入的雅各比为：
+$$
+\mathbf{J}=\frac{\partial z}{\partial \mathbf{x}}=(\mathbf{p}-\mathbf{y})^{\top} \in \mathbb{R}^{1 \times C} \tag{13.44}
+$$
+为了说明这一点，假设目标的真实类别为 $c$。 我们有
+$$
+z=f(\mathbf{x})=-\log \left(p_{c}\right)=-\log \left(\frac{e^{x_{c}}}{\sum_{j} e^{x_{j}}}\right)=\log \left(\sum_{j} e^{x_{j}}\right)-x_{c} \tag{13.45}
+$$
+所以
+$$
+\frac{\partial z}{\partial x_{i}}=\frac{\partial}{\partial x_{i}} \log \sum_{j} e^{x_{j}}-\frac{\partial}{\partial x_{i}} x_{c}=\frac{e^{x_{i}}}{\sum_{j} e^{x_{j}}}-\frac{\partial}{\partial x_{i}} x_{c}=p_{i}-\mathbb{I}(i=c) \tag{13.46}
+$$
+如果我们定义 $\mathbf{y}=[\mathbb{I}(i=c)]$ ，我们将获得式 ($13.44$)。需要注意的是该层的雅各比是一个行向量，因为输出是一个标量。  对应的 $\textrm{VJP}$ 为 $\mathbf{u}^{\top} \mathbf{J}$ ，其中 $\mathbf{u} \in \mathbb{R}$ 。
+
+#### 13.3.3.2 逐元素非线性 
+
+考虑使用逐元素非线性的网络层 $\mathbf{z}=\mathbf{f}(\mathbf{x})=\varphi(\mathbf{x})$ ，所以 $z_{i}=\varphi\left(x_{i}\right)$ 。雅各比的 $(i,j)$ 元素值为：
+$$
+\frac{\partial z_{i}}{\partial x_{j}}=\left\{\begin{array}{ll}
+\varphi^{\prime}\left(x_{i}\right) & \text { if } i=j \\
+0 & \text { otherwise }
+\end{array}\right. \tag{13.47}
+$$
+其中 $\varphi^{\prime}(a)=\frac{d}{d a} \varphi(a)$。换句话说， 关于输入的雅各比为
+$$
+\mathbf{J}=\frac{\partial \mathbf{f}}{\partial \mathbf{x}}=\operatorname{diag}\left(\varphi^{\prime}(\mathbf{x})\right) \tag{13.48}
+$$
+对于任意一个向量 $\mathbf{u}$， 我们可以将 $\mathbf{J}$ 的对角元素与向量 $\mathbf{u}$ 进行逐元素相乘，得到 $\mathbf{u}^{\top} \mathbf{J}$。举例来说，如果
+$$
+\varphi(a)=\operatorname{ReLU}(a)=\max (a, 0) \tag{13.49}
+$$
+我们有
+$$
+\varphi^{\prime}(a)=\left\{\begin{array}{ll}
+0 & a<0 \\
+1 & a>0
+\end{array}\right. \tag{13.50}
+$$
+其中 $a=0$ 处的亚梯度（见 $\textrm{B.4.4}$）为处于 $[0,1]$ 区间的任意值。 通常情况下等于 $0$。所以
+$$
+\operatorname{ReLU}^{\prime}(a)=H(a) \tag{13.51}
+$$
+其中 $H$ 为单位阶跃函数。
+
+#### 13.3.3.3 线性层
+
+现在考虑一个线性层，$\mathbf{z}=\mathbf{f}(\mathbf{x}, \mathbf{W})=\mathbf{W} \mathbf{x}$ ，其中  $\mathbf{W} \in \mathbb{R}^{m \times n}$ , 所以 $\mathbf{x} \in \mathbb{R}^{n}$ ，$\mathbf{z} \in \mathbb{R}^{m}$。我们可以计算关于输入向量的雅各比， $\mathbf{J}=\frac{\partial \mathbf{z}}{\partial \mathbf{x}} \in \mathbb{R}^{m \times n}$ 。注意到
+$$
+z_{i}=\sum_{k=1}^{n} W_{i k} x_{k} \tag{13.52}
+$$
+所以雅各比的 $(i,j)$ 项为
+$$
+\frac{\partial z_{i}}{\partial x_{j}}=\frac{\partial}{\partial x_{j}} \sum_{k=1}^{n} W_{i k} x_{k}=\sum_{k=1}^{n} W_{i k} \frac{\partial}{\partial x_{j}} x_{k}=W_{i j} \tag{13.53}
+$$
+因为 $\frac{\partial}{\partial x_{j}} x_{k}=\mathbb{I}(k=j)$ 。所以关于输入的雅各比为
+$$
+\mathbf{J}=\frac{\partial \mathbf{z}}{\partial \mathbf{x}}=\mathbf{W} \tag{13.54}
+$$
+$\mathbf{u}^{\top} \in \mathbb{R}^{1 \times m}$ 与 $\mathbf{J} \in \mathbb{R}^{m \times n}$ 的 $\textrm{VJP}$ 为
+$$
+\mathbf{u}^{\top} \frac{\partial \mathbf{z}}{\partial \mathbf{x}}=\mathbf{u}^{\top} \mathbf{W} \in \mathbb{R}^{1 \times n} \tag{13.55}
+$$
+我们现在考虑关于权重矩阵的雅各比 $J=\frac{\partial \mathbf{z}}{\partial \mathbf{W}}$ 。它可以表示为一个 $m\times(m\times n)$的矩阵，处理起来会比较麻烦。所以取而代之的，我们关注对单个权重 $W_{ij}$ 的梯度。这个就比较容易计算了，因为 $\frac{\partial \mathbf{z}}{\partial W_{i j}}$ 是一个向量。为了计算该值，注意到
+$$
+\begin{align}
+z_{k} &=\sum_{l=1}^{m} W_{k l} x_{l} \tag{13.56} \\
+\frac{\partial z_{k}}{\partial W_{i j}} &=\sum_{l=1}^{m} x_{l} \frac{\partial}{\partial W_{i j}} W_{k l}=\sum_{l=1}^{m} x_{l} \mathbb{I}(i=k \text { and } j=l) \tag{13.57}
+\end{align}
+$$
+所以
+$$
+\frac{\partial \mathbf{z}}{\partial W_{i j}}=\left(\begin{array}{lllllll}
+0 & \cdots & 0 & x_{j} & 0 & \cdots & 0
+\end{array}\right)^{\top} \tag{13.58}
+$$
+其中非零项处在位置 $i$。$\mathbf{u}^{\top} \in \mathbb{R}^{1 \times m}$ 与 $\frac{\partial \mathbf{z}}{\partial \mathbf{W}} \in \mathbb{R}^{m \times(m \times n)}$ 之间的 VJP 可以表示为一个形状为 $1 \times(m \times n)$ 的矩阵。需要注意的是
+$$
+\mathbf{u}^{\top} \frac{\partial \mathbf{z}}{\partial W_{i j}}=\sum_{k=1}^{m} u_{k} \frac{\partial z_{k}}{\partial W_{i j}}=u_{i} x_{j} \tag{13.59}
+$$
+所以
+$$
+\left[\mathbf{u}^{\top} \frac{\partial \mathbf{z}}{\partial \mathbf{W}}\right]_{1,:}=\mathbf{u x}^{\top} \in \mathbb{R}^{m \times n} \tag{13.60}
+$$
+
+#### 13.3.3.4 将它们放在一起
+
+练习 $13.1$ 需要将它们放在一起
+
+### 13.3.4 计算图
+
+$\textrm{MLPs}$ 是一种简单的 $\textrm{DNN}$ 模型，其中每一层的输出直接输入下一层，从而形成一个链式结构，如图 $13.12$ 所示。然而，最新的 $\textrm{DNN}$ 模型可以以更加复杂地方式组合可微的部件，从而构成一个 **计算图**（$\textrm{computation graph}$），这一点类似于程序员将初等函数组合成更加复杂的函数。（的确，有些人也建议将 “深度学习” 称为 “**可微编程**”（$\textrm{differentiable programming}$））唯一的约束在于最终的计算图对应于一个**有向无环图**（$\textrm{directed ayclic graph, DAG}$），其中每一个节点都是关于输入可微的函数。
+
+举个例子，考虑函数
+$$
+f\left(x_{1}, x_{2}\right)=x_{2} e^{x_{1}} \sqrt{x_{1}+x_{2} e^{x_{1}}} \tag{13.61}
+$$
+我们可以使用图 $13.13$ 中的 $\textrm{DAG}$ 进行计算，其中包含如下的中间函数：
+$$
+\begin{align}{l}
+x_{3}& =f_{3}\left(x_{1}\right)=e^{x_{1}} \tag{13.62} \\
+x_{4}& =f_{4}\left(x_{2}, x_{3}\right)=x_{2} x_{3}  \tag{13.63} \\
+x_{5}& =f_{5}\left(x_{1}, x_{4}\right)=x_{1}+x_{4} \tag{13.64}\\
+x_{6}& =f_{6}\left(x_{5}\right)=\sqrt{x_{5}} \tag{13.65} \\
+x_{7}& =f_{7}\left(x_{4}, x_{6}\right)=x_{4} x_{6} \tag{13.66}
+\end{align}
+$$
+值得注意的是我们已经按照拓扑结构对节点进行了编号（父节点在子节点之前）。在反向传播期间，因为计算图不再是链式结构，我们需要对多条路径的梯度进行求和。举例来说，因为 $x_4$ 影响 $x_5$ 和 $x_7$，我们有
+$$
+\frac{\partial \mathrm{o}}{\partial \mathrm{x}_{4}}=\frac{\partial \mathrm{o}}{\partial \mathrm{x}_{5}} \frac{\partial \mathrm{x}_{5}}{\partial \mathrm{x}_{4}}+\frac{\partial \mathrm{o}}{\partial \mathrm{x}_{7}} \frac{\partial \mathrm{x}_{7}}{\partial \mathrm{x}_{4}} \tag{13.67}
+$$
+通过拟拓扑顺序的计算方式，我们可以避免重复计算
+$$
+\begin{align}
+\frac{\partial \mathbf{o}}{\partial \mathbf{x}_{7}}= & \frac{\partial \mathbf{x}_{7}}{\partial \mathbf{x}_{7}}=\mathbf{I}_{m} \tag{13.68} \\
+\frac{\partial \mathbf{o}}{\partial \mathbf{x}_{6}}= & \frac{\partial \mathbf{o}}{\partial \mathbf{x}_{7}} \frac{\partial \mathbf{x}_{7}}{\partial \mathbf{x}_{6}} \tag{13.69}\\
+\frac{\partial \mathbf{o}}{\partial \mathbf{x}_{5}}= & \frac{\partial \mathbf{o}}{\partial \mathbf{x}_{6}} \frac{\partial \mathbf{x}_{6}}{\partial \mathbf{x}_{5}} \tag{13.70} \\
+\frac{\partial \mathbf{o}}{\partial \mathbf{x}_{4}}= & \frac{\partial \mathbf{o}}{\partial \mathbf{x}_{5}} \frac{\partial \mathbf{x}_{5}}{\partial \mathbf{x}_{4}}+\frac{\partial \mathbf{o}}{\partial \mathbf{x}_{7}} \frac{\partial \mathbf{x}_{7}}{\partial \mathbf{x}_{4}} \tag{13.71}
+\end{align}
+$$
+总而言之，我们使用
+$$
+\frac{\partial \mathrm{o}}{\partial \mathrm{x}_{j}}=\sum_{k \in \text { children }(j)} \frac{\partial \mathrm{o}}{\partial \mathrm{x}_{k}} \frac{\partial \mathrm{x}_{k}}{\partial \mathrm{x}_{j}} \tag{13.72}
+$$
+其中我们对节点 $j$ 的所有子节点 $k$ 进行求和，如图 $13.14$ 所示。对于每个子节点 $k$ 的梯度向量 $\frac{\partial \mathbf{o}}{\partial \mathbf{x}_{k}}$ 已经被计算，并被称为**共轭矩阵**（$\textrm{adjoint}$）。该值被每个子节点的雅各比 $\frac{\partial \mathbf{x}_{k}}{\partial \mathbf{x}_{j}}$ 相乘。
+
+通过使用 $\textrm{API}$ 定义静态图，可以提前计算计算图(这就是 $\textrm{Tensorflow 1}$ 的工作原理。）或者，可以通过跟踪函数在输入参数上的执行来“及时”计算图形(这就是 $\textrm{Tensorflow-eager}$ 模式以及 $\textrm{JAX}$ 和 $\textrm{PyTorch}$ 的工作原理。）后一种方法使处理动态图变得更容易，动态图的形状可以根据函数计算的值而改变。
+
+## 13.4 训练神经网络
+
+本节，我们将讨论如何根据数据对 $\textrm{DNNs}$ 进行训练。 最标准的方式是使用最大似然估计，通过最小化负对数似然：
+$$
+\mathcal{L}(\theta)=-\log p(\mathcal{D} \mid \theta)=-\sum_{n=1}^{N} \log p\left(\mathbf{y}_{n} \mid \mathbf{x}_{n} ; \theta\right) \tag{13.73}
+$$
+通常情况下，也会增加一个正则项（比如负对数先验），正如我们在13.5节讨论的那样。
+
+原则上，我们可以使用 $\textrm{backprop}$ 算法（第 $13.3$ 节）来计算这种损失的梯度，并将其传递给现成的优化器，如第$5$ 章中所讨论的优化器。（第 $5.4.6.3$ 节中的 $\textrm{Adam}$ 优化器是一个流行的选择，因为它能够扩展到大型数据集（由于是 $\textrm{SGD}$ 类型的算法），并且能够相当快速地收敛（由于使用对角预处理和动量）。）但是，在实践中，这可能不起作用。在本节中，我们将讨论可能出现的各种问题，以及一些解决方案。有关 $\textrm{DNN}$ 训练实践的更多详细信息，请参阅各种其他书籍，如[HG20][^HG20]；[Zha+19a][^Zha19a]；[Ger19][^Ger19]。
+
+除了实践问题，还有重要的理论问题。特别地，我们注意到 $\textrm{DNN}$ 损失不是一个凸目标，所以通常我们无法找到全局最优解。尽管如此，$\textrm{SGD}$ 总能找到令人惊讶的好办法。为什么会这样的研究仍在进行中；参见[Bah+20][^Bah20]最近对一些工作的回顾。
+
+[^HG20]:
+[^Zha19a]:
+[^Ger19]:
+[^Bah20]:
+
+### 13.4.1 调整学习率
+
+在用 $\textrm{SGD}$ 拟合 $\textrm{DNN}$ 时，调整学习速率对于良好的性能非常重要。在第 $5.4.3$ 节中，我们讨论了 $\textrm{SGD}$ 的学习率若要收敛到局部最优值必须满足的必要条件，但是这些条件并没有精确地指定要使用什么样的学习率调度。
+
+在深度学习文献中，提出了许多启发式方法，其中一些方法如图 $13.15$ 所示。其中包括分段常数计划（图$\textrm{13.15b}$）、余弦或周期计划（图$\textrm{13.15c}$）、单周期计划（图$\textrm{13.15d}$）等（后者从一个较小的值开始，以防止参数“爆炸”，然后升温，直到找到一个良好的吸引盆，然后冷却，以找到局部最小值）
+
+除了选择衰减时间表外，还需要选择初始学习率 $\eta_{0}$。一种常见的启发式方法，在[BCN18][^BCN18]中提出。在[Smi18][^Smi18]中（他称之为“学习速率发现器”）的独立定义如下：从一个小值开始，计算小批量的训练或验证损失，然后依次尝试更大的（每一步增加$10$倍），直到损失在 $\eta_{\max }$“爆发”。 举例来说，在图$13.16$中，我们发现 $\eta_{\max } \approx 0.1$ 。然后我们将 $\eta_{0}$ 设置为比 $\eta_{\mathrm{max}}$ 稍小的值 （比如说，小于$10$倍）。
+
+[^BCN18]:
+[^Smi18]:
+
+### 13.4.2 梯度消失问题
+
+在某些 $\textrm{DNN}$ 中，梯度信号在通过网络传播回来时变为 $0$，这阻止了学习的发生。这就是所谓的消失梯度问题。[GB10][^GB10]。
+
+为了了解它为什么会发生，让我们考虑一下 $\textrm{sigmoid}$ 激活函数
+$$
+\varphi(a)=\sigma(a)=\frac{1}{1+\exp (-a)} \tag{13.74}
+$$
+上式的导数为
+$$
+\varphi^{\prime}(a)=\sigma(a)(1-\sigma(a)) \tag{13.75}
+$$
+现在考虑网络层 $\mathbf{z}=\sigma(\mathbf{W} \mathbf{x})$ 。假设这是最后一层，所以 $\delta=\frac{\partial \mathbf{f}(\mathbf{x}, \boldsymbol{\theta})}{\partial \mathbf{x}} = \mathbf{z}(1-\mathbf{z})$ 。使用 $13.3.3$ 节中的结果，我们该激活函数的局部梯度为
+$$
+\frac{\partial \mathcal{L}}{\partial \mathbf{x}}=\delta^{\top} \mathbf{W}=\mathbf{W}^{\top} \mathbf{z}(1-\mathbf{z}) \tag{13.76}
+$$
+并且
+$$
+\frac{\partial \mathcal{L}}{\partial \mathbf{W}}=\delta \mathbf{x}^{\top}=\mathbf{z}(1-\mathbf{z}) \mathbf{x}^{\top} \tag{13.77}
+$$
+如果权重被初始化为大（正或负），那么 $\mathbf{W}{\mathrm{x}}$ 的（某些分量）很容易取大值，因此 $\mathbf{z}$ 在 $0$ 或 $1$ 附近饱和，因为$\textrm{sigmoid}$ 饱和，如图 $\textrm{13.17a}$ 所示。在任何一种情况下，我们都可以看到梯度将变为 $0$，如图 $\textrm{13.17b}$ 所示。
+
+解决梯度消失问题的标准方案是使用 $\textrm{ReLU}$ 激活函数。所以假设我们使用 $\mathbf{z}=\operatorname{ReLU}\left(\mathbf{Wx}\right)$，其中
+$$
+\operatorname{ReLU}(a)=\max (a, 0) \tag{13.78}
+$$
+梯度为
+$$
+\operatorname{ReLU}^{\prime}(a)=\mathbb{I}(a>0) \tag{13.79}
+$$
+假设这是最后一层，所以 $\delta=\frac{\partial \mathbf{f}(\mathbf{x}, \boldsymbol{\theta})}{\partial \mathbf{x}}=\mathbb{I}(\mathbf{z}>\mathbf{0})$ 。使用 $13.3.3$ 节的结果，我们发现激活函数的局部梯度为
+$$
+\frac{\partial \mathcal{L}}{\partial \mathbf{x}}=\delta^{\top} \mathbf{W}=\mathbf{W}^{\top} \mathbb{I}(\mathbf{z}>\mathbf{0}) \tag{13.80}
+$$
+并且
+$$
+\frac{\partial \mathcal{L}}{\partial \mathbf{W}}=\delta \mathbf{x}^{\top}=\mathbb{I}(\mathbf{z}>0) \mathbf{x}^{\top} \tag{13.81}
+$$
+如果权重初始化为较大的负值，会容易导致 $\mathbf{Wx}$ 变成较大的负值，进而导致 $\mathbf{z}=0$，如图 $\textrm{13.18a}$  所示。这将会导致关于权重的梯度等于 $0$，如图 $\textrm{13.18b}$ 所示。算法将永远无法逃离这种情况，所以激活单元将永远被关闭。这被称为 "$\textrm{dead relu}$" 问题。这个问题可以通过使用 $\operatorname{ReLU}$ 的非饱和变体进行解决，正如我们在 $13.2.3$ 节中所讨论的那样。
+
+### 13.4.3 训练深度模型的困难
+
+当我们训练非常深的模型的时候，梯度往往会趋向于变得过小（**梯度消失问题**，$\textrm{vanishing gradient problem}$）或过大（**梯度爆炸问题**，$\textrm{exploding gradient problem}$），因为误差信号在经过一系列层的时候会被放大或者抑制。（$\textrm{RNNs}$ 应用于较长序列时，也会出现这种问题，我们将会在 $15.2.5$ 节解释。）
+
+为了更加深入地解释这个问题，考虑损失关于层 $l$ 中某个节点的梯度：
+$$
+\frac{\partial \mathcal{L}}{\partial \mathbf{z}_{l}}=\frac{\partial \mathcal{L}}{\partial \mathbf{z}_{l+1}} \frac{\partial \mathbf{z}_{l+1}}{\partial \mathbf{z}_{l}}=\mathbf{J}_{l} \mathbf{g}_{l+1} \tag{13.82}
+$$
+其中 $\mathbf{J}_{l}=\frac{\partial \mathbf{z}_{l+1}}{\partial \mathbf{z}_{l}}$ 为雅各比矩阵，$\mathbf{g}_{l+1}=\frac{\partial \mathcal{L}}{\partial \mathbf{z}_{l+1}}$ 表示下一层的梯度。如果 $\mathbf{J}_l$ 在不同的层都是一个常数，那么显然最后一层的梯度 $\mathbf{g}_L$ 对层 $l$ 的贡献为 $\mathbf{J}^{L-l} \mathbf{g}_{L}$ 。所以系统的行为将依赖于 $\mathbf{J}$ 的特征向量。
+
+尽管 $\mathbf{J}$ 是一个实数矩阵，但它不是（一般情况下）对称的， 所以它的特征值和特征向量可能是复数， 其中的虚数部分对应着振荡的行为。令 $\lambda$ 表示 $\mathbf{J}$ 的 **谱半径**（$\textrm{spectral radius}$），即特征值的绝对值的最大值。 如果它大于 $1$， 梯度将发生爆炸； 如果小于 $1$， 梯度将会消失。 （类似地， $\mathbf{W}$ 的谱半径， 连接着 $\mathbf{z}_l$ 和 $\mathbf{z}_{l+1}$， 决定了在前向模式下动态系统的稳定性。）
+
+梯度爆炸问题可以通过 **梯度截断**（$\textrm{gradient clipping}$） 来进行改善，当梯度过大时，我们将它的幅值进行截断， 举例来说， 我们使用
+$$
+\mathrm{g}^{\prime}=\min \left(1, \frac{c}{\|\mathrm{~g}\|}\right) \mathrm{g} \tag{13.83}
+$$
+通过这种方式，$\mathrm{g}^{\prime}$ 的范数将不会超过 $c$，但其更新方向始终与 $\mathrm{g}$ 相同。
+
+然而，梯度消失问题却很难解决。有如下几种解决方案：
+
+- 更改模型结构，从而使得梯度的更新通过相加而不是相乘的形式；见 $13.4.4$ 节。
+- 更改模型结构，使每一层的激活值标准化，从而使整个数据集上的激活值的分布在训练期间保持一致； 见 $13.4.5$ 节。
+- 小心地选择参数的初始化值； 见 $13.4.6$ 节。
+
+### 13.4.4 残差连接
+
+对于 $\textrm{DNNs}$ 而言，一种解决梯度消失问题的方案是使用 **残差网络**（$\textrm{residual network, ResNet}$）[He+16a][He16a]。该前向网络中的每一层的形式是一个**残差模块**（$\textrm{residual block}$），定义为
+$$
+\mathcal{F}_{l}^{\prime}(\mathrm{x})=\mathcal{F}_{l}(\mathrm{x})+\mathrm{x} \tag{13.84}
+$$
+其中 $\mathcal{F}_{l}$ 是一个很浅的非线性映射 （比如： 线性层—激活层—线性层）。内部 $\mathcal{F}_{l}$ 函数计算需要添加到输入  $\mathrm{x}$  中以生成所需输出的剩余项或增量；学习对输入产生小扰动通常比直接预测输出更容易。（如第 $14.3.2.4$ 节所述，剩余连接通常与 $\textrm{CNN}$ 一起使用，但也可用于 $\textrm{MLP}$。）
+
+有残差连接的模型与没有残差连接的模型具有相同的参数数量，但是训练起来比较容易。原因是梯度可以直接从输出传递到浅层，如图 $\textrm{13.19b}$ 所示。要看到这一点，请注意，输出层的激活可以通过使用任意浅层 $l$ 的输出得到：
+$$
+\mathrm{z}_{L}=\mathrm{z}_{l}+\sum_{i=l}^{L-1} \mathcal{F}_{i}\left(\mathrm{z}_{i} ; \boldsymbol{\theta}_{i}\right) \tag{13.85}
+$$
+所以我们可以计算损失关于 $l$ 层的梯度：
+$$
+\begin{align}
+\frac{\partial \mathcal{L}}{\partial \boldsymbol{\theta}_{l}} &=\frac{\partial \mathbf{z}_{l}}{\partial \boldsymbol{\theta}_{l}} \frac{\partial \mathcal{L}}{\partial \mathbf{z}_{l}} \tag{13.86} \\
+&=\frac{\partial \mathbf{z}_{l}}{\partial \boldsymbol{\theta}_{l}} \frac{\partial \mathcal{L}}{\partial \mathbf{z}_{L}} \frac{\partial \mathbf{z}_{L}}{\partial \mathbf{z}_{l}} \tag{13.87} \\
+&=\frac{\partial \mathbf{z}_{l}}{\partial \boldsymbol{\theta}_{l}} \frac{\partial \mathcal{L}}{\partial \mathbf{z}_{L}}\left(1+\sum_{i=l}^{L-1} \frac{\partial f\left(\mathbf{z}_{i} ; \boldsymbol{\theta}_{i}\right)}{\partial \mathbf{z}_{l}}\right) \tag{13.88} \\
+&=\frac{\partial \mathbf{z}_{l}}{\partial \boldsymbol{\theta}_{l}} \frac{\partial \mathcal{L}}{\partial \mathbf{z}_{L}}+\text { otherterms } \tag{13.89}
+\end{align}
+$$
+所以我们发现第 $l$ 层的梯度可以直接取决于第 $L$ 层的梯度，并与网络的深度无关。
+
+### 13.4.5 Batch normalization
+
+对DNN架构的另一个流行修改是添加一个层，当在一个小批量中的样本中平均时，该层确保层内激活的分布是零均值和单位方差。这称为**批处理规范化** （$\mathrm{batch\ normalization, BN}$）[IS15][^IS15]。
+
+更准确地说，我们将样本 $n$ （在某一层）的激活向量 $\mathbf{z}_n$ （或者是预激活向量 $\mathbf{a}_n$）替换为 $\tilde{\mathbf{z}}_{n}$ ，计算方式为：
+
+
+$$
+\begin{align}
+\tilde{\mathbf{z}}_{n} & =\pmb{\gamma} \odot \hat{\mathbf{z}}_{n}+\pmb{\beta} \tag{13.90} \\
+\hat{\mathbf{z}}_{n} & =\frac{\mathbf{z}_{n}-\pmb{\mu}_{\mathcal{B}}}{\sqrt{\pmb{\sigma}_{\mathcal{B}}^{2}+\epsilon}} \tag{13.91} \\
+\pmb{\mu}_{\mathcal{B}} & =\frac{1}{|\mathcal{B}|} \sum_{\pmb{\mathbf{z}} \in \mathcal{B}} \mathbf{z} \tag{13.92} \\
+\pmb{\sigma}_{\mathcal{B}}^{2} & =\frac{1}{|\mathcal{B}|} \sum_{\pmb{\mathbf{z}} \in \mathcal{B}}\left(\mathbf{z}-\pmb{\mu}_{\mathcal{B}}\right)^{2} \tag{13.93}
+\end{align}
+$$
+其中 $\mathcal{B}$ 为包含样本 $n$ 的批次，$\pmb{\mu}_\mathcal{B}$ 为该批次的激活值的均值[^4]，$\pmb{\sigma}_{\mathcal{B}}^{2}$ 为对应的方差， $\hat{\mathbf{z}}_{n}$ 表示标准化后的激活向量，$\tilde{\mathbf{z}}_{n}$ 表示经过平移和缩放后的结果 （$\mathrm{BN}$ 层的输出），$\pmb{\beta}$ 和 $\pmb{\gamma}$ 表示该层的可学习参数， $\epsilon>0$ 是一个值很小的常数。考虑到 $\mathrm{BN}$ 是可微的， 我们可以很容易地将梯度反传到该层的输入和 $\mathrm{BN}$的参数 $\pmb{\beta}$ 和 $\pmb{\gamma}$。
+
+[^4]:  当应用于卷积层时，我们平均跨空间位置和跨示例，但不跨通道（因此 $\pmb{\mu}$ 的长度是通道数）。当应用于一个完全连接的层时，我们只需对示例进行平均（因此 $\pmb{\mu}$ 的长度就是层的宽度）。
+
+对于输入层， $\mathrm{batch\ normalization}$ 等价于我们在 $10.2.8$ 节讨论的常规的标准化程序。值得注意的是， 输入层的均值和方差只需要计算一次，因为数据是静态的。然而，中间层的经验均值和方差是不断改变的，因为参数一直在更新。（这通常被称为 “**内协变量漂移**”（$\mathrm{internal\ covariate\ shift}$）。这就是我们需要对每一个批次重新计算 $\pmb{\mu}$ 和 $\pmb{\sigma}^2$ 的原因。
+
+$\mathrm{BN}$ 的作用（在训练速度和稳定性方面）是非常显著的，尤其是对于深度 $\textrm{CNNs}$。具体的原因还不是很清楚， 但 $\mathrm{BN}$ 似乎使优化曲面变得更加平滑 [San+18][^San18]。同时它也降低了对学习率的敏感性 [ALL18][^ALL18]。除了计算方面的优势，它还具备统计上的优势。特别地， $\mathrm{BN}$ 更像一个正则器；事实上，它可以被证明是相当于一种形式的近似贝叶斯推理 [TAS18][^TAS18];[Luo+19][^Luo19]。
+
+然而，依赖于小批量数据会导致几个问题。首先，在小批量训练时，它可能会导致参数估计不稳定，尽管该方法的最新版本称为批量重正化[Iof17][^Iof17]， 该方法部分解决了这个问题。第二，$\mathrm{BN}$ 在推理阶段需要进行调整， 因为在测试阶段时的$\textrm{batch size}$ 可能是 $1$。 标准的计算过程是： 在训练之后， 计算训练集中所有样本在第 $l$ 层的 $\pmb{\mu}_l$ 和 $\pmb{\sigma}_l^2$， 然后”冻结“这些参数， 并将这些值添加到该层其他参数的列表中， 即 $\pmb{\beta}_l$ 和 $\pmb{\gamma}_l$ 。在测试阶段， 我们利用这些冻结的参数计算 $\pmb{\mu}_l$ 和 $\pmb{\sigma}_l^2$， 而不是从测试批次中计算统计量。（所以在使用包含 $\mathrm{BN}$ 的模型中， 我们需要指定模型是用于训练还是测试。）
+
+为了提高速度，我们可以将冻结后的批处理规范层与前一层结合起来。 特别地， 假设前一层计算 $\mathbf{XW}+\mathbf{b}$；将其与 $\mathrm{BN}$ 组合 $\pmb{\gamma}\ \odot(\mathbf{XW+b-\pmb{\mu}})/\pmb{\sigma}\ +\ \pmb{\beta}$。如果我们定义 $\mathbf{W}^{\prime}=\gamma \odot \mathbf{W} / \sigma$ 和 $\mathbf{b}^{\prime}=\gamma \odot(\mathbf{b}-\boldsymbol{\mu}) / \sigma+\boldsymbol{\beta}$ ， 然后我们可以将组合的层写成 $\mathrm{X} \mathrm{W}^{\prime}+\mathrm{b}^{\prime}$。 这被称为 **融合批规范**（$\mathrm{fused\ batchnorm}$）。在训练过程中，可以开发类似的技巧来加速 $\mathrm{BN}$ 计算[Jun+19][^Jun19]。
+
+[^IS15]:
+[^San18]:
+[^ALL18]:
+[^ TAS18]: text
+[^ Luo19]: text
+[^ Iof17]: text
+[^ Jun19]: text
