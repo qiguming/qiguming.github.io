@@ -134,13 +134,13 @@ layout: default
 <script>
     var gitalk  = new Gitalk ({
         id: window.location.pathname,   // Ensure uniqueness and length less than 50
-        clientID: '{ {site.comment_gitalk_clientId} }',
-        clientSecret: '{ {site.comment_gitalk_clientSecret} }',
-        repo: '{ {site.comment_gitalk_repo} }',
-        owner: '{ {site.github_username} }',
-        admin: ['{ {site.github_username} }'],
-		    distractionFreeMode: false  // Facebook-like distraction free mode
-    })
+        clientID: 'b51ad1001051820f33c6',
+        clientSecret: 'e8b07f03f7d33b9558c0ff7257f8a110a8f3357f',
+        repo: 'https://github.com/qiguming/qiguming.github.io',
+        owner: 'qiguming',
+        admin: ['qiguming'],
+        distractionFreeMode: false  // Facebook-like distraction free mode
+    });
     gitalk.render('gitalk-container')
 </script> 
 <!-- Gitalk end -->
