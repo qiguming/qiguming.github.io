@@ -1,4 +1,4 @@
----
+```yml
 title: 13 面向非结构数据的神经网络
 author: fengliang qi
 date: 2021-06-17 11:33:00 +0800
@@ -8,7 +8,7 @@ math: true
 mermaid: true
 toc: true
 comments: true
----
+```
 
 ## 13.1 引言
 
@@ -31,9 +31,7 @@ $$
 线性(仿射)变换：linear(affine) transformation.
 ```
 
-------
-
-在线性模型中，我们假设输出与输入 $\mathbf{x}$呈线性关系，该假设具有很强的局限性。为了增加此类线性模型的灵活性，一种简单方法是使用特征变换，即利用 $\phi(\mathbf{x})$ 替代 $\mathbf{x}$。举例来说，我们可以使用多项式变换，在 $\textrm{1}$ 维数据中，该变换函数定义为 $\phi(x)=[1,x,x^2,x^3,...]$，我们在 $\textrm{1.2.2.2}$ 节中对该方法进行了讨论。这种方法有时被称为 **基函数拓展** ($\textrm{basis function expansion}$)。基于该变换，上述模型定义为:
+在线性模型中，我们假设输出与输入 $\mathbf{x}$ 呈线性关系，该假设具有很强的局限性。为了增加此类线性模型的灵活性，一种简单方法是使用特征变换，即利用 $\phi(\mathbf{x})$ 替代 $\mathbf{x}$。举例来说，我们可以使用多项式变换，在 $\textrm{1}$ 维数据中，该变换函数定义为 $\phi(x)=[1,x,x^2,x^3,...]$，我们在 $\textrm{1.2.2.2}$ 节中对该方法进行了讨论。这种方法有时被称为 **基函数拓展** ($\textrm{basis function expansion}$)。基于该变换，上述模型定义为:
 $$
 f(\mathbf{x}; \pmb{\theta})=\mathbf{W}\mathbf{\phi}(\mathbf{x}) + \mathbf{b} \tag{13.3}
 $$
@@ -54,15 +52,21 @@ $$
 特征提取器： feature extractor
 ```
 
-------
+术语 “$\textrm{ DNN}$ ” 实际上包含了一大类模型，它们的特点在于将多个可微函数组合成任何类型的 $\textrm{DAG}$（有向无环图），从而实现输入到输出的映射函数的建模， 式 (\ref{eq:13.5}) 是最简单的一个例子，其中的 $\textrm{DAG}$ 是一个链式结构。“$\textrm{ DNN}$ ”又被称为 **前馈神经网络**（$\textrm{feedforward neural network, FFNN}$）或 **多层感知机**（$\textrm{multilayer perceptron, MLP}$）。
 
-术语 “$\textrm{ DNN}$ ” 实际上包含了一大类模型，其中我们将可微函数组合到任何类型的 $\textrm{DAG}$（有向无环图）中，从而实现输入到输出的映射函数建模。 式 (\ref{eq:13.5}) 是链式 $\textrm{DAG}$ 的最简单示例。 这被称为 **前馈神经网络**（$\textrm{feedforward neural network, FFNN}$）或 **多层感知器**（$\textrm{multilayer perceptron, MLP}$）。
-
-$\textrm{MLP}$ 假定输入是一个维度固定的矢量，即 $\mathbf{x} \in \mathbb{R}^D$。 我们称此类数据为“**非结构化数据**” ($\textrm{unstructured data}$)，因为我们没有对输入的形式进行任何假设。 但是，$\textrm{MLP}$ 难以应用于具有可变大小或形状的输入。 在第 $\textrm{14}$ 章中，我们讨论了**卷积神经网络**（$\textrm{convolutional neural networks, CNN}$），用于处理可变大小的图像。 在第 $\textrm{15}$ 章中，我们讨论了**递归神经网络**（$\textrm{recurrent neural networks, RNN}$），用于处理可变大小的序列。 在第 $\textrm{23}$ 章中，我们讨论了**图神经网络**（$\textrm{graph neural networks, GNN}$），用于处理可变大小的图。 有关 $\textrm{DNN}$ 的更多信息，请参见其他书籍 [HG20][^HG20], [Zha19a][^Zha19a], [Ger19][^Ger19]。
+$\textrm{MLP}$ 假定输入是一个维度固定的矢量，即 $\mathbf{x} \in \mathbb{R}^D$。 我们称此类数据为“**非结构化数据**” ($\textrm{unstructured data}$)，因为我们没有对输入的形式进行任何假设。 但是，$\textrm{MLP}$ 难以应用于具有可变大小或形状的输入。 在第 $\textrm{14}$ 章中，我们讨论了**卷积神经网络**（$\textrm{convolutional neural networks, CNN}$），用于处理可变大小的图像。 在第 $\textrm{15}$ 章中，我们讨论了**递归神经网络**（$\textrm{recurrent neural networks, RNN}$），用于处理可变大小的序列。 在第 $\textrm{23}$ 章中，我们讨论了**图神经网络**（$\textrm{graph neural networks, GNN}$），用于处理可变大小的图数据。 有关 $\textrm{DNN}$ 的更多信息，请参见其他书籍 [HG20][^HG20], [Zha19a][^Zha19a], [Ger19][^Ger19]。
 
 [^HG20]: J. Howard and S. Gugger. Deep Learning for Coders with Fastai and PyTorch: AI Applications Without a PhD. en. 1st ed. O’Reilly Media, Aug. 2020.
 [^Zha19a]: A. Zhang, Z. Lipton, M. Li, and A. Smola. Dive into deep learning. 2019.
 [^Ger19]: A. Géron. Hands-On Machine Learning with Scikit-Learn and TensorFlow: Concepts, Tools, and Techniques for Building Intelligent Systems (2nd edition). en. O’Reilly Media, Incorporated, 2019.
+
+> 本节我们:
+>
+> 1. 引入了 "DNN" 的概念，其背后的动机在于: 通过给于特征提取器更加复杂的结构以及更多的参数量，提高模型在特征提取方面的能力。
+>
+> 2. "DNN" 又被称为前馈神经网络，所谓前馈神经网络一般是指有向无环图模型。与之对应的是循环神经网络。前馈神经网络中主要包含：感知机，多层感知机，径向基网络等。
+
+---
 
 ## 13.2 多层感知机
 
@@ -70,11 +74,9 @@ $\textrm{MLP}$ 假定输入是一个维度固定的矢量，即 $\mathbf{x} \in 
 $$
 f(\mathbf{x};\mathbf{\theta})=\mathbb{I}(\mathbf{w}^{\rm{T}}\mathbf{x}+b\ge0)=H(\mathbf{w}^{\rm{T}}\mathbf{x}+b) \tag{13.6}
 $$
-其中 $H(a)$ 表示 **单位阶跃函数**（$\textrm{heaviside step function}$）， 又被称为 **线性阈值函数** ($\textrm{linear threshold function}$）。由于感知机的决策边界依然是线性的，所以其表达能力十分有限。$\textrm{1969}$ 年，$\textrm{Marvin Minsky}$ 和 $\textrm{Seymour Papert}$ 出版了一本名为 $\textrm{《 Perceptrons》}$ [MP69][^MP69] 的著名著作，其中他们给出了许多感知机无法解决的模式识别的问题。 在讨论如何解决问题之前，我们首先举一个具体的例子。
+其中 $H(a)$ 表示 **单位阶跃函数**（$\textrm{heaviside step function}$）， 又被称为 **线性阈值函数** ($\textrm{linear threshold function}$）。由于感知机的决策边界依然是线性的，所以其表达能力十分有限。$\textrm{1969}$ 年，$\textrm{Marvin Minsky}$ 和 $\textrm{Seymour Papert}$ 出版了一本名为 $\textrm{《 Perceptrons》}$ [MP69][^MP69] 的著作，其中给出了许多感知机无法解决的模式识别问题。 在讨论如何解决问题之前，我们首先举一个具体的例子。
 
 [^MP69]: M. Minsky and S. Papert. Perceptrons. MIT Press, 1969.
-
-
 
 | $x_1$ | $x_2$ | $y$  |
 | ----- | ----- | :--: |
@@ -83,11 +85,11 @@ $$
 | 1     | 0     |  1   |
 | 1     | 1     |  0   |
 
->  表$\textrm{ 13.1}$： 抑或问题的真值表，$y=x_{1} \underline{\vee} x_{2}$。
+>   <font size=2> 表$\textrm{ 13.1}$： 抑或问题的真值表，$y=x_{1} \underline{\vee} x_{2}$。</font>
 
 ![xor-heaviside](/assets/img/figures/xor-heaviside.png)
 
->  图 $\textrm{13.1}$：$\textrm{(a)}$ 抑或函数无法实现线性可分，但基于单位阶跃函数构建的两层模型可以将数据分开。程序由 $xor-heaviside.py$ 生成。 $\textrm{(b)}$ 包含一个隐藏层的神经网络，其中的权重由人工设计，该网络实现了抑或函数。 $h_1$ 表示 $AND$ 函数，$h_2$ 表示 $OR$ 函数。 偏置项表示为常数节点（值为 $\textrm{1}$）的连接权重。
+>  <font size=2>图 $\textrm{13.1}$：$\textrm{(a)}$ 抑或函数无法实现线性可分，但基于单位阶跃函数构建的两层模型可以将数据分开。程序由 $xor-heaviside.py$ 生成。 $\textrm{(b)}$ 包含一个隐藏层的神经网络，其中的权重由人工设计，该网络实现了抑或函数。 $h_1$ 表示 $AND$ 函数，$h_2$ 表示 $OR$ 函数。 偏置项表示为常数节点（值为 $\textrm{1}$）的连接权重。</font>
 
 ```python
 import numpy as np
@@ -121,9 +123,9 @@ plt.show()
 
 $\textrm{《 Perceptrons》}$书中最著名的例子之一就是 $\textrm{XOR}$ 问题。 在该例子中，我们的目标是学习一个函数，该函数用于计算两个二进制输入的异或值。 表 $\textrm{13.1}$ 给出了该函数的真值表。 我们在图 $\textrm{13.1a}$ 中对该函数进行了可视化。 显然，数据并不是线性可分离的，因此感知机模型无法表示该映射函数。
 
-但是，我们可以通过叠加多个感知机来克服这个问题，即**多层感知机**（$\textrm{multilayer perceptron, MLP}$）。 例如，要解决 $\textrm{XOR}$ 问题，我们可以使用图 $\textrm{13.1b}$  所示的 $\textrm{MLP}$。 它由 $\textrm{3}$ 个感知机组成，分别为 $h_1$，$h_2$ 和 $y$。 节点 $x$ 表示输入，节点 $1$ 表示常数项。 节点 $h_1$ 和 $h_2$ 被称为**隐藏单元** （$\textrm{hidden units}$），因为在训练数据中未观察到它们的真值。
+但是，我们可以通过叠加多个感知机来克服这个问题，即 **多层感知机**（$\textrm{multilayer perceptron, MLP}$）。 例如，要解决 $\textrm{XOR}$ 问题，我们可以使用图 $\textrm{13.1b}$  所示的 $\textrm{MLP}$。 它由 $\textrm{3}$ 个感知机组成，分别为 $h_1$，$h_2$ 和 $y$。 节点 $x$ 表示输入，节点 $1$ 表示常数项， 节点 $h_1$ 和 $h_2$ 被称为 **隐藏单元** （$\textrm{hidden units}$），因为在训练数据中未观察到它们的真值。
 
-第一个隐藏单元通过使用设置的合理权重来计算 $h_{1}=x_{1} \wedge x_{2}$。（ $\wedge$ 表示 $\rm{AND}$ 操作。）特别地，它的输入为 $x_1$和 $x_2$，且权重均为为 $\textrm{1.0}$，同时具有 $\textrm{-1.5}$ 的偏置项（通过虚拟一个常量节点 $\textrm{1}$ 来实现偏置）。 因此，如果 $x_1$ 和 $x_2$ 都等于 $\textrm{1}$，则 $h_1$ 将被激活，因为
+第一个隐藏单元通过使用设置的合理权重来计算 $h_{1}=x_{1} \wedge x_{2}$。（ $\wedge$ 表示 $\rm{AND}$ 操作。）特别地，它的输入为 $x_1$和 $x_2$，且权重均为为 $\textrm{1.0}$，同时具有 $\textrm{-1.5}$ 的偏置项（通过虚设一个常量节点 $\textrm{1}$ 来模拟偏置项）。 因此，如果 $x_1$ 和 $x_2$ 都等于 $\textrm{1}$，则 $h_1$ 将被激活，因为
 $$
 \mathbf{w}_1^{\rm{T}}\mathbf{x}-b_1=[1.0, 1.0]^{\rm{T}}[1, 1] - 1.5 =0.5 > 0 \tag{13.7}
 $$
@@ -137,7 +139,7 @@ $$
 
 ### 13.2.2 可微多层感知机
 
-我们在第 $\textrm{13.2.1}$ 节中讨论的 $\textrm{MLP}$ 被定义为多个感知机的叠加，每个感知机都包含不可微的 $\textrm{Heaviside}$ 函数。 这使得模型很难训练，这就是为什么它们从未被广泛使用的原因。然而，如果我们将阶跃函数 $H:\mathbb{R}\rightarrow \{0,1\}$ 替换为一个可微的 **激活函数** （$\textrm{activation function}$）$\varphi:\mathbb{R} \rightarrow \mathbb{R}$ 。更精确地讲，我们将每一层 $l$ 的隐藏单元 $\mathbf{z}_l$ 定义为通过激活函数逐元素传递的上一层隐藏单元的线性变换：
+我们在第 $\textrm{13.2.1}$ 节中讨论的 $\textrm{MLP}$ 被定义为多个感知机的叠加，每个感知机都包含不可微的 $\textrm{Heaviside}$ 函数。 这使得模型很难训练，这就是为什么它们从未被广泛使用的原因。然而，如果我们将阶跃函数 $H:\mathbb{R}\rightarrow \{0,1\}$ 替换为一个可微的 **激活函数** （$\textrm{activation function}$）$\varphi:\mathbb{R} \rightarrow \mathbb{R}$ 。：更准确地说，我们将每个层 $l$ 的隐藏单元 $\mathbf{z}_l$ 定义为通过这个激活函数进行逐元素传递的前一层的隐藏单元的线性变换的结果。
 
 > More precisely, we define the hidden units $\mathbf{z}_l$ at each layer $l$ to be a linear transformation of the hidden units at the previous layer passed elementwise through this activation function.
 
@@ -147,14 +149,14 @@ $$
 $$
 
 
-或者，以标量的形式：
+或者，以标量的形式表示为：
 
 
 $$
 z_{kl}=\varphi_l \left( b_{kl}+\sum_{j=1}^{K_{l-1}}w_{jkl}z_{jl-1} \right) \tag{13.10}
 $$
 
-如式 (\ref{eq:13.5}) 中所示，如果我们现在将 $L$ 个诸如此类的激活函数叠加在一起。然后使用链式规则，计算输出关于每一层中的参数的梯度，也称为 **反向传播** （$\textrm{backpropagation}$），如我们在第 $\textrm{13.3}$ 节中所解释的。 （这对于任何一种可微的激活函数都是正确的，尽管某些类型的函数要比其他类型的函数更适用，正如我们在第 $\textrm{13.2.3}$ 节中讨论的那样。）然后，我们可以将梯度传递给优化器，从而最小化某些训练目标，正如我们在 $\textrm{13.4}$ 节讨论的那样。 因此，术语“$\textrm{ MLP}$”几乎总是指可微的模型，而不是指具有不可微分线性阈值单位的历史版本。
+如式 (\ref{eq:13.5}) 中所示，如果我们现在将 $L$ 个诸如此类的激活函数叠加在一起。然后使用链式规则，计算输出关于每一层中参数的梯度，也称为 **反向传播** （$\textrm{backpropagation}$），如我们在第 $\textrm{13.3}$ 节中所解释的。 （这对于任何一种可微的激活函数都是可行的，尽管某些类型的激活函数要比其他类型的函数更适用，正如我们在第 $\textrm{13.2.3}$ 节中讨论的那样。）然后，我们可以将梯度传递给优化器，从而最小化某些训练目标，正如我们在 $\textrm{13.4}$ 节讨论的那样。 因此，术语“$\textrm{ MLP}$”几乎总是指可微的模型，而不是指具有不可微的线性阈值单位的历史版本。
 
 ```tt
 不可微: non-differentiable
@@ -254,13 +256,21 @@ $$
 
 [^RZL17]: 
 
+> 本节我们介绍了  
+>
+> 1. 传统感知机在解决 $XOR$ 这一模式识别问题上的无效性; 
+> 2. 通过引入 $MLP$ 解决了上述难点，但其所包含的不可微的单位阶跃函数限制了其在优化方面的表现; 
+> 3. 通过使用可微的非线性激活函数，可以有效改善上述问题，但应避免使用存在饱和区的激活函数（会导致梯度消失的问题）
+
+---
+
 ### 13.2.4 案例模型
 
 $\textrm{MLPs}$ 可以对很多类型的数据进行分类和回归，接下来我们将给出一些案例。
 
 ![mlpIris](/assets/img/figures/mlpIris.jpg)
 
->  图 $\textrm{13.3}$：一个简单的用于鸢尾花分类问题的 $2$ 层 $\textrm{MLP}$。隐藏层中的节点代表隐藏单元 $h_{1,i}$ 和 $h_{2,j}$，节点间的边代表权重 $w_{2,i,j}$ ，其中 $2$ 表示第二层。 （第一层的权重矩阵对应于 $\textrm{input-to-hidden}$ 映射。）所以<span> $\mathbf{z}_{2}=\varphi_{2}(\mathbf{W}_{2} \mathbf{z}_{1}+\mathbf{b}_{1})$</span> ，尽管为了表达上的简洁，我们省略了偏置项。
+>  <center><font size=2>图 $\textrm{13.3}$：一个简单的用于鸢尾花分类问题的 $2$ 层 $\textrm{MLP}$。隐藏层中的节点代表隐藏单元 $h_{1,i}$ 和 $h_{2,j}$，节点间的边代表权重 $w_{2,i,j}$ ，其中 $2$ 表示第二层。 （第一层的权重矩阵对应于 $\textrm{input-to-hidden}$ 映射。）所以$\mathbf{z}_{2}=\varphi_{2}(\mathbf{W}_{2} \mathbf{z}_{1}+\mathbf{b}_{1})$ ，尽管为了表达上的简洁，我们省略了偏置项。</font></center>
 
 #### 13.2.4.1 MLP用于表格数据分类
 
@@ -314,8 +324,9 @@ $$
 
 [^Maa11]: 
 
-我们可以设计一个 $\textrm{MLP}$ 来进行情感分析，如下所示。假设输入是一个包含 $T$ 个符号（$\textrm{token}$）的序列 $\mathbf{x}_{1:T}$，其中 $\mathbf{x}_t$ 是一个长度为 $V$ 的 $\textrm{one-hot}$ 向量， $V$ 为语料库的大小。我们将此视为无序的单词袋（第$\textrm{10.4.3.1}$ 节）。模型的第一层为 $E\times V$  的嵌入矩阵 $\mathbf{W}_1$，该层将每一个稀疏的 $V$ 维向量映射到一个稠密的 $E$ 维向量 ${\rm{e}}_t=\mathbf{W}_1\mathbf{x}_t$（见$\textrm{19.5}$ 节学习更多关于词嵌入的细节）。接着我们使用 **全局平均池化**（$\textrm{global average pooling}$）将 $T\times D$ 的序列嵌入向量转化为一个固定长度的向量 ${\rm{\bar{\mathbf{e}}}}=\frac{1}{T}\sum_{t=1}^T{\rm{\mathbf{e}}}_t$。接着我们将该向量传入一个非线性隐藏层，计算一个 $K$ 维向量 $\mathbf{h}$，并将其传入最后的线性 $\textrm{logistic}$ 层。 综上所述，模型定义如下：
+我们可以设计一个 $\textrm{MLP}$ 来进行情感分析，如下所示。假设输入是一个包含 $T$ 个符号（$\textrm{token}$）的序列 $\textbf{x}_{1:T}$，其中 $ \textbf{x}_t $ 是一个长度为 $ V $ 的 $ \textrm{one-hot} $ 向量， $V$ 为语料库的大小。我们将此视为无序的单词袋（第 $10.4.3.1$ 节）。模型的第一层为 $E\times V$  的嵌入矩阵 $\textbf{W}_1 $，该层将每一个稀疏的 $V $ 维向量映射到一个稠密的 $E $ 维向量 $\mathbf{e}_t=\mathbf{W}_1 \mathbf{x}_t $（见 $19.5$ 节学习更多关于词嵌入的细节）。
 
+接着我们使用 **全局平均池化**（$\textrm{global average pooling}$）将 $T\times D $ 的序列嵌入向量转化为一个固定长度的向量 $\overline{\mathbf{e}}=\frac{1}{T}\sum_{t=1}^T \mathbf{e}_t $ 。最后我们将该向量传入一个非线性隐藏层，计算一个 $K $ 维向量 $\mathbf{h} $，并将其传入最后的线性 $\textrm{logistic} $ 层。 综上所述，模型定义如下：
 
 $$
 \begin{align}
@@ -392,9 +403,11 @@ $\textrm{DNN}$ 的“爆发”有几个促成因素。 一是便宜的$\textrm{G
 
 ### 13.2.6 与生物学的联系
 
-在本节中，我们讨论上文中的各种神经网络（称为人工神经网络, $\textrm{artificial neural networks, ANN}$）与实际神经网络之间的联系。 真实的生物大脑工作细节非常复杂（例如，参见[Kan+12][^Kan12]），但是我们可以给出一个简单的“卡通”（$\textrm{cartoon}$）。
+在本节中，我们讨论上文中的各种神经网络（称为人工神经网络, $\textrm{artificial neural networks, ANN}$）与实际神经网络之间的联系。 真实的生物大脑工作细节非常复杂（例如，参见[Kan+12][^Kan12]），但是我们可以给出一个简单的“卡通”（$\textrm{cartoon}$）。我们首先考虑单个神经元的模型。 大致上，我们可以说神经元 $k$ 是否发射（用 $h_{k} \in\{0,1\}$ 表示）取决于其输入的行为（用 $\mathbf{x} \in \mathbb{R}^{D}$表示）以及连接的强度（用 $\mathbf{w}_k \in \mathbb{R}^D$表示）。 
 
-我们首先考虑单个神经元的模型。 大致上，我们可以说神经元 $k$ 是否发射（用 $h_{k} \in\{0,1\}$ 表示）取决于其输入的行为（用 $\mathbf{x} \in \mathbb{R}^{D}$表示）以及连接的强度（用$\mathbf{w}_{k} \in \mathbb{R}^{D}$表示）。 我们可以使用 $a_{k}=\mathbf{w}_{k}^{\top} \mathbf{x}$ 来计算输入的加权和。 这些权重可以看作是将输入 $x_d$ 连接到神经元 $h_k$ 的“电线”。 这些类似于真实神经元中的树突（见图$\textrm{13.10}$）。该加权和接着被用于与阈值 $b_k$ 进行比较，如果激活超过阈值，则神经元触发； 这类似于神经元发出电输出或动作电位。 因此，我们可以使用 $h_{k}(\mathbf{x})=H\left(\mathbf{w}_{k}^{\top} \mathbf{x}-b_{k}\right)$ 来模拟神经元的行为，其中 $H(a)=\mathbb{I}(a>0)$ 是$\textrm{Heaviside}$函数。 这称为神经元的$\textrm{McCulloch-Pitts}$模型，并于 $\textrm{1943}$ 年提出[MP43][^MP43]。
+我们可以使用 $a _{k}=\mathbf{w} _{k}^{\top} \mathbf{x}$ 来计算输入的加权和。 这些权重可以看作是将输入 $x _d$ 连接到神经元 $h _k$ 的“电线”。 这些类似于真实神经元中的树突（见图$\textrm{13.10} $）。该加权和接着被用于与阈值 $b_k $ 进行比较，如果激活超过阈值，则神经元触发； 这类似于神经元发出电输出或动作电位。 
+
+因此，我们可以使用 $h _{k}(\mathbf{x})=H\left(\mathbf{w} _k^\top \mathbf{x}-b _k\right) $ 来模拟神经元的行为，其中 $H(a)=\mathbb{I}(a>0)$ 是$\textrm{Heaviside}$函数。 这称为神经元的$\textrm{McCulloch-Pitts}$模型，并于 $\textrm{1943}$ 年提出[MP43][^MP43]。
 
 [^Kan12]: 
 [^MP43]: 
@@ -444,7 +457,9 @@ $\textrm{DNN}$ 的“爆发”有几个促成因素。 一是便宜的$\textrm{G
 ## 13.3 反向传播
 
 在本节，我们将介绍著名的 **反向传播算法**（$\textrm{backpropagation algorithm}$），正如第 $\textrm{13.4}$ 节讨论的，该算法可用于计算损失函数关于网络每一层参数的梯度，并将该梯度传递给基于梯度的优化算法。
-反向传播算法最初由[BH69][^BH69]提出，同时在[Wer74][^Wer74]中被独立发现。 但是，该算法引起“主流”机器学习社区的注意，还要归功于[RHW86][^RHW86]。 关于该算法的更多历史记录，请参考  $\textrm{Wikipedia page}$[^3]。
+
+反向传播算法最初由[BH69][^BH69]提出，同时在[Wer74][^Wer74]中被独立发现。 但是，该算法引起“主流”机器学习社区的注意，还要归功于[RHW86][^RHW86]。 关于该算法的更多历史信息，请参考  $\textrm{Wikipedia page}$[^3]。
+
 为了方便分析，我们首先假设计算图是一个简单的类似于 $\textrm{MLP}$ 的线性链，该线性链中的每一层都是一个线性映射函数。 在这种情况下，反向传播等价于链式法则的重复使用（参考式（$\textrm{B.42}$））。 但是，正如我们在第 $\textrm{13.3.4}$ 节中将要讨论的，该方法可以推广到任意的有向无环图（$\textrm{DAG}$）模型。 整个反向传播算法的过程通常被称为 **自动微分**（$\textrm{automatic differentiation, autodiff}$）。
 
 [^BH69]: 
@@ -462,13 +477,19 @@ $$
 其中 $\mathbf{f}_1:\mathbb{R}^n \rightarrow \mathbb{R}^{m_1}$, $\mathbf{f}_2:\mathbb{R}^{m_1} \rightarrow \mathbb{R}^{m_2}$, $\mathbf{f}_3:\mathbb{R}^{m_2} \rightarrow \mathbb{R}^{m_3}$, $\mathbf{f}_4:\mathbb{R}^{m_3} \rightarrow \mathbb{R}^{m}$。 为了得到最终的结果 $\mathbf{o}=\mathbf{f}(\mathbf{x})$,  需要依次计算中间过程 $\mathbf{x}_2=\mathbf{f}_1(\mathbf{x})$, $\mathbf{x}_3=\mathbf{f}_2(\mathbf{x}_2)$, $\mathbf{x}_4=\mathbf{f}_3(\mathbf{x}_3)$, $\mathbf{o}=\mathbf{f}_4(\mathbf{x}_4)$。
 
 我们可以使用链式法则计算雅各比 （$\textrm{Jacobian}$） $\mathbf{J}_\mathbf{f}(\mathbf{x})=\frac{\partial \mathbf{o}}{\partial \mathbf{x}}\in \mathbb{R}^{m\times n}$：
+
+
 $$
 \begin{align}
 \frac{\partial \mathbf{o}}{\partial \mathbf{x}} = & \frac{\partial \mathbf{o}}{\partial \mathbf{x}_4}\frac{\partial \mathbf{x}_4}{\partial \mathbf{x}_3}\frac{\partial \mathbf{x}_3}{\partial \mathbf{x}_2}\frac{\partial \mathbf{x}_2}{\partial \mathbf{x}} = \frac{\partial \mathbf{f}_4(\mathbf{x}_4)}{\partial \mathbf{x}_4}\frac{\partial \mathbf{f}_3(\mathbf{x}_3)}{\partial \mathbf{x}_3}\frac{\partial \mathbf{f}_2(\mathbf{x}_2)}{\partial \mathbf{x}_2}\frac{\partial \mathbf{f}_1(\mathbf{x})}{\partial \mathbf{x}} \tag{13.28} \\
 = & \mathbf{J}_{\mathbf{f}_4}(\mathbf{x}_4)\mathbf{J}_{\mathbf{f}_3}(\mathbf{x}_3)\mathbf{J}_{\mathbf{f}_2}(\mathbf{x}_2)\mathbf{J}_{\mathbf{f}_1}(\mathbf{x}_1) \tag{13.29}
 \end{align}
 $$
+
+
 我们现在讨论如何高效地计算雅各比 $\mathbf{J}_\mathbf{f}(\mathbf{x})$。回顾雅各比的定义：
+
+
 $$
 \mathbf{J}_\mathbf{f}(\mathbf{x}) = \frac{\partial \mathbf{f}(\mathbf{x})}{\partial \mathbf{x}}= 
 \begin{pmatrix}
@@ -488,31 +509,37 @@ $$
 \end{pmatrix}
  \in \mathbb{R}^{m\times n} \tag{13.30}
 $$
-其中 $\nabla f_i(\mathbf{x})^{\rm{T}} \in \mathbb{R} ^ {1 \times n}$ 为第 $i$ 行 （ $i = 1:m$ ） ，$\frac{\partial \mathbf{f}}{\partial x_j} \in \mathbb{R}^m$ 为第 $j$ 列 （$j = 1:n$）。值得注意的是， 当 $m = 1$ 时， 梯度表示为 $\nabla \mathbf{f}(\mathbf{x})$ ，其形状与 $\mathbf{x}$ 相同，即是一个列向量，然而，此时 $\mathbf{J}_{\mathbf{f}}(\mathbf{x})$ 是一个行向量，在这种情况下，我们令 $\nabla \mathbf{f}(\mathbf{x}) = \mathbf{J}_{\mathbf{f}}(\mathbf{x})^ {\rm{T}} $。
 
-我们可以通过向量雅各比乘（$\textrm{vector Jacobian product，VJP}$）$\mathbf{e}_i^{\rm{T}}\mathbf{J}_\mathbf{f}(\mathbf{x})$ 从 $\mathbf{J}_\mathbf{f}(\mathbf{x})$ 中提取第 $i$ 行，其中 $\mathbf{e}_i \in \mathbb{R}^m$ 表示单位基向量。类似地，我们可以使用雅各比向量乘（$\textrm{Jacobian vector product, JVP}$）$\mathbf{J}_\mathbf{f}(\mathbf{x})\mathbf{e}_j$ 从 $\mathbf{J}_\mathbf{f}(\mathbf{x})$ 中提取第 $j$ 列，其中 $\mathbf{e}_j \in \mathbb{R}^n$。 因此 $\mathbf{J}_\mathbf{f}(\mathbf{x})$ 的计算可以退化为 $\textrm{n}$ 个 $\textrm{JVPs}$ 或 $\textrm{m}$ 个 $\textrm{VJPs}$。
+
+其中 $\nabla f_i(\mathbf{x})^{\rm{T}} \in \mathbb{R} ^ {1 \times n}$ 为第 $i$ 行 （ $i = 1:m$ ） ，$\frac{\partial \mathbf{f}}{\partial x_ j} \in \mathbb{R}^m$ 为第 $j$ 列 （$j = 1:n$）。值得注意的是， 当 $m = 1$ 时， 梯度表示为 $\nabla \mathbf{f}(\mathbf{x})$ ，其形状与 $\mathbf{x}$ 相同，即是一个列向量，然而，此时 $\mathbf{J}_ {\mathbf{f}}(\mathbf{x})$ 是一个行向量，在这种情况下，我们令 $\nabla\mathbf{f}(\mathbf{x})=\mathbf{J} _{\mathbf{f}}(\mathbf{x})^{\top} $。
+
+我们可以通过向量雅各比乘（$\textrm{vector Jacobian product，VJP}$）$\mathbf{e} _i^{\rm{T}}\mathbf{J} _\mathbf{f}(\mathbf{x})$ 从 $\mathbf{J} _\mathbf{f}(\mathbf{x})$ 中提取第 $i$ 行，其中 $\mathbf{e} _i \in \mathbb{R}^m$ 表示单位基向量。类似地，我们可以使用雅各比向量乘（$\textrm{Jacobian vector product, JVP}$）$\mathbf{J} _\mathbf{f}(\mathbf{x})\mathbf{e} _j$ 从 $\mathbf{J} _\mathbf{f}(\mathbf{x})$ 中提取第 $j$ 列，其中 $\mathbf{e} _j \in \mathbb{R}^n$。 因此 $\mathbf{J} _\mathbf{f}(\mathbf{x})$ 的计算可以退化为 $\textrm{n}$ 个 $\textrm{JVPs}$ 或 $\textrm{m}$ 个 $\textrm{VJPs}$。[^译者注1]
+
+[^译者注1]: 复杂度计算可参考 https://math.stackexchange.com/questions/2195377/reverse-mode-differentiation-vs-forward-mode-differentiation-where-are-the-be
 
 如果 $n \lt m$，计算 $\mathbf{J}_\mathbf{f}(\mathbf{x})$ 的高效方法是，对每一列 $j=1:n$ 使用 $\textrm{JVPs}$， 并在计算的过程中使用从右到左的计算顺序。右乘列向量的形式为：
+
+
 $$
 \mathbf{J}_{\mathbf{f}}(\mathbf{x}) \mathbf{v}=\underbrace{\mathbf{J}_{\mathbf{f}_{4}}\left(\mathbf{x}_{4}\right)}_{m \times m_{3}} \underbrace{\mathbf{J}_{\mathrm{f}_{3}}\left(\mathbf{x}_{3}\right)}_{m_{3} \times m_{2}} \underbrace{\mathbf{J}_{\mathrm{f}_{2}}\left(\mathbf{x}_{2}\right)}_{m_{2} \times m_{1}} \underbrace{\mathbf{J}_{\mathbf{f}_{1}}\left(\mathbf{x}_{1}\right)}_{m_{1} \times n} \underbrace{\mathbf{v}}_{n \times 1} \tag{13.31}
 $$
+
+
 上式可以通过**前向模式微分**（$\textrm{forward mode differentiation}$）得到；算法 $\textrm{5}$ 给出了伪代码。假设 $m=1$，同时 $n=m_1=m_2=m_3$，计算 $\mathbf{J}_\mathbf{f}(\mathbf{x})$ 的时间复杂度为 $O(n^3)$。
-
-
 
 > $\textrm{Algorithm 5}$: 前向模式微分
 >
 > 1. $\mathbf{x}_{1}:=\mathbf{x}$
 >
-> 2. $\mathbf{v}_{j}:=\mathbf{e}_{j} \in \mathbb{R}^{n}$ for $j=1: n$
+> 2. $\mathbf{v}_j:=\mathbf{e}_j \in \mathbb{R}^n$ $\textrm{for}$ $j=1: n$
 >
 > 3. $\textbf{for}$ $k=1:K$ $\textbf{do}$
 >
-> 4. > $\mathbf{x}_{k+1}=\mathbf{f}_{k}\left(\mathbf{x}_{k}\right)$
+> 4. > $\mathbf{x}_{k+1}=\mathbf{f}_k\left(\mathbf{x}_k\right)$
 >
-> 5. > $\mathbf{v}_{j}:=\mathbf{J}_{\mathbf{f}_{k}}\left(\mathbf{x}_{k}\right) \mathbf{v}_{j}$ for $j=1: n$
+> 5. > $\mathbf{v} _j:=\mathbf{J} _{\mathbf{f}_k}(\mathbf{x} _k)\mathbf{v} _j \textrm{ for }j=1: n$
 >
-> 6. $\textrm{Return}$ $\mathbf{o}=\mathbf{x}_{K+1},\left[\mathbf{J}_{\mathbf{f}}(\mathbf{x})\right]_{:, j}=\mathbf{v}_{j}$ $\textrm{for}$ $j=1: n$
+> 6. $\textrm{Return}$ $\mathbf{o}=\mathbf{x} _{K+1},\left[\mathbf{J} _{\mathbf{f}}(\mathbf{x})\right] _{:, j}=\mathbf{v} _j\textrm{ for }j=1: n$
 
 
 
@@ -530,21 +557,25 @@ $$
 >
 >2. $\textbf{for}$ $k=1:K$ $\textbf{do}$
 >
->3. > $\mathbf{x}_{k+1}=\mathbf{f}_{k}\left(\mathbf{x}_{k}\right)$
+>3. > $\mathbf{x} _{k+1}=\mathbf{f} _{k}\left(\mathbf{x} _{k}\right)$
 >
->4. $\mathbf{u}_{i}:=\mathbf{e}_{i} \in \mathbb{R}^{m}$ $\textrm{for}$ $i=1: m$
+>4. $\mathbf{u} _{i}:=\mathbf{e} _{i} \in \mathbb{R}^{m}$ $\textrm{for}$ $i=1: m$
 >
 >5. $\textbf{for}$ $k=K:1$ $\textbf{do}$
 >
->6. > $\mathbf{u}_{i}^{\top}:=\mathbf{u}_{i}^{\top} \mathbf{J}_{\mathbf{f}_{k}}\left(\mathbf{x}_{k}\right)$ $\textbf{for}$ $i=1: m$
+>6. > $\mathbf{u} _{i}^{\top}:=\mathbf{u} _{i}^{\top} \mathbf{J} _{\mathbf{f} _{k}}\left(\mathbf{x} _{k}\right)$ $\textbf{for}$ $i=1: m$
 >
->7. $\textrm{Return}$ $\mathbf{o}=\mathbf{x}_{K+1},\left[\mathbf{J}_{\mathbf{f}}(\mathbf{x})\right]_{i,:}=\mathbf{u}_{i}^{\top}$ $\textrm{for}$  $i=1: m$
+>7. $\textrm{Return}$ $\mathbf{o}=\mathbf{x} _{K+1},\left[\mathbf{J} _{\mathbf{f}}(\mathbf{x})\right] _{i,:}=\mathbf{u} _{i}^{\top}$ $\textrm{for}$  $i=1: m$
 
 
+
+![feedforward_model_with_4_layers](/assets/img/figures/feedforward_model_with_4_layers.png)
+
+> 图 $13.12$: 一个简单的包含 $4$ 层的线性链式前馈网络。其中 $\mathbf{x}$ 表示输入， $\mathbf{o}$ 表示输出。
 
 ### 13.3.2 用于多层感知机的反向模式微分
 
-在之前的章节中，我们仅仅考虑了一个简单的线性链式前馈网络，其中的每一层都不包含可学习的参数。本节，每一层网络层包含参数 $\mathbf{\theta}_1,...,\mathbf{\theta}_4$，如图 $13.12$ 所示。我们集中讨论最终输出为标量的情况：$\mathcal{L}:\mathbb{R}^n\rightarrow \mathbb{R}$。举例来说，考虑作用于包含一个隐藏层的  $\textrm{MLP}$ 的 $l_2$ 损失函数：
+在之前的章节中，我们仅仅考虑了一个简单的线性链式前馈网络，其中的每一层都不包含可学习的参数。本节，所考虑的网络中每一层包含参数 $\mathbf{\theta}_1,...,\mathbf{\theta}_4$，如图 $13.12$ 所示。我们集中讨论最终输出为标量的情况：$\mathcal{L}:\mathbb{R}^n\rightarrow \mathbb{R}$。举例来说，考虑作用于包含一个隐藏层的  $\textrm{MLP}$ 的 $l_2$ 损失函数：
 $$
 \mathcal{L}((\mathbf{x}, \mathbf{y}), \boldsymbol{\theta})=\frac{1}{2}\left\|\mathbf{y}-\mathbf{W}_{2} \varphi\left(\mathbf{W}_{1} \mathbf{x}\right)\right\|_{2}^{2} \tag{13.33}
 $$
@@ -558,11 +589,13 @@ $$
 \mathcal{L} &=\mathbf{f}_{4}\left(\mathbf{x}_{4}, \mathbf{y}\right)=\frac{1}{2}\left\|\mathbf{x}_{4}-\mathbf{y}\right\|^{2} \tag{13.38}
 \end{align}
 $$
-我们用符号 $\mathbf{f}_k(\mathbf{x}_k,\boldsymbol{\theta}_k)$ 表示层 $k$ 的函数，其中 $\mathbf{x}_k$ 为上一层的输出， $\boldsymbol{\theta}_k$ 表示该层的可选参数。
+我们用符号 $\mathbf{f}_k(\mathbf{x}_k,\boldsymbol{\theta}_k)$ 表示第 $k$ 层的函数，其中 $\mathbf{x}_k$ 为上一层的输出， $\boldsymbol{\theta}_k$ 表示该层的可选参数。
 
-在这个例子中，最后层的输出为一个标量，因为它对应于一个损失函数 $\mathcal{L}\in \mathbb{R}$。所以使用反向模式微分计算梯度向量的效率更高。
+在这个例子中，最后一层的输出为一个标量，因为它对应于一个损失函数 $\mathcal{L}\in \mathbb{R}$。所以使用反向模式微分计算梯度向量的效率更高。
 
-我们首先讨论如何计算标量输出关于每一层中参数的梯度。我们可以使用矢量微积分直接计算 $\frac{\partial L}{\partial \boldsymbol{\theta}_{4}}$。对于中间项，我们使用链式法则：
+我们首先讨论如何计算标量输出关于每一层中参数的梯度。我们可以使用矢量微积分直接计算 $\frac{\partial L}{\partial \boldsymbol{\theta} _{4}}$。对于中间项，我们使用链式法则：
+
+
 $$
 \begin{align}
 \frac{\partial \mathcal{L}}{\partial \boldsymbol{\theta}_{3}}&=\frac{\partial \mathcal{L}}{\partial \mathbf{x}_{4}} \frac{\partial \mathbf{x}_{4}}{\partial \boldsymbol{\theta}_{3}} \tag{13.39}\\
@@ -570,7 +603,9 @@ $$
 \frac{\partial \mathcal{L}}{\partial \boldsymbol{\theta}_{1}}&=\frac{\partial \mathcal{L}}{\partial \mathbf{x}_{4}} \frac{\partial \mathbf{x}_{4}}{\partial \mathbf{x}_{3}} \frac{\partial \mathbf{x}_{3}}{\partial \mathbf{x}_{2}} \frac{\partial \mathbf{x}_{2}}{\partial \boldsymbol{\theta}_{1}} \tag{13.41}
 \end{align}
 $$
-其中 $\frac{\partial \mathcal{L}}{\partial \boldsymbol{\theta}_{k}}=\left(\nabla_{\boldsymbol{\theta}_{k}} \mathcal{L}\right)^{\top}$ 是一个 $d_k$ 维的行向量，$d_k$ 为层 $k$ 的参数数量。我们发现这些值可以通过递归方式进行计算，即将 $k$ 层的梯度行向量与大小为 $n_{k} \times n_{k-1}$ 的雅各比 $\frac{\partial \mathbf{x}_{k}}{\partial \mathbf{x}_{k-1}}$ 相乘，其中 $n_k$ 为层 $k$ 的隐藏节点的数量。算法 $7$ 给出了伪代码。
+
+
+其中 $\frac{\partial \mathcal{L}}{\partial \boldsymbol{\theta}_ {k}}=\left(\nabla_ {\boldsymbol{\theta}_ {k}} \mathcal{L}\right)^{\top}$ 是一个 $d _k$ 维的行向量，$d _k$ 为第 $k$ 层的参数数量。我们发现这些值可以通过递归方式进行计算，即将第 $k$ 层的梯度行向量与大小为 $n _{k} \times n _{k-1}$ 的雅各比 $\frac{\partial \mathbf{x} _{k}}{\partial \mathbf{x} _{k-1}}$ 相乘，其中 $n _k$ 为第 $k$ 层隐藏节点的数量。算法 $7$ 给出了伪代码。
 
 
 
@@ -582,7 +617,7 @@ $$
 >
 > 3. $\textbf{for}$ $k=1:K$ $\textbf{do}$
 >
-> 4. > $\mathbf{x}_{k+1}=\mathbf{f}_{k}\left(\mathbf{x}_{k}, \pmb{\theta}_k\right)$
+> 4. > $\mathbf{x} _{k+1}=\mathbf{f} _{k}\left(\mathbf{x} _{k}, \pmb{\theta} _k\right)$
 >
 > 5. $\textrm{// Backward pass}$
 >
@@ -590,23 +625,25 @@ $$
 >
 > 7. $\textbf{for}$ $k=K:1$ $\textbf{do}$
 >
-> 8. > $\mathbf{g}_{k}:=\mathbf{u}_{k+1}^{\top} \frac{\partial \mathbf{f}_{k}\left(\mathbf{x}_{k}, \boldsymbol{\theta}_{k}\right)}{\partial \boldsymbol{\theta}_{k}}$
+> 8. > $\mathbf{g} _{k}:=\mathbf{u} _{k+1}^{\top} \frac{\partial \mathbf{f} _{k}\left(\mathbf{x} _{k}, \boldsymbol{\theta} _{k}\right)}{\partial \boldsymbol{\theta} _{k}}$
 >
-> 9. > $\mathbf{u}_{k}^{\top}:=\mathbf{u}_{k+1}^{\top} \frac{\partial \mathbf{f}_{k}\left(\mathbf{x}_{k}, \boldsymbol{\theta}_{k}\right)}{\partial \mathbf{x}_{k}}$
+> 9. > $\mathbf{u} _{k}^{\top}:=\mathbf{u} _{k+1}^{\top} \frac{\partial \mathbf{f} _{k}\left(\mathbf{x} _{k}, \boldsymbol{\theta} _{k}\right)}{\partial \mathbf{x} _{k}}$
 >
 > 10. $\textrm{// Output}$
 >
-> 11. $\textrm{Return}$ $\mathcal{L}=\mathrm{x}_{K+1}, \nabla_{\mathbf{x}} \mathcal{L}=\mathbf{u}_{1},\left\{\nabla_{\boldsymbol{\theta}_{k}} \mathcal{L}=\mathrm{g}_{k}: k=1: K\right\}$
+> 11. $\textrm{Return}$ $\mathcal{L}=\mathrm{x} _{K+1}$, $\nabla _{\mathbf{x}} \mathcal{L}=\mathbf{u} _{1}$, $\left\\{\nabla _{\boldsymbol{\theta} _{k}} \mathcal{L}=\mathrm{g} _{k}: k=1: K\right\\}$
 
 
 
-该算法计算出损失关于每一层参数的梯度。同时还计算了损失关于输入的梯度 $\nabla_{\mathbf{x}} \mathcal{L} \in \mathbb{R}^{n}$ ，其中 $n$ 表述输入的维度。后一项对于参数的学习并不需要，但对于生成输入的模型来说却是有用的（见 $ 14.5$ 节）。
+该算法计算出损失关于每一层参数的梯度。同时还计算了损失关于输入的梯度 $\nabla_{\mathbf{x}} \mathcal{L} \in \mathbb{R}^{n}$ ，其中 $n$ 表述输入的维度。后一项对于参数的更新并不需要，但对于需要生成输入 $\mathbf{x}$ 的模型来说却是有用的（见 $ 14.5$ 节）。
 
-剩下的部分就是如何计算相关层的向量雅各比乘（$\textrm{VJP}$）。其中的细节取决于每一层函数的具体形式。我们在下文讨论一些具体的例子。
+剩下的部分就是如何计算具体层的向量雅各比乘（$\textrm{VJP}$）。其中的细节取决于每一层映射函数的具体形式。我们在下文讨论一些具体的例子。
 
 ### 13.3.3 常规层的向量雅各比乘
 
 回顾形式为 $\mathbf{f}:\mathbb{R}^n\rightarrow \mathbb{R}^m$ 的网络层的雅各比矩阵：
+
+
 $$
 \mathbf{J}_{\mathbf{f}}(\mathbf{x})=\frac{\partial \mathbf{f}(\mathbf{x})}{\partial \mathbf{x}}=\left(\begin{array}{ccc}
 \frac{\partial f_{1}}{\partial x_{1}} & \cdots & \frac{\partial f_{1}}{\partial x_{n}} \\
@@ -618,6 +655,8 @@ $$
 \nabla f_{m}(\mathbf{x})^{\top}
 \end{array}\right)=\left(\frac{\partial \mathbf{f}}{\partial x_{1}}, \cdots, \frac{\partial \mathbf{f}}{\partial x_{n}}\right) \in \mathbb{R}^{m \times n} \tag{13.42}
 $$
+
+
 其中 $\nabla f_{i}(\mathbf{x})^{\top} \in \mathbb{R}^{n}$ 表示第 $i$ 行 （$i = 1:m$），$\frac{\partial \mathbf{f}}{\partial x_{j}} \in \mathbb{R}^{m}$ 为第 $j$ 列（$j=1:n$）。本节，我们将描述如何计算常规层的 $\textrm{VJP}$ $\mathbf{u}^{\top} \mathbf{J}_{\mathbf{f}}(\mathbf{x})$ 。
 
 #### 13.3.3.1 交叉熵层
@@ -626,7 +665,7 @@ $$
 $$
 z=f(\mathbf{x})=\text { CrossEntropyWithLogits }(\mathbf{y}, \mathbf{x})=-\sum_{c} y_{c} \log p_{c} \tag{13.43}
 $$
-其中 $\mathbf{p}=\mathcal{S}(\mathbf{x})=\frac{e^{x_{c}}}{\sum_{c^{\prime}=1}^{C} e^{x_{c^{\prime}}}}$ 表示预测的类别概率值， $\mathbf{y}$ 为标签的 $\textrm{one-hot}$ 编码。（所以 $\mathbf{p}$ 和 $\mathbf{y}$ 都是 维度为 $C$ 的概率单纯形。）关于输入的雅各比为：
+其中 $\mathbf{p}=\mathcal{S}(\mathbf{x})=\frac{e^{x_{c}}}{\sum_{c^{\prime}=1}^{C} e^{x_{c^{\prime}}}}$ 表示预测的类别概率值， $\mathbf{y}$ 为标签的 $\textrm{one-hot}$ 编码。（所以 $\mathbf{p}$ 和 $\mathbf{y}$ 都是维度为 $C$ 的概率单纯形（$\textrm{simplex}$）。）输出关于输入的雅各比为：
 $$
 \mathbf{J}=\frac{\partial z}{\partial \mathbf{x}}=(\mathbf{p}-\mathbf{y})^{\top} \in \mathbb{R}^{1 \times C} \tag{13.44}
 $$
@@ -638,7 +677,7 @@ $$
 $$
 \frac{\partial z}{\partial x_{i}}=\frac{\partial}{\partial x_{i}} \log \sum_{j} e^{x_{j}}-\frac{\partial}{\partial x_{i}} x_{c}=\frac{e^{x_{i}}}{\sum_{j} e^{x_{j}}}-\frac{\partial}{\partial x_{i}} x_{c}=p_{i}-\mathbb{I}(i=c) \tag{13.46}
 $$
-如果我们定义 $\mathbf{y}=[\mathbb{I}(i=c)]$ ，我们将获得式 ($13.44$)。需要注意的是该层的雅各比是一个行向量，因为输出是一个标量。  对应的 $\textrm{VJP}$ 为 $\mathbf{u}^{\top} \mathbf{J}$ ，其中 $\mathbf{u} \in \mathbb{R}$ 。
+定义 $\mathbf{y}=[\mathbb{I}(i=c)]$ ，我们将获得式 ($13.44$)。需要注意的是该层的雅各比是一个行向量，因为输出是一个标量。  对应的 $\textrm{VJP}$ 为 $\mathbf{u}^{\top} \mathbf{J}$ ，其中 $\mathbf{u} \in \mathbb{R}$ 。
 
 #### 13.3.3.2 逐元素非线性 
 
@@ -649,11 +688,11 @@ $$
 0 & \text { otherwise }
 \end{array}\right. \tag{13.47}
 $$
-其中 $\varphi^{\prime}(a)=\frac{d}{d a} \varphi(a)$。换句话说， 关于输入的雅各比为
+其中 $\varphi^{\prime}(a)=\frac{d}{d a} \varphi(a)$。换句话说， 输出关于输入的雅各比为
 $$
 \mathbf{J}=\frac{\partial \mathbf{f}}{\partial \mathbf{x}}=\operatorname{diag}\left(\varphi^{\prime}(\mathbf{x})\right) \tag{13.48}
 $$
-对于任意一个向量 $\mathbf{u}$， 我们可以将 $\mathbf{J}$ 的对角元素与向量 $\mathbf{u}$ 进行逐元素相乘，得到 $\mathbf{u}^{\top} \mathbf{J}$。举例来说，如果
+对于任意一个向量 $\mathbf{u}$， 我们可以将 $\mathbf{J}$ 的对角元素与向量 $\mathbf{u}$ 进行逐元素相乘，得到 $\mathbf{u}^{\top} \mathbf{J}$。举例来说，假设
 $$
 \varphi(a)=\operatorname{ReLU}(a)=\max (a, 0) \tag{13.49}
 $$
@@ -664,7 +703,7 @@ $$
 1 & a>0
 \end{array}\right. \tag{13.50}
 $$
-其中 $a=0$ 处的亚梯度（见 $\textrm{B.4.4}$）为处于 $[0,1]$ 区间的任意值。 通常情况下等于 $0$。所以
+其中 $a=0$ 处的亚梯度（$\textrm{subderivative}$）（见 $\textrm{B.4.4}$）为 $[0,1]$ 区间的任意值。 通常情况下等于 $0$。所以
 $$
 \operatorname{ReLU}^{\prime}(a)=H(a) \tag{13.51}
 $$
@@ -672,7 +711,7 @@ $$
 
 #### 13.3.3.3 线性层
 
-现在考虑一个线性层，$\mathbf{z}=\mathbf{f}(\mathbf{x}, \mathbf{W})=\mathbf{W} \mathbf{x}$ ，其中  $\mathbf{W} \in \mathbb{R}^{m \times n}$ , 所以 $\mathbf{x} \in \mathbb{R}^{n}$ ，$\mathbf{z} \in \mathbb{R}^{m}$。我们可以计算关于输入向量的雅各比， $\mathbf{J}=\frac{\partial \mathbf{z}}{\partial \mathbf{x}} \in \mathbb{R}^{m \times n}$ 。注意到
+现在考虑线性层，$\mathbf{z}=\mathbf{f}(\mathbf{x}, \mathbf{W})=\mathbf{W} \mathbf{x}$ ，其中  $\mathbf{W} \in \mathbb{R}^{m \times n}$ , 所以 $\mathbf{x} \in \mathbb{R}^{n}$ ，$\mathbf{z} \in \mathbb{R}^{m}$。我们可以计算关于输入向量的雅各比， $\mathbf{J}=\frac{\partial \mathbf{z}}{\partial \mathbf{x}} \in \mathbb{R}^{m \times n}$ 。注意到
 $$
 z_{i}=\sum_{k=1}^{n} W_{i k} x_{k} \tag{13.52}
 $$
@@ -701,7 +740,7 @@ $$
 0 & \cdots & 0 & x_{j} & 0 & \cdots & 0
 \end{array}\right)^{\top} \tag{13.58}
 $$
-其中非零项处在位置 $i$。$\mathbf{u}^{\top} \in \mathbb{R}^{1 \times m}$ 与 $\frac{\partial \mathbf{z}}{\partial \mathbf{W}} \in \mathbb{R}^{m \times(m \times n)}$ 之间的 VJP 可以表示为一个形状为 $1 \times(m \times n)$ 的矩阵。需要注意的是
+其中非零项处在位置 $i$。$\mathbf{u}^{\top} \in \mathbb{R}^{1 \times m}$ 与 $\frac{\partial \mathbf{z}}{\partial \mathbf{W}} \in \mathbb{R}^{m \times(m \times n)}$ 之间的 $\textrm{VJP}$ 可以表示为一个形状为 $1 \times(m \times n)$ 的矩阵。需要注意的是
 $$
 \mathbf{u}^{\top} \frac{\partial \mathbf{z}}{\partial W_{i j}}=\sum_{k=1}^{m} u_{k} \frac{\partial z_{k}}{\partial W_{i j}}=u_{i} x_{j} \tag{13.59}
 $$
@@ -712,11 +751,19 @@ $$
 
 #### 13.3.3.4 将它们放在一起
 
-练习 $13.1$ 需要将它们放在一起
+练习 $13.1$ 需要将它们放在一起。
+
+![computation_graph](/assets/img/figures/computation_graph.png)
+
+> 图 $13.13$: 包含 $2$ 个（标量）输入和 $1$ 个（标量）输出的计算图。
+
+![auto_diff](/assets/img/figures/auto_diff.png)
+
+> 图 $13.14$：计算图中节点 $j$ 的自动微分的图示。
 
 ### 13.3.4 计算图
 
-$\textrm{MLPs}$ 是一种简单的 $\textrm{DNN}$ 模型，其中每一层的输出直接输入下一层，从而形成一个链式结构，如图 $13.12$ 所示。然而，最新的 $\textrm{DNN}$ 模型可以以更加复杂地方式组合可微的部件，从而构成一个 **计算图**（$\textrm{computation graph}$），这一点类似于程序员将初等函数组合成更加复杂的函数。（的确，有些人也建议将 “深度学习” 称为 “**可微编程**”（$\textrm{differentiable programming}$））唯一的约束在于最终的计算图对应于一个**有向无环图**（$\textrm{directed ayclic graph, DAG}$），其中每一个节点都是关于输入可微的函数。
+$\textrm{MLPs}$ 是一种简单的 $\textrm{DNN}$ 模型，其中每一层的输出直接输入到下一层，从而形成一个链式结构，如图 $13.12$ 所示。然而，最新的 $\textrm{DNN}$ 模型可以以更加复杂的形式组合可微的部件，从而构成一个 **计算图**（$\textrm{computation graph}$），这一点类似于程序员将初等函数组合成更加复杂的函数。（的确，有些人也建议将 “深度学习” 称为 “**可微编程**”（$\textrm{differentiable programming}$））唯一的约束在于最终的计算图对应于一个**有向无环图**（$\textrm{directed ayclic graph, DAG}$），其中每一个节点都是关于输入的可微函数。
 
 举个例子，考虑函数
 $$
@@ -736,7 +783,7 @@ $$
 $$
 \frac{\partial \mathrm{o}}{\partial \mathrm{x}_{4}}=\frac{\partial \mathrm{o}}{\partial \mathrm{x}_{5}} \frac{\partial \mathrm{x}_{5}}{\partial \mathrm{x}_{4}}+\frac{\partial \mathrm{o}}{\partial \mathrm{x}_{7}} \frac{\partial \mathrm{x}_{7}}{\partial \mathrm{x}_{4}} \tag{13.67}
 $$
-通过拟拓扑顺序的计算方式，我们可以避免重复计算
+通过逆拓扑顺序的计算方式，我们可以避免重复计算
 $$
 \begin{align}
 \frac{\partial \mathbf{o}}{\partial \mathbf{x}_{7}}= & \frac{\partial \mathbf{x}_{7}}{\partial \mathbf{x}_{7}}=\mathbf{I}_{m} \tag{13.68} \\
@@ -749,41 +796,61 @@ $$
 $$
 \frac{\partial \mathrm{o}}{\partial \mathrm{x}_{j}}=\sum_{k \in \text { children }(j)} \frac{\partial \mathrm{o}}{\partial \mathrm{x}_{k}} \frac{\partial \mathrm{x}_{k}}{\partial \mathrm{x}_{j}} \tag{13.72}
 $$
-其中我们对节点 $j$ 的所有子节点 $k$ 进行求和，如图 $13.14$ 所示。对于每个子节点 $k$ 的梯度向量 $\frac{\partial \mathbf{o}}{\partial \mathbf{x}_{k}}$ 已经被计算，并被称为**共轭矩阵**（$\textrm{adjoint}$）。该值被每个子节点的雅各比 $\frac{\partial \mathbf{x}_{k}}{\partial \mathbf{x}_{j}}$ 相乘。
+其中我们对节点 $j$ 的所有子节点 $k$ 进行求和，如图 $13.14$ 所示。对于每个子节点 $k$ 的梯度向量 $\frac{\partial \mathbf{o}}{\partial \mathbf{x}_{k}}$ 已经被计算，并被称为**共轭矩阵**（$\textrm{adjoint}$），该值用于与每个子节点的雅各比 $\frac{\partial \mathbf{x}_{k}}{\partial \mathbf{x}_{j}}$ 相乘。
 
-通过使用 $\textrm{API}$ 定义静态图，可以提前计算计算图(这就是 $\textrm{Tensorflow 1}$ 的工作原理。）或者，可以通过跟踪函数在输入参数上的执行来“及时”计算图形(这就是 $\textrm{Tensorflow-eager}$ 模式以及 $\textrm{JAX}$ 和 $\textrm{PyTorch}$ 的工作原理。）后一种方法使处理动态图变得更容易，动态图的形状可以根据函数计算的值而改变。
+通过使用 $\textrm{API}$ 的定义静态图，可以提前计算出计算图（ $\textrm{Tensorflow 1}$ 的工作原理。）或者，可以通过跟踪函数在输入上的执行情况来“及时”计算计算图（这就是 $\textrm{Tensorflow-eager}$ 模式以及 $\textrm{JAX}$ 和 $\textrm{PyTorch}$ 的工作原理。）后一种方法使处理动态图变得更容易，动态图的形状可以根据函数计算的值而改变。
 
 ## 13.4 训练神经网络
 
-本节，我们将讨论如何根据数据对 $\textrm{DNNs}$ 进行训练。 最标准的方式是使用最大似然估计，通过最小化负对数似然：
+本节，我们将讨论如何基于数据对 $\textrm{DNNs}$ 进行训练。 最标准的方式是使用最大似然估计，通过最小化负对数似然：
 $$
 \mathcal{L}(\theta)=-\log p(\mathcal{D} \mid \theta)=-\sum_{n=1}^{N} \log p\left(\mathbf{y}_{n} \mid \mathbf{x}_{n} ; \theta\right) \tag{13.73}
 $$
-通常情况下，也会增加一个正则项（比如负对数先验），正如我们在13.5节讨论的那样。
+通常情况下，也会增加一个正则项（比如负对数先验），正如我们在 $13.5$ 节讨论的那样。
 
-原则上，我们可以使用 $\textrm{backprop}$ 算法（第 $13.3$ 节）来计算这种损失的梯度，并将其传递给现成的优化器，如第$5$ 章中所讨论的优化器。（第 $5.4.6.3$ 节中的 $\textrm{Adam}$ 优化器是一个流行的选择，因为它能够扩展到大型数据集（由于是 $\textrm{SGD}$ 类型的算法），并且能够相当快速地收敛（由于使用对角预处理和动量）。）但是，在实践中，这可能不起作用。在本节中，我们将讨论可能出现的各种问题，以及一些解决方案。有关 $\textrm{DNN}$ 训练实践的更多详细信息，请参阅各种其他书籍，如[HG20][^HG20]；[Zha+19a][^Zha19a]；[Ger19][^Ger19]。
+原则上，我们可以使用 $\textrm{backprop}$ 算法（第 $13.3$ 节）来计算这种损失的梯度，并将其传递给在第 $5$ 章中所讨论的现成的优化器。（第 $5.4.6.3$ 节中的 $\textrm{Adam}$ 优化器是一个普遍的选择，因为它能够扩展到大型数据集（由于是 $\textrm{SGD}$ 类型的算法），并且能够相当快速地收敛（由于使用对角预处理和动量）。）但是，在实践中，也有可能无法取得较好的结果。在本节中，我们将讨论可能出现的各种问题，以及一些解决方案。有关 $\textrm{DNN}$ 训练策略的更多详细信息，请参阅其他书籍[HG20][^HG20]；[Zha+19a][^Zha19a]；[Ger19][^Ger19]。
 
-除了实践问题，还有重要的理论问题。特别地，我们注意到 $\textrm{DNN}$ 损失不是一个凸目标，所以通常我们无法找到全局最优解。尽管如此，$\textrm{SGD}$ 总能找到令人惊讶的好办法。为什么会这样的研究仍在进行中；参见[Bah+20][^Bah20]最近对一些工作的回顾。
+除了具体的实践问题，还有重要的理论问题。特别地，我们注意到 $\textrm{DNN}$ 损失不是一个凸目标，所以通常我们无法找到全局最优解。尽管如此，$\textrm{SGD}$ 总能收敛到出人意料的好的结果。具体的原因仍在研究当中，可以参考[Bah+20][^Bah20]对一些最近工作的回顾。
 
 [^HG20]:
 [^Zha19a]:
 [^Ger19]:
 [^Bah20]:
 
+![lr_sche](/assets/img/figures/lr_sche.png)
+
+> 图$13.15$: 不同的学习率启发方式。$(a)$ 指数下降方案；$(b)$ 分段常数方案；$(c)$ 余弦退火方案（又被称为 **含重启器的随机梯度**（$\textrm{stochastic gradient with restarts}$））[Smi17][^Smi17],[LH17][^LH17]；$(d)$ 单周期方案[Smi18][^Smi18]。
+
+![lr_finder](/assets/img/figures/lr_finder.png)
+
+> 图$13.16$: 训练损失与学习率的关系，在 $FashionMNIST$ 数据集上，使用原生的 $SGD$ 拟合一个小的 $MLP$ 模型。（蓝色为原始损失，橘黄色为 $EWMA$ 版本）。
+
+[^Smi17]: 
+[^LH17]:
+[^Smi18]:
+
 ### 13.4.1 调整学习率
 
-在用 $\textrm{SGD}$ 拟合 $\textrm{DNN}$ 时，调整学习速率对于良好的性能非常重要。在第 $5.4.3$ 节中，我们讨论了 $\textrm{SGD}$ 的学习率若要收敛到局部最优值必须满足的必要条件，但是这些条件并没有精确地指定要使用什么样的学习率调度。
+在用 $\textrm{SGD}$ 训练 $\textrm{DNN}$ 时，调整学习速率对于取得良好的性能非常重要。在第 $5.4.3$ 节中，我们讨论了 $\textrm{SGD}$ 的学习率若要收敛到局部最优值必须满足的必要条件，但是这些条件并没有精确地指出要使用什么样的**学习率调节方案**（$\textrm{learning rate schedule}$）。
 
-在深度学习文献中，提出了许多启发式方法，其中一些方法如图 $13.15$ 所示。其中包括分段常数计划（图$\textrm{13.15b}$）、余弦或周期计划（图$\textrm{13.15c}$）、单周期计划（图$\textrm{13.15d}$）等（后者从一个较小的值开始，以防止参数“爆炸”，然后升温，直到找到一个良好的吸引盆，然后冷却，以找到局部最小值）
+在深度学习文献中，提出了许多启发式的方案，其中一些方法如图 $13.15$ 所示。包括分段常数策略（图$\textrm{13.15b}$）、余弦或周期策略（图$\textrm{13.15c}$）、单周期策略（图$\textrm{13.15d}$）等（后者首先从一个较小的学习率开始，以防止参数“爆炸”，然后逐步增加，直到找到一个比较好的学习率，接着再逐步下降，以找到局部最小值）
 
-除了选择衰减时间表外，还需要选择初始学习率 $\eta_{0}$。一种常见的启发式方法，在[BCN18][^BCN18]中提出。在[Smi18][^Smi18]中（他称之为“学习速率发现器”）的独立定义如下：从一个小值开始，计算小批量的训练或验证损失，然后依次尝试更大的（每一步增加$10$倍），直到损失在 $\eta_{\max }$“爆发”。 举例来说，在图$13.16$中，我们发现 $\eta_{\max } \approx 0.1$ 。然后我们将 $\eta_{0}$ 设置为比 $\eta_{\mathrm{max}}$ 稍小的值 （比如说，小于$10$倍）。
+除了选择学习率的衰减策略外，还需要选择初始学习率 $\eta_{0}$。[BCN18][^BCN18]提出了一种常见的启发式方法，该方法在[Smi18][^Smi18]中被同时发现（并称之为“**学习速率发现器**”（$\textrm{learning rate finder}$）），该方法定义为：从一个较小的学习率开始，计算小批量数据的训练或验证损失，然后依次尝试更大的（每一步增加 $10$ 倍）学习率，直到损失在 $\eta_{\max }$“爆炸”。 举例来说，在图 $13.16$ 中，我们发现 $\eta_{\max } \approx 0.1$ 。然后我们将 $\eta_{0}$ 设置为比 $\eta_{\mathrm{max}}$ 稍小的值 （如小于$10$倍大小）。
 
 [^BCN18]:
 [^Smi18]:
 
+![sigmoid_act](/assets/img/figures/sigmoid_act.png)
+
+> 图 $13.17$: $(a)$ $\textrm{sigmoid}$ 激活函数。 $(b)$ 对应的导数。
+
+![relu_act](/assets/img/figures/relu_act.png)
+
+> 图 $13.18$: $(a)$ $\textrm{ReLU}$ 激活函数。 $(b)$ 对应的导数。
+
 ### 13.4.2 梯度消失问题
 
-在某些 $\textrm{DNN}$ 中，梯度信号在通过网络传播回来时变为 $0$，这阻止了学习的发生。这就是所谓的消失梯度问题。[GB10][^GB10]。
+在某些 $\textrm{DNN}$ 中，梯度信号在通过网络传播回来时会变为 $0$，进而阻止了学习过程的继续。这就是所谓的**梯度消失问题**（$\textrm{vanishing gradient problem}$）[GB10][^GB10]。
 
 为了了解它为什么会发生，让我们考虑一下 $\textrm{sigmoid}$ 激活函数
 $$
@@ -793,7 +860,7 @@ $$
 $$
 \varphi^{\prime}(a)=\sigma(a)(1-\sigma(a)) \tag{13.75}
 $$
-现在考虑网络层 $\mathbf{z}=\sigma(\mathbf{W} \mathbf{x})$ 。假设这是最后一层，所以 $\delta=\frac{\partial \mathbf{f}(\mathbf{x}, \boldsymbol{\theta})}{\partial \mathbf{x}} = \mathbf{z}(1-\mathbf{z})$ 。使用 $13.3.3$ 节中的结果，我们该激活函数的局部梯度为
+现在考虑网络层 $\mathbf{z}=\sigma(\mathbf{W} \mathbf{x})$ 。假设这是最后一层，所以 $\delta=\frac{\partial \mathbf{f}(\mathbf{x}, \boldsymbol{\theta})}{\partial \mathbf{x}} = \mathbf{z}(1-\mathbf{z})$ 。使用 $13.3.3$ 节中的结果，我们发现损失函数关于 $\mathbf{x}$ 的梯度为：
 $$
 \frac{\partial \mathcal{L}}{\partial \mathbf{x}}=\delta^{\top} \mathbf{W}=\mathbf{W}^{\top} \mathbf{z}(1-\mathbf{z}) \tag{13.76}
 $$
@@ -801,7 +868,7 @@ $$
 $$
 \frac{\partial \mathcal{L}}{\partial \mathbf{W}}=\delta \mathbf{x}^{\top}=\mathbf{z}(1-\mathbf{z}) \mathbf{x}^{\top} \tag{13.77}
 $$
-如果权重被初始化为大（正或负），那么 $\mathbf{W}{\mathrm{x}}$ 的（某些分量）很容易取大值，因此 $\mathbf{z}$ 在 $0$ 或 $1$ 附近饱和，因为$\textrm{sigmoid}$ 饱和，如图 $\textrm{13.17a}$ 所示。在任何一种情况下，我们都可以看到梯度将变为 $0$，如图 $\textrm{13.17b}$ 所示。
+如果权重被初始化为一个很大的值（正或负），那么 $\mathbf{W}{\mathrm{x}}$ 的（某些分量）很容易取很大的值，因此 $\mathbf{z}$ 将接近 $\textrm{sigmoid}$ 的饱和值 $0$ 或 $1$，如图 $\textrm{13.17a}$ 所示。在任何一种情况下，我们都可以看到梯度将变为 $0$，如图 $\textrm{13.17b}$ 所示。
 
 解决梯度消失问题的标准方案是使用 $\textrm{ReLU}$ 激活函数。所以假设我们使用 $\mathbf{z}=\operatorname{ReLU}\left(\mathbf{Wx}\right)$，其中
 $$
@@ -811,7 +878,7 @@ $$
 $$
 \operatorname{ReLU}^{\prime}(a)=\mathbb{I}(a>0) \tag{13.79}
 $$
-假设这是最后一层，所以 $\delta=\frac{\partial \mathbf{f}(\mathbf{x}, \boldsymbol{\theta})}{\partial \mathbf{x}}=\mathbb{I}(\mathbf{z}>\mathbf{0})$ 。使用 $13.3.3$ 节的结果，我们发现激活函数的局部梯度为
+假设这是最后一层，所以 $\delta=\frac{\partial \mathbf{f}(\mathbf{x}, \boldsymbol{\theta})}{\partial \mathbf{x}}=\mathbb{I}(\mathbf{z}>\mathbf{0})$ 。使用 $13.3.3$ 节的结果，发现激活函数的局部梯度为
 $$
 \frac{\partial \mathcal{L}}{\partial \mathbf{x}}=\delta^{\top} \mathbf{W}=\mathbf{W}^{\top} \mathbb{I}(\mathbf{z}>\mathbf{0}) \tag{13.80}
 $$
@@ -819,21 +886,21 @@ $$
 $$
 \frac{\partial \mathcal{L}}{\partial \mathbf{W}}=\delta \mathbf{x}^{\top}=\mathbb{I}(\mathbf{z}>0) \mathbf{x}^{\top} \tag{13.81}
 $$
-如果权重初始化为较大的负值，会容易导致 $\mathbf{Wx}$ 变成较大的负值，进而导致 $\mathbf{z}=0$，如图 $\textrm{13.18a}$  所示。这将会导致关于权重的梯度等于 $0$，如图 $\textrm{13.18b}$ 所示。算法将永远无法逃离这种情况，所以激活单元将永远被关闭。这被称为 "$\textrm{dead relu}$" 问题。这个问题可以通过使用 $\operatorname{ReLU}$ 的非饱和变体进行解决，正如我们在 $13.2.3$ 节中所讨论的那样。
+如果权重初始化为较大的负值，会容易导致 $\mathbf{Wx}$ 变成较大的负值，进而导致 $\mathbf{z}=0$，如图 $\textrm{13.18a}$  所示。这将会导致关于权重的梯度等于 $0$，如图 $\textrm{13.18b}$ 所示。算法将永远无法摆脱该局部解，所以对应的激活单元将永远被关闭。这被称为 "$\textrm{dead relu}$" 问题。这个问题可以通过使用 $\operatorname{ReLU}$ 的非饱和变体进行解决，正如我们在 $13.2.3$ 节中所讨论的那样。
 
 ### 13.4.3 训练深度模型的困难
 
 当我们训练非常深的模型的时候，梯度往往会趋向于变得过小（**梯度消失问题**，$\textrm{vanishing gradient problem}$）或过大（**梯度爆炸问题**，$\textrm{exploding gradient problem}$），因为误差信号在经过一系列层的时候会被放大或者抑制。（$\textrm{RNNs}$ 应用于较长序列时，也会出现这种问题，我们将会在 $15.2.5$ 节解释。）
 
-为了更加深入地解释这个问题，考虑损失关于层 $l$ 中某个节点的梯度：
+为了更加深入地理解这个问题，考虑损失关于第 $l$ 层中某个节点的梯度：
 $$
 \frac{\partial \mathcal{L}}{\partial \mathbf{z}_{l}}=\frac{\partial \mathcal{L}}{\partial \mathbf{z}_{l+1}} \frac{\partial \mathbf{z}_{l+1}}{\partial \mathbf{z}_{l}}=\mathbf{J}_{l} \mathbf{g}_{l+1} \tag{13.82}
 $$
-其中 $\mathbf{J}_{l}=\frac{\partial \mathbf{z}_{l+1}}{\partial \mathbf{z}_{l}}$ 为雅各比矩阵，$\mathbf{g}_{l+1}=\frac{\partial \mathcal{L}}{\partial \mathbf{z}_{l+1}}$ 表示下一层的梯度。如果 $\mathbf{J}_l$ 在不同的层都是一个常数，那么显然最后一层的梯度 $\mathbf{g}_L$ 对层 $l$ 的贡献为 $\mathbf{J}^{L-l} \mathbf{g}_{L}$ 。所以系统的行为将依赖于 $\mathbf{J}$ 的特征向量。
+其中 $\mathbf{J} _{l}=\frac{\partial \mathbf{z} _{l+1}}{\partial \mathbf{z} _{l}}$ 为雅各比矩阵，$\mathbf{g} _{l+1}=\frac{\partial \mathcal{L}}{\partial \mathbf{z} _{l+1}}$ 表示下一层的梯度。如果 $\mathbf{J} _l$ 在不同的层都是一个常数，那么显然最后一层的梯度 $\mathbf{g} _L$ 对第 $l$ 层的贡献为 $\mathbf{J}^{L-l} \mathbf{g} _{L}$ 。所以系统的行为将依赖于 $\mathbf{J}$ 的特征向量。
 
-尽管 $\mathbf{J}$ 是一个实数矩阵，但它不是（一般情况下）对称的， 所以它的特征值和特征向量可能是复数， 其中的虚数部分对应着振荡的行为。令 $\lambda$ 表示 $\mathbf{J}$ 的 **谱半径**（$\textrm{spectral radius}$），即特征值的绝对值的最大值。 如果它大于 $1$， 梯度将发生爆炸； 如果小于 $1$， 梯度将会消失。 （类似地， $\mathbf{W}$ 的谱半径， 连接着 $\mathbf{z}_l$ 和 $\mathbf{z}_{l+1}$， 决定了在前向模式下动态系统的稳定性。）
+尽管 $\mathbf{J}$ 是一个实数矩阵，但它不是（一般情况下）对称的， 所以它的特征值和特征向量可能是复数， 其中的虚数部分对应着振荡的行为。令 $\lambda$ 表示 $\mathbf{J}$ 的 **谱半径**（$\textrm{spectral radius}$），即特征值的绝对值的最大值。 如果它大于 $1$， 梯度将发生爆炸； 如果小于 $1$， 梯度将会消失。 （类似地， $\mathbf{W}$ 的谱半径， 连接着 $\mathbf{z} _l$ 和 $\mathbf{z} _{l+1}$， 决定了在前向模式下动态系统的稳定性。）
 
-梯度爆炸问题可以通过 **梯度截断**（$\textrm{gradient clipping}$） 来进行改善，当梯度过大时，我们将它的幅值进行截断， 举例来说， 我们使用
+梯度爆炸问题可以通过 **梯度截断**（$\textrm{gradient clipping}$） 来进行改善，当梯度过大时，我们将它的幅值进行截断， 举例来说， 使用
 $$
 \mathrm{g}^{\prime}=\min \left(1, \frac{c}{\|\mathrm{~g}\|}\right) \mathrm{g} \tag{13.83}
 $$
@@ -845,15 +912,19 @@ $$
 - 更改模型结构，使每一层的激活值标准化，从而使整个数据集上的激活值的分布在训练期间保持一致； 见 $13.4.5$ 节。
 - 小心地选择参数的初始化值； 见 $13.4.6$ 节。
 
+![res_block](/assets/img/figures/res_block.png)
+
+> 图$13.19$: $(a)$ 残差模块的示意图。$(b)$ 残差模块有利于深度网络训练的原因。图形来自于 [Ger19][^Ger19] 的图 $14.16$。
+
 ### 13.4.4 残差连接
 
 对于 $\textrm{DNNs}$ 而言，一种解决梯度消失问题的方案是使用 **残差网络**（$\textrm{residual network, ResNet}$）[He+16a][He16a]。该前向网络中的每一层的形式是一个**残差模块**（$\textrm{residual block}$），定义为
 $$
 \mathcal{F}_{l}^{\prime}(\mathrm{x})=\mathcal{F}_{l}(\mathrm{x})+\mathrm{x} \tag{13.84}
 $$
-其中 $\mathcal{F}_{l}$ 是一个很浅的非线性映射 （比如： 线性层—激活层—线性层）。内部 $\mathcal{F}_{l}$ 函数计算需要添加到输入  $\mathrm{x}$  中以生成所需输出的剩余项或增量；学习对输入产生小扰动通常比直接预测输出更容易。（如第 $14.3.2.4$ 节所述，剩余连接通常与 $\textrm{CNN}$ 一起使用，但也可用于 $\textrm{MLP}$。）
+其中 $\mathcal{F} _{l}$ 是一个很浅的非线性映射函数 （比如： 线性层—激活层—线性层）。 $\mathcal{F} _{l}$ 函数计算需要添加到输入  $\mathrm{x}$  中以生成所需输出的残差项或增量；相较于直接让网络学习如何预测输出，学习在输入的基础上产生的小扰动通常更加容易。（如第 $14.3.2.4$ 节所述，残差连接通常与 $\textrm{CNN}$ 一起使用，但也可用于 $\textrm{MLP}$。）
 
-有残差连接的模型与没有残差连接的模型具有相同的参数数量，但是训练起来比较容易。原因是梯度可以直接从输出传递到浅层，如图 $\textrm{13.19b}$ 所示。要看到这一点，请注意，输出层的激活可以通过使用任意浅层 $l$ 的输出得到：
+含有残差连接的模型与没有残差连接的模型具有相同的参数数量，但是训练起来比较容易。原因是梯度可以直接从输出传递到浅层，如图 $\textrm{13.19b}$ 所示。要说明这一点，值得注意的是，输出层的激活可以通过使用任意浅层 $l$ 的输出得到：
 $$
 \mathrm{z}_{L}=\mathrm{z}_{l}+\sum_{i=l}^{L-1} \mathcal{F}_{i}\left(\mathrm{z}_{i} ; \boldsymbol{\theta}_{i}\right) \tag{13.85}
 $$
@@ -870,9 +941,9 @@ $$
 
 ### 13.4.5 Batch normalization
 
-对DNN架构的另一个流行修改是添加一个层，当在一个小批量中的样本中平均时，该层确保层内激活的分布是零均值和单位方差。这称为**批处理规范化** （$\mathrm{batch\ normalization, BN}$）[IS15][^IS15]。
+对 $\textrm{DNN}$ 结构的另一个普遍的修改是添加一个层，该层可以确保层内激活值的分布均值为 $0$ 和方差为 $1$。这被称为**批处理规范化** （$\mathrm{batch\ normalization, BN}$）[IS15][^IS15]。
 
-更准确地说，我们将样本 $n$ （在某一层）的激活向量 $\mathbf{z}_n$ （或者是预激活向量 $\mathbf{a}_n$）替换为 $\tilde{\mathbf{z}}_{n}$ ，计算方式为：
+更准确地说，我们将样本 $n$ （在某一层）的激活向量 $\mathbf{z} _n$ （或者是预激活向量 $\mathbf{a} _n$）替换为 $\tilde{\mathbf{z}} _{n}$ ，计算方式为：
 
 
 $$
@@ -883,17 +954,19 @@ $$
 \pmb{\sigma}_{\mathcal{B}}^{2} & =\frac{1}{|\mathcal{B}|} \sum_{\pmb{\mathbf{z}} \in \mathcal{B}}\left(\mathbf{z}-\pmb{\mu}_{\mathcal{B}}\right)^{2} \tag{13.93}
 \end{align}
 $$
-其中 $\mathcal{B}$ 为包含样本 $n$ 的批次，$\pmb{\mu}_\mathcal{B}$ 为该批次的激活值的均值[^4]，$\pmb{\sigma}_{\mathcal{B}}^{2}$ 为对应的方差， $\hat{\mathbf{z}}_{n}$ 表示标准化后的激活向量，$\tilde{\mathbf{z}}_{n}$ 表示经过平移和缩放后的结果 （$\mathrm{BN}$ 层的输出），$\pmb{\beta}$ 和 $\pmb{\gamma}$ 表示该层的可学习参数， $\epsilon>0$ 是一个值很小的常数。考虑到 $\mathrm{BN}$ 是可微的， 我们可以很容易地将梯度反传到该层的输入和 $\mathrm{BN}$的参数 $\pmb{\beta}$ 和 $\pmb{\gamma}$。
+其中 $\mathcal{B}$ 为包含样本 $n$ 的批次，$\pmb{\mu} _\mathcal{B}$ 为该批次数据激活值的均值[^4]，$\pmb{\sigma} _{\mathcal{B}}^{2}$ 为对应的方差， $\hat{\mathbf{z}} _{n}$ 表示标准化后的激活向量，$\tilde{\mathbf{z}} _{n}$ 表示经过平移和缩放后的结果 （$\mathrm{BN}$ 层的输出），$\pmb{\beta}$ 和 $\pmb{\gamma}$ 表示该层的可学习参数， $\epsilon>0$ 是一个值很小的常数。考虑到 $\mathrm{BN}$ 是可微的， 我们可以很容易地将梯度反传到该层的输入和 $\mathrm{BN}$ 的参数 $\pmb{\beta}$ 和 $\pmb{\gamma}$。
 
 [^4]:  当应用于卷积层时，我们平均跨空间位置和跨示例，但不跨通道（因此 $\pmb{\mu}$ 的长度是通道数）。当应用于一个完全连接的层时，我们只需对示例进行平均（因此 $\pmb{\mu}$ 的长度就是层的宽度）。
 
-对于输入层， $\mathrm{batch\ normalization}$ 等价于我们在 $10.2.8$ 节讨论的常规的标准化程序。值得注意的是， 输入层的均值和方差只需要计算一次，因为数据是静态的。然而，中间层的经验均值和方差是不断改变的，因为参数一直在更新。（这通常被称为 “**内协变量漂移**”（$\mathrm{internal\ covariate\ shift}$）。这就是我们需要对每一个批次重新计算 $\pmb{\mu}$ 和 $\pmb{\sigma}^2$ 的原因。
+对于输入层， $\mathrm{batch\ normalization}$ 等价于我们在 $10.2.8$ 节讨论的常规的标准化过程。值得注意的是， 输入层的均值和方差只需要计算一次，因为数据是静态的。然而，中间层的经验均值和方差是不断改变的，因为参数一直在更新。（这通常被称为 “**内协变量漂移**”（$\mathrm{internal\ covariate\ shift}$）。这就是我们需要对每一个批次重新计算 $\pmb{\mu}$ 和 $\pmb{\sigma}^2$ 的原因。
 
 $\mathrm{BN}$ 的作用（在训练速度和稳定性方面）是非常显著的，尤其是对于深度 $\textrm{CNNs}$。具体的原因还不是很清楚， 但 $\mathrm{BN}$ 似乎使优化曲面变得更加平滑 [San+18][^San18]。同时它也降低了对学习率的敏感性 [ALL18][^ALL18]。除了计算方面的优势，它还具备统计上的优势。特别地， $\mathrm{BN}$ 更像一个正则器；事实上，它可以被证明是相当于一种形式的近似贝叶斯推理 [TAS18][^TAS18];[Luo+19][^Luo19]。
 
-然而，依赖于小批量数据会导致几个问题。首先，在小批量训练时，它可能会导致参数估计不稳定，尽管该方法的最新版本称为批量重正化[Iof17][^Iof17]， 该方法部分解决了这个问题。第二，$\mathrm{BN}$ 在推理阶段需要进行调整， 因为在测试阶段时的$\textrm{batch size}$ 可能是 $1$。 标准的计算过程是： 在训练之后， 计算训练集中所有样本在第 $l$ 层的 $\pmb{\mu}_l$ 和 $\pmb{\sigma}_l^2$， 然后”冻结“这些参数， 并将这些值添加到该层其他参数的列表中， 即 $\pmb{\beta}_l$ 和 $\pmb{\gamma}_l$ 。在测试阶段， 我们利用这些冻结的参数计算 $\pmb{\mu}_l$ 和 $\pmb{\sigma}_l^2$， 而不是从测试批次中计算统计量。（所以在使用包含 $\mathrm{BN}$ 的模型中， 我们需要指定模型是用于训练还是测试。）
+然而，依赖于小批量数据会导致几个问题。首先，在小批量训练时，它可能会导致参数估计不稳定，尽管该方法的最新版本**批量重规范化**（$\textrm{batch renormalization}$）[Iof17][^Iof17]部分地解决了这个问题。其次，$\mathrm{BN}$ 在推理阶段需要进行一些调整， 因为在测试阶段时的 $\textrm{batch size}$ 可能是 $1$。 具体的测试过程为：在训练之后， 计算训练集中所有样本在第 $l$ 层的 $\pmb{\mu}_l$ 和 $\pmb{\sigma}_l^2$， 然后”冻结“这些参数， 并将这些值添加到该层其他参数的列表中， 即 $\pmb{\beta}_l$ 和 $\pmb{\gamma}_l$ 。在测试阶段， 我们利用这些冻结的参数计算 $\pmb{\mu}_l$ 和 $\pmb{\sigma}_l^2$， 而不是从测试批次中计算统计量。（所以在使用包含 $\mathrm{BN}$ 的模型中， 我们需要指定模型是用于训练还是测试。）
 
-为了提高速度，我们可以将冻结后的批处理规范层与前一层结合起来。 特别地， 假设前一层计算 $\mathbf{XW}+\mathbf{b}$；将其与 $\mathrm{BN}$ 组合 $\pmb{\gamma}\ \odot(\mathbf{XW+b-\pmb{\mu}})/\pmb{\sigma}\ +\ \pmb{\beta}$。如果我们定义 $\mathbf{W}^{\prime}=\gamma \odot \mathbf{W} / \sigma$ 和 $\mathbf{b}^{\prime}=\gamma \odot(\mathbf{b}-\boldsymbol{\mu}) / \sigma+\boldsymbol{\beta}$ ， 然后我们可以将组合的层写成 $\mathrm{X} \mathrm{W}^{\prime}+\mathrm{b}^{\prime}$。 这被称为 **融合批规范**（$\mathrm{fused\ batchnorm}$）。在训练过程中，可以开发类似的技巧来加速 $\mathrm{BN}$ 计算[Jun+19][^Jun19]。
+> The standard approach to this is as follows: after training, compute $\pmb{\mu}_l$ and $\pmb{\sigma}_l^2$ for layer $l$ across all the examples in the training set, and then “freeze” these parameters, and add them to the list of other parameters for the layer, namely $\pmb{\beta}_l$ and $\mathbf{\gamma}_l$. At test time, we then use these frozen training values for  $\pmb{\mu}_l$ and $\pmb{\sigma}_l^2$ , rather than computing statistics from the test batch. (Thus when using a model with $\textrm{BN}$, we need to specify if we are using it for inference or training.)
+
+为了提高推理速度，我们可以将冻结后的批处理规范层与前一层结合起来。 特别地， 假设前一层计算 $\mathbf{XW}+\mathbf{b}$；将其与 $\mathrm{BN}$ 组合 $\pmb{\gamma}\ \odot(\mathbf{XW+b-\pmb{\mu}})/\pmb{\sigma}\ +\ \pmb{\beta}$。如果我们定义 $\mathbf{W}^{\prime}=\gamma \odot \mathbf{W} / \sigma$ 和 $\mathbf{b}^{\prime}=\gamma \odot(\mathbf{b}-\boldsymbol{\mu}) / \sigma+\boldsymbol{\beta}$ ， 然后我们可以将组合的层写成 $\mathbf{X} \mathbf{W}^{\prime}+\mathbf{b}^{\prime}$。 这被称为 **融合批规范**（$\mathrm{fused\ batchnorm}$）。在训练过程中，可以开发类似的技巧来加速 $\mathrm{BN}$ 计算[Jun+19][^Jun19]。
 
 [^IS15]:
 [^San18]:
@@ -902,3 +975,132 @@ $\mathrm{BN}$ 的作用（在训练速度和稳定性方面）是非常显著的
 [^ Luo19]: text
 [^ Iof17]: text
 [^ Jun19]: text
+
+### 13.4.6 参数初始化
+
+由于 $\textrm{DNN}$ 训练的目标函数是非凸的， $\textrm{DNN}$ 参数的初始化方式对我们最终能够得到的优化解以及训练优化过程的难易程度（即 ，信息在前向与反向传播过程中的有益程度）有很大的影响。 在本节的剩余部分，我们将介绍一些用于初始化参数的常见的启发式方法。
+
+#### 13.4.6.1 启发式
+
+在 [GB10][^GB10] 中，他们表明从标准正态中采样得到的参数会导致输出的方差远大于输入的方差，从而导致梯度爆炸。为了解决这个问题，他们提出从均值为 $0$ ，方差为 $\sigma^{2}=1 / \text{fan} _{\text{avg}}$ 的高斯分布中采样参数，其中$ \text{fan} _\text{avg} = (\text{fan} _\text{in} + \text{fan} _\text{out})/2$，其中 $\text{fan} _\text{in}$ 是一个单元的扇入（传入连接数），$\text{fan} _\text{out}$是单元的扇出（传出连接数）。这种方法被称为 $\textbf{Xavier}$ 初始化或 $\textbf{Glorot}$ 初始化，以 [GB10][^GB10] 的第一作者的名字命名。如果我们使用  $\sigma^{2}=1 / \text{fan} _{\text{in}}$，我们会得到一种称为 $\textbf{LeCun}$ 初始化的方法，以 $\textrm{Yann LeCun}$ 的名字命名，他于 $1990$ 年代提出该方法，等效于 $\text{fan} _\text{in} = \text{fan} _\text{out} $ 时的 $\textbf{Glorot}$ 初始化。如果我们用 $\sigma^{2}=2 / \text{fan} _{\text{in}}$，该方法称为 $\textbf{He}$初始化，得名于$\text{Kaiming He}$，他在[He+15][^He15]中提出了该方法。初始化方法的最佳选择取决于所使用的激活函数。对于线性、$\text{tanh}$、$\text{logistic}$ 和 $\text{softmax}$ 激活函数，推荐使用 $\textbf{Glorot}$。对于 $\text{ReLU}$ 及其变体，推荐使用 $\text{He}$。对于 $\text{SELU}$，推荐 $\text{LeCun}$。有关更多启发式的方法，请参考 [Gér19][^Ger19]。
+
+```typo
+Ximing He ——> Kaiming He
+```
+
+我们也可以使用一种数据驱动的参数初始化方法。举例来说，[MM16][^MM16] 提出一种简单而且有效的策略，被称为 $\textbf{layer-sequential unit-variance (LSUV)}$ 初始化，工作原理如下。首先我们对每一层（全连接或卷积层）的权重初始化一个 [SMG14][^SMG14] 中提出的正交矩阵。（该正交矩阵可以通过如下方式获得，首先从分布 $\mathbf{w} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$ 中进行采样， 并将 $\mathbf{w}$  $\text{reshape}$ 为矩阵 $\mathbf{W}$，然后使用 $\textrm{QR}$ 或者 $\textrm{SVD}$ 分解获取矩阵的正交基。）接着，对于每一层 $l$，我们计算一个 $\textrm{minibatch}$ 的激活值的方差 $v_l$；然后使用 $\mathrm{W} _{l}:=\mathrm{W} _{l} / \sqrt{v _{l}}$ 进行重缩放。该策略可以看作是正交初始化与 $\textrm{batch normalization}$ 的组合，而后者只需要针对第一个 $\textrm{mini-batch}$ 进行计算。实验表明，这样的 $\textrm{normalization}$ 已经足够，并且该方法要快于完全使用 $\textrm{batch normalization}$。
+
+另一种方法被称为 $\mathbf{fixup}$ [ZDM19][^ZDM19]。该方法可以用于训练没有 $\textrm{batchnorm}$ 的非常深的残差网络。
+
+[^GB10]: 
+[^He15]:
+[^Ger19]:
+[^MM16]:
+[^SMG14]:
+[^ZDM19]:
+
+#### 13.4.6.2 一种函数空间视角
+
+考虑一个含有 $L$ 个隐藏层和 $1$ 个线性输出层的 $\textrm{MLP}$：
+$$
+f(\mathbf{x} ; \boldsymbol{\theta})=\mathbf{W}_{L}\left(\cdots \varphi\left(\mathbf{W}_{2} \varphi\left(\mathbf{W}_{1} \mathbf{x}+\mathbf{b}_{1}\right)+\mathbf{b}_{2}\right)\right)+\mathbf{b}_{L} \tag{13.94}
+$$
+我们可以假设模型参数分别服从如下分布：
+$$
+\mathbf{W}_{\ell} \sim \mathcal{N}\left(0, \alpha_{\ell}^{2} \mathbf{I}\right), \mathbf{b}_{\ell} \sim \mathcal{N}\left(0, \beta_{\ell}^{2} \mathbf{I}\right) \tag{13.95}
+$$
+我们可以对上述分布进行重参数化：
+$$
+\mathbf{W}_{\ell}=\alpha_{\ell} \eta_{\ell}, \eta_{\ell} \sim \mathcal{N}(0, \mathbf{I}), \mathbf{b}_{\ell}=\beta_{\ell} \epsilon_{\ell}, \epsilon_{\ell} \sim \mathcal{N}(0, \mathbf{I}) \tag{13.96}
+$$
+所以每一种先验超参都指定了一个如下的随机函数：
+$$
+f(\mathrm{x} ; \boldsymbol{\alpha}, \boldsymbol{\beta})=\alpha_{L} \eta_{L}\left(\cdots \varphi\left(\alpha_{1} \eta_{1} \mathrm{x}+\beta_{1} \epsilon_{1}\right)\right)+\beta_{L} \epsilon_{L} \tag{13.97}
+$$
+为了理解这些超参数的影响，我们可以从这些先验中采样得到 $\textrm{MLP}$ 的参数，并且绘制出最终的随机函数。我们使用 $\textrm{sigmoid}$ 非线性函数，所以 $\varphi(a)=\sigma(a)$。 我们考虑 $L=2$ 层的网络， 所以 $\mathbf{W}_1$ 对应 $\text{input-to-hidden}$ 的权重， $\mathbf{W}_2$ 对应 $\text{hidden-to-output}$ 的权重。我们假设输入和输出为标量，所以我们最终可以随机生成非线性映射 $f: \mathbb{R} \rightarrow \mathbb{R}$。
+
+图 $13.20(a)$ 展示了一些采样得到的函数，其中 $\alpha_{1}=5, \beta_{1}=1, \alpha_{2}=1, \beta_{2}=1$ 。在图 $13.20(b)$ 中我们增加了 $\alpha_1$；这使得第一层的权重变得更大，导致 $\textrm{S}$ 型函数的形状更陡 （与图 $10.2$ 相比）。在图 $13.20(c)$ 中，我们增加 $\beta_1$；这使得第一层的偏置更大，使得函数的中心更多地向左右两侧移动。图 $13.20(d)$中，我们增加 $\alpha_2$，使得第二层的线性层权重更大，导致函数变得更加 “扭曲”(wiggly) （对输入的变化更加敏感，所以导致更大的动态范围）
+
+上述结果只是针对 $\textrm{sigmoidal}$ 激活函数的情况。 $\textrm{ReLU}$ 函数的结果可能不一样。举例来说， [WI20, App.E][^WI20] 表明，对于包含 $\textrm{ReLU}$ 激活单元的 $\text{MLPs}$ ，如果我们令 $\beta_l=0$，那么所有的偏置项都为 $0$， 那么改变 $\alpha_l$ 的影响只是对输出进行尺度缩放。为了说明这一点，注意到公式 $(13.97)$ 可以简化为
+$$
+\begin{align}
+f(\mathrm{x} ; \alpha, \beta=0) &=\alpha_{L} \eta_{L}\left(\cdots \varphi\left(\alpha_{1} \eta_{1} \mathrm{x}\right)\right)=\alpha_{L} \cdots \alpha_{1} \eta_{L}\left(\cdots \varphi\left(\eta_{1} \mathrm{x}\right)\right) \tag{13.98} \\
+&=\alpha_{L} \cdots \alpha_{1} f(\mathrm{x} ;(\alpha=1, \beta=0)) \tag{13.99}
+\end{align}
+$$
+其中我们使用了 $\text{ReLU}$ 的规律， $\varphi(\alpha z)=\alpha \varphi(z)$ 对任意正数 $\alpha$ 都成立，$\varphi(\alpha z)=0$ 对于任意的负数 $\alpha$ 都成立 （因为预激活值 $z \gt 0$）。一般情况下， 输入信号在一个随机初始化的网络中进行前向和反向传播时到底会发生什么情况，通常由 $\alpha$ 和 $\beta$ 决定，更多细节可参考 [Bah+20][^Bah20]。
+
+从上面的分析中我们发现， $\text{DNN}$ 中参数的不同分布对应于函数的不同分布。所以模型的随机初始化更像是从先验知识中进行采样。当神经网络趋向于无限宽时，我们可以推导出该先验分布的解析解：这被称为 **神经网络高斯过程**（$\textrm{neural network Gaussian process}$）,我们将会在本书的第二册进行解释 [Mur22][^Mur22]。
+
+[^WI20]:
+[^Bah20]:
+[^Mur22]:
+
+## 13.5 正则化
+
+在 $13.4$ 节，我们从计算角度讨论了在训练（大型）神经网络过程中的一些问题。本节，我们会从统计学的角度对这个问题展开讨论。特别地，我们将集中讨论避免过拟合的方法。关于这一点十分重要，因为较大的神经网络很容易具有百万级的参数。
+
+### 13.5.1 提前终止 (Early stopping)
+
+或许避免过拟合最好的方式就是**提前终止** ($\textrm{early stopping}$)，这是一种启发式的方法，当模型在验证集上的错误率开始增加时终止对模型的训练（见图 $4.7$）。该方法之所以奏效，是因为我们限制了优化算法将训练样本中的信息传递到模型参数的能力，正如 [AS19][^AS19] 所解释的。
+
+[^AS19]: 
+
+### 13.5.2 权重衰减 (Weight decay)
+
+一种常见的避免过拟合的方式是为参数赋予一个先验分布，然后使用 $\textrm{MAP}$ 估计。通常情况下对模型的权重使用高斯先验 $\mathcal{N}\left(\mathbf{w} \mid \mathbf{0}, \alpha^{2} \mathbf{I}\right)$， 对偏置使用 $\mathcal{N}\left(\mathbf{b} \mid \mathbf{0}, \beta^{2} \mathbf{I}\right)$。（参考 $13.4.6.2$ 节对该先验的讨论）这等价于目标函数的 $l_2$ 正则。在神经网络的文献中，被称为 **权重衰减** （$\textrm{weight decay}$），因为该方法鼓励值小的权重，即更加简单的模型，正如岭回归的原理一样 （$11.3$ 节）。
+
+### 13.5.3 稀疏化 DNNs
+
+考虑到神经网络中包含很多权重，通常鼓励稀疏化是有益的。这将允许我们进行**模型压缩**（$\textrm{model compression}$），从而可以节省存储和时间。为了实现这一点，我们可以使用 $l_1$ 正则（$11.5$ 节），或者 $\textrm{ARD}$ （$11.6.6$ 节），或者 $\textrm{spike and slab}$ 先验（$11.6.4.1$ 节），或者 $\textrm{horseshoe}$ 先验（$11.6.4.3$ 节）等。（[GEH19][^GEH19] 给出了相关知识的综述）。
+
+考虑一个具体例子，图 $13.21$ 展示了一个 $5$ 层 $\textrm{MLP}$，该模型已经对 $1$ 维数据进行了拟合，并且对权重使用了 $l_1$ 正则。我们发现最终的图形拓扑结构是稀疏的。当然，存在很多稀疏化估计的方法也是可行的。
+
+尽管直觉上稀疏化的拓扑结构很具有吸引力，但实际上这种方法却很少被普遍使用，因为主流的 $\textrm{GPUs}$ 只针对 *稠密* （$\textit{dense}$）矩阵乘法作了优化，而稀疏矩阵的乘法并没有什么计算上的优势。然而，如果我们使用能够鼓励 *组* ($\textit{group}$) 稀疏化的方法，我们对模型中的整个层都进行减枝操作。这将导致 *块稀疏化*（$\textit{block sparse}$） 权重矩阵，这将有利于计算上的加速和存储上的节约（参考 [Sca+17][^Sca17];[Wen+16][^Wen16];[MAV17][^MAV17];[LUW17][^LUW17]）。
+
+[^GEH19]:
+[^Sca17]:
+[^Wen16]:
+[^MAV17]:
+[^LUW17]:
+
+### 13.5.4 Dropout
+
+假设我们依概率 $p$ 随机的将每个节点的输出连接关闭，如图 $13.22$ 所示。该技术被称为 $\textbf{dropout}$ [Sri+14][^Sri14]。
+
+$\textrm{Dropout}$ 可以显著地降低过拟合风险并且被广泛使用。直觉上，该技术之所以有效的原因在于，它阻止了隐藏节点间的复杂的互适应性。换句话说，每一个节点必须表现良好，及时某些其他的节点被随机的取消。这将阻止节点之间学习到复杂但脆弱的依赖关系[^5]。一个更加正式的解释，从高斯尺度混合先验角度进行分析，该解释可参考[NHLS19][^NHLS19]。
+
+[^5]:  Geoff Hinton, who invented dropout, said he was inspired by a talk on sexual reproduction, which encourages genes to be individually useful (or at most depend on a small number of other genes), even when combined with random other genes. 
+
+我们可以将该技术视作是一种对权重的含噪估计 $\theta_{l i j}=w_{l i j} \epsilon_{l i}$，其中 $\epsilon_{l i} \sim \operatorname{Ber}(1-p)$ 为伯努利噪声项。（所以如果我们采样 $\epsilon_{l i}=0$ , 那么所有连接 $l-1$ 层的节点 $i$ 与 $l$ 层的 $j$ 节点的权重将被设置为 $0$。）在测试阶段，我们通常将噪声关闭，这等价于令 $\epsilon_{l i}=1$ 。为了获得无噪声权重的估计值，我们应该使用 $w_{l i j}=\theta_{l i j} / \mathbb{E}\left[\epsilon_{l i}\right]$，所以测试阶段权重的期望值与训练阶段的期望值保持一致。对于伯努利噪声，我们有 $\mathbb{E}[\epsilon]=1-p$ ，所以在测试阶段我们应该除以 $1-p$。
+
+```typo
+th enoise -> the noise
+```
+
+然而，我们也可以在测试阶段使用 $\textrm{dropout}$。其最终的结果为 网络的$\textrm{ensemble}$，每一个子网络对应一个稀疏的图结构。这被称为 $\textbf{Monte Carlo dropout} $[GG16][^GG16];[KG17][^KG17]，具体形式为:
+$$
+p(\mathbf{y} \mid \mathbf{x}, \mathcal{D}) \approx \frac{1}{S} \sum_{s=1}^{S} p\left(\mathbf{y} \mid \mathbf{x}, \hat{\mathbf{W}} \epsilon^{s}+\hat{\mathbf{b}}\right) \tag{13.100}
+$$
+其中 $S$ 为采样样本的数量，$\hat{\mathbf{W}} \epsilon^{s}$ 表明我们将所有估计的矩阵与一个经随机采样得到的噪声向量进行了矩阵乘。这种方式通常可以提供一个对贝叶斯后验预测分布 $p(\mathbf{y} \mid \mathbf{x}, \mathcal{D})$ 的好的近似，尤其是在噪声比是被优化过的情况下 [GHK17][^GHK17]。
+
+[^Sri14]:
+[^NHLS19]:
+[^GG16]:
+[^KG17]:
+[^GHK17]:
+
+
+
+### 13.5.5 贝叶斯神经网络
+
+主流的 $\textrm{DNNs}$ 通常使用（含惩罚项）最大似然估计的目标函数来搜寻一种参数的配置。然而，对于特别大的模型，其参数量往往大于数据量，所以可能存在多种可能的模型，它们对训练集的拟合情况都很好，但在泛化性能上具有差异性。通过获取后验分布中的不确定性通常是有用的。我们可以关于模型参数计算边缘概率分布实现这一点
+$$
+p(\mathbf{y} \mid \mathbf{x}, \mathcal{D})=\int p(\mathbf{y} \mid \mathbf{x}, \boldsymbol{\theta}) p(\boldsymbol{\theta} \mid \mathcal{D}) d \boldsymbol{\theta} \tag{13.101}
+$$
+上述结果被称为 $\textbf{Bayesian neural network}$ 或者 $\textbf{BNN}$。它可以被认识是一个含不同权重的神经网络的无限集成。通过对参数求边缘分布，我们可以避免过拟合[Mac95][^Mac95]。贝叶斯边缘化对于大型神经网络具有挑战性，但同样可以获得大幅的性能提升 [WI20][^WI20]。关于$\textbf{Bayesian deep learning}$ 的更多细节，可以参考书籍 [Mur22][^Mur22]。
+
+[^Mac95]:
+[^WI20]:
+[^Mur22]:
+
