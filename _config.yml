@@ -179,9 +179,10 @@ jekyll-archives:
 
 markdown: kramdown
 
-
 # Gitalk settings
 comment_gitalk_clientId: b51ad1001051820f33c6
-comment_gitalk_clientSecret: 336f5adb0d644fb6b38ba0ff2ea8c3f996259903
-comment_gitalk_repo: qiguming.github.io
+comment_gitalk_clientSecret: 13d72ceba1c71e6ce1def69a57a20e68f53958c5
+comment_gitalk_repo: https://github.com/qiguming/qiguming.github.io
 github_username: qiguming
+
+
