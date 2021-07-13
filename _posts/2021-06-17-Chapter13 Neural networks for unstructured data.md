@@ -1,4 +1,4 @@
-```yml
+---
 title: 13 面向非结构数据的神经网络
 author: fengliang qi
 date: 2021-06-17 11:33:00 +0800
@@ -8,11 +8,31 @@ math: true
 mermaid: true
 toc: true
 comments: true
-```
+---
+
+> 本章，我们介绍了深度神经网络（$\textrm{DNN}$），深度神经网络的优势在于：通过构建复杂的特征提取器，缓解了手动设计特征的负担，提高了模型的拟合能力。
+>
+> - 我们首先介绍了多层感知机模型，它有效解决了传统（单层）感知机模型在解决某些模式识别问题上的不足。
 
 ## 13.1 引言
 
-在部分 $\mathrm{II}$， 我们讨论了在回归和分类任务中的线性模型。其中，在第 $\textrm{11}$ 章，我们讨论了线性回归模型，即 $p(y|\mathbf{x}, \mathbf{w})=\mathcal{N}\left(y|\mathbf{w}^{\top}\mathbf{x}, \sigma^{2}\right)$  。在第 $\textrm{10}$ 章，我们讨论了逻辑回归，在二分类任务中，模型定义为 $p(y|\mathbf{x}, \mathbf{w})={\rm{Ber}}(y|\sigma(\mathbf{w}^{\top}\mathbf{x}))$，在多分类任务中，模型定义为 $ p(y|\mathbf{x},\mathbf{w})=\operatorname{Cat}(y|\mathcal{S}(\mathbf{W} \mathbf{x}))$。在第 $\textrm{12}$ 章，我们讨论了广义线性模型，定义为:
+> <table><tr><td bgcolor=blue>名词对照表</td></tr></table> 
+>
+> - 线性回归：linear regression;
+> - 逻辑回归: logistic regression;
+> - 广义线性模型: generalized linear models;
+> - 指数族分布：exponential family distribution;
+> - 逆连接函数：inverse link function;
+> - 线性(仿射)变换：linear(affine) transformation;
+> - 特征变换： feature transformation;
+> - 特征提取器： feature extractor.
+>
+> <table><tr><td bgcolor=blue>内容总结</td></tr></table> 
+>
+> - 引入了 "$\textrm{DNN}$" 的概念，其背后的动机在于: 通过给于特征提取器更加复杂的结构（更多的可学习参数），提高模型在特征提取方面的能力；
+> - "$\textrm{DNN}$" 又被称为前馈神经网络，所谓前馈神经网络一般是指模型的结构是一个有向无环图。与之对应的是循环神经网络。前馈神经网络中主要包含：（单层）感知机，多层感知机，径向基网络等。
+
+在本书的部分 $\mathrm{II}$， 我们讨论了应用于回归和分类任务的线性模型。其中，在第 $\textrm{11}$ 章，我们讨论了线性回归模型，即 $p(y|\mathbf{x}, \mathbf{w})=\mathcal{N}\left(y|\mathbf{w}^{\top}\mathbf{x}, \sigma^{2}\right)$  。在第 $\textrm{10}$ 章，我们讨论了逻辑回归，其中对于二分类情况，模型的形式定义为 $p(y|\mathbf{x}, \mathbf{w})={\rm{Ber}}(y|\sigma(\mathbf{w}^{\top}\mathbf{x}))$，在多分类任务中，模型定义为 $ p(y|\mathbf{x},\mathbf{w})=\operatorname{Cat}(y|\mathcal{S}(\mathbf{W} \mathbf{x}))$。在第 $\textrm{12}$ 章，我们进一步讨论了广义线性模型，定义为:
 $$
 p(\mathbf{y}|\mathbf{x};\pmb{\theta})=p(\mathbf{y}|g^{-1}(f(\mathbf{x};\pmb{\theta}))) \tag{13.1}
 $$
@@ -20,63 +40,62 @@ $$
 $$
 f(\mathbf{x};\pmb{\theta})=\mathbf{Wx} + \mathbf{b} \tag{13.2}
 $$
-表示关于输入的一个线性（仿射）变换函数， 其中 $\mathbf{W}$ 被称为 **权重** ($\textrm{weights}$)，$\mathbf{b}$ 被称为 **偏置** ($\textrm{biases}$)。
+表示关于输入 $\mathbf{x}$ 的一个线性（仿射）变换函数， 其中 $\mathbf{W}$ 被称为 **权重** ($\textrm{weights}$)，$\mathbf{b}$ 被称为 **偏置** ($\textrm{biases}$)。
 
-```tt
-线性回归：linear regression;
-逻辑回归: logistic regression;
-广义线性模型: generalized linear models;
-指数族分布：exponential family distribution;
-逆连接函数：inverse link function;
-线性(仿射)变换：linear(affine) transformation.
-```
+---
 
-在线性模型中，我们假设输出与输入 $\mathbf{x}$ 呈线性关系，该假设具有很强的局限性。为了增加此类线性模型的灵活性，一种简单方法是使用特征变换，即利用 $\phi(\mathbf{x})$ 替代 $\mathbf{x}$。举例来说，我们可以使用多项式变换，在 $\textrm{1}$ 维数据中，该变换函数定义为 $\phi(x)=[1,x,x^2,x^3,...]$，我们在 $\textrm{1.2.2.2}$ 节中对该方法进行了讨论。这种方法有时被称为 **基函数拓展** ($\textrm{basis function expansion}$)。基于该变换，上述模型定义为:
+在线性模型中，我们依然假设输出与输入 $\mathbf{x}$ 呈线性关系，该假设具有很强的局限性。为了增加此类线性模型的灵活性，一种简单方法是使用特征变换，即利用 $\phi(\mathbf{x})$ 替代 $\mathbf{x}$。举例来说，我们可以使用多项式变换。举例而言，在 $\textrm{1}$ 维数据中，该变换函数定义可以定义为 $\phi(x)=[1,x,x^2,x^3,...]$，我们在 $\textrm{1.2.2.2}$ 节中对该方法进行了讨论。这种方法有时被称为 **基函数拓展** ($\textrm{basis function expansion}$)。在特征变换的基础上，式 $13.2$ 可以定义为:
 $$
 f(\mathbf{x}; \pmb{\theta})=\mathbf{W}\mathbf{\phi}(\mathbf{x}) + \mathbf{b} \tag{13.3}
 $$
-上式模型关于参数 $\pmb{\theta}=(\mathbf{W}, \mathbf{b})$ 依然是线性关系，从而降低了模型的拟合难度。然而，手动设计的特征变换函数依然具有很强的局限性。
+需要注意的是，上式模型的输出关于参数 $\pmb{\theta}=(\mathbf{W}, \mathbf{b})$ 依然是线性关系，这样可以降低了模型的拟合难度。然而，手动设计的特征变换函数依然具有很强的局限性。
 
-一个很自然的拓展是为特征提取器赋予自己的参数 $\pmb{\theta}^\prime$， 即:
+---
+
+一个很自然的泛化是为特征提取器赋予自己的参数 $\pmb{\theta}^\prime$， 即:
 $$
 f(\mathbf{x};\pmb{\theta},\pmb{\theta}^\prime)=\mathbf{W}\phi(\mathbf{x};\pmb{\theta}^\prime)+\mathbf{b} \tag{13.4}
 $$
 我们可以递归地重复上述过程，从而构造一个越来越复杂的函数。如果我们组合 $L$ 个函数，即
 $$
-f(\mathbf{x};\pmb{\theta})=f_L(f_{L-1}(...(f_1(\mathbf{x}))...)) \label{eq:13.5} \tag{13.5}
+f(\mathbf{x};\pmb{\theta})=f_L(f_{L-1}(...(f_1(\mathbf{x}))...))\tag{13.5}
 $$
-其中 $f_l(\mathbf{x})=f(\mathbf{x};\pmb{\theta}_l)$ 为第 $l$ 层的函数。这便是 **深度神经网络** ($\textrm{deep neural networks, DNNs}$) 背后的关键思想。
+其中 $f _l(\mathbf{x})=f(\mathbf{x};\pmb{\theta} _l)$ 为第 $l$ 层的函数。这便是 **深度神经网络** ($\textrm{deep neural networks, DNNs}$) 背后的关键思想。
 
-```tt
-特征变换： feature transformation
-特征提取器： feature extractor
-```
+---
 
-术语 “$\textrm{ DNN}$ ” 实际上包含了一大类模型，它们的特点在于将多个可微函数组合成任何类型的 $\textrm{DAG}$（有向无环图），从而实现输入到输出的映射函数的建模， 式 (\ref{eq:13.5}) 是最简单的一个例子，其中的 $\textrm{DAG}$ 是一个链式结构。“$\textrm{ DNN}$ ”又被称为 **前馈神经网络**（$\textrm{feedforward neural network, FFNN}$）或 **多层感知机**（$\textrm{multilayer perceptron, MLP}$）。
+术语 “$\textrm{ DNN}$ ” 实际上包含了一大类模型，这类模型的特点在于它们都是将多个可微函数组合成任何类型的 $\textrm{DAG}$（有向无环图），从而实现输入到输出的映射函数的建模， 式 $13.5$ 是其中的最简单的一个例子，它的 $\textrm{DAG}$ 是一个链式结构。“$\textrm{ DNN}$ ”又被称为 **前馈神经网络**（$\textrm{feedforward neural network, FFNN}$）或 **多层感知机**（$\textrm{multilayer perceptron, MLP}$）。
 
-$\textrm{MLP}$ 假定输入是一个维度固定的矢量，即 $\mathbf{x} \in \mathbb{R}^D$。 我们称此类数据为“**非结构化数据**” ($\textrm{unstructured data}$)，因为我们没有对输入的形式进行任何假设。 但是，$\textrm{MLP}$ 难以应用于具有可变大小或形状的输入。 在第 $\textrm{14}$ 章中，我们讨论了**卷积神经网络**（$\textrm{convolutional neural networks, CNN}$），用于处理可变大小的图像。 在第 $\textrm{15}$ 章中，我们讨论了**递归神经网络**（$\textrm{recurrent neural networks, RNN}$），用于处理可变大小的序列。 在第 $\textrm{23}$ 章中，我们讨论了**图神经网络**（$\textrm{graph neural networks, GNN}$），用于处理可变大小的图数据。 有关 $\textrm{DNN}$ 的更多信息，请参见其他书籍 [HG20][^HG20], [Zha19a][^Zha19a], [Ger19][^Ger19]。
+$\textrm{MLP}$ 假定输入是一个维度固定的矢量，即 $\mathbf{x} \in \mathbb{R}^D$。 我们称此类数据为“**非结构化数据**” ($\textrm{unstructured data}$)，因为我们没有对输入的形式作任何假设。 但是，$\textrm{MLP}$ 很难应用于具有可变大小或形状的输入。 在第 $\textrm{14}$ 章中，我们将讨论**卷积神经网络**（$\textrm{convolutional neural networks, CNN}$），用于处理可变大小的图像。 在第 $\textrm{15}$ 章中，我们将讨论**递归神经网络**（$\textrm{recurrent neural networks, RNN}$），用于处理可变长度的序列。 在第 $\textrm{23}$ 章中，我们将讨论**图神经网络**（$\textrm{graph neural networks, GNN}$），用于处理可变形状的图数据。 有关 $\textrm{DNN}$ 的更多信息，可参考其他书籍 [$\textrm{HG20}$][^HG20], [$\textrm{Zha19a}$][^Zha19a], [$\textrm{Ger19}$][^Ger19]。
 
-[^HG20]: J. Howard and S. Gugger. Deep Learning for Coders with Fastai and PyTorch: AI Applications Without a PhD. en. 1st ed. O’Reilly Media, Aug. 2020.
-[^Zha19a]: A. Zhang, Z. Lipton, M. Li, and A. Smola. Dive into deep learning. 2019.
-[^Ger19]: A. Géron. Hands-On Machine Learning with Scikit-Learn and TensorFlow: Concepts, Tools, and Techniques for Building Intelligent Systems (2nd edition). en. O’Reilly Media, Incorporated, 2019.
+[^HG20]: $\textrm{[HG20]}$: J. Howard and S. Gugger. Deep Learning for Coders with Fastai and PyTorch: AI Applications Without a PhD. en. 1st ed. O’Reilly Media, Aug. 2020.
+[^Zha19a]: $\textrm{[Zha19a]}$ : A. Zhang, Z. Lipton, M. Li, and A. Smola. Dive into deep learning. 2019.
+[^Ger19]: $\textrm{[Ger19]}$ : A. Géron. Hands-On Machine Learning with Scikit-Learn and TensorFlow: Concepts, Tools, and Techniques for Building Intelligent Systems (2nd edition). en. O’Reilly Media, Incorporated, 2019.
 
-> 本节我们:
->
-> 1. 引入了 "DNN" 的概念，其背后的动机在于: 通过给于特征提取器更加复杂的结构以及更多的参数量，提高模型在特征提取方面的能力。
->
-> 2. "DNN" 又被称为前馈神经网络，所谓前馈神经网络一般是指有向无环图模型。与之对应的是循环神经网络。前馈神经网络中主要包含：感知机，多层感知机，径向基网络等。
+***
 
 ---
 
 ## 13.2 多层感知机
 
-在第 $\textrm{10.2.5}$ 节，我们表明 **感知机** ($\textrm{perceptron}$) 就是逻辑回归模型的一个确定性版本。具体来说，它是一个具备如下形式映射函数:
+> <table><tr><td bgcolor=blue>名词对照表</td></tr></table> 
+>
+> - 不可微: non-differentiable
+> - 优化器：optimizer
+>
+> <table><tr><td bgcolor=blue>内容总结</td></tr></table> 
+>
+> - 传统感知机模型在解决 $XOR$ 这一模式识别问题上的无效性; 
+> - 通过引入 $MLP$ 解决了上述难点，但其所包含的不可微的单位阶跃函数限制了其在优化方面的表现;
+> - 通过使用可微的非线性激活函数，可以有效改善上述问题，但应避免使用存在饱和区的激活函数（会导致梯度消失的问题）
+
+在第 $\textrm{10.2.5}$ 节，我们介绍了 **感知机** ($\textrm{perceptron}$) 模型， 它实际上就是逻辑回归模型的一个确定性版本（$\textrm{deterministic version}$）。具体而言，它是一个具备如下形式的映射函数:
 $$
 f(\mathbf{x};\mathbf{\theta})=\mathbb{I}(\mathbf{w}^{\rm{T}}\mathbf{x}+b\ge0)=H(\mathbf{w}^{\rm{T}}\mathbf{x}+b) \tag{13.6}
 $$
-其中 $H(a)$ 表示 **单位阶跃函数**（$\textrm{heaviside step function}$）， 又被称为 **线性阈值函数** ($\textrm{linear threshold function}$）。由于感知机的决策边界依然是线性的，所以其表达能力十分有限。$\textrm{1969}$ 年，$\textrm{Marvin Minsky}$ 和 $\textrm{Seymour Papert}$ 出版了一本名为 $\textrm{《 Perceptrons》}$ [MP69][^MP69] 的著作，其中给出了许多感知机无法解决的模式识别问题。 在讨论如何解决问题之前，我们首先举一个具体的例子。
+其中 $H(a)$ 表示 **单位阶跃函数**（$\textrm{heaviside step function}$）， 又被称为 **线性阈值函数** ($\textrm{linear threshold function}$）。由于感知机模型的决策边界依然是线性的，所以表达能力十分有限。$\textrm{1969}$ 年，$\textrm{Marvin Minsky}$ 和 $\textrm{Seymour Papert}$ 出版了一本名为 $\textrm{《 Perceptrons》}$ [$\textrm{MP69}$][^MP69] 的著作，书中列举了许多感知机无法解决的模式识别问题。 在讨论如何解决这些问题之前，我们首先分析其中的一个具体示例。
 
-[^MP69]: M. Minsky and S. Papert. Perceptrons. MIT Press, 1969.
+[^MP69]: $\textrm{[MP69]}$ M. Minsky and S. Papert. Perceptrons. MIT Press, 1969.
 
 | $x_1$ | $x_2$ | $y$  |
 | ----- | ----- | :--: |
@@ -85,11 +104,11 @@ $$
 | 1     | 0     |  1   |
 | 1     | 1     |  0   |
 
->   <font size=2> 表$\textrm{ 13.1}$： 抑或问题的真值表，$y=x_{1} \underline{\vee} x_{2}$。</font>
+>   <center><font size=2> 表$13.1$： 抑或问题的真值表，$y=x _{1} \underline{\vee} x _{2}$。</font></center>
 
 ![xor-heaviside](/assets/img/figures/xor-heaviside.png)
 
->  <font size=2>图 $\textrm{13.1}$：$\textrm{(a)}$ 抑或函数无法实现线性可分，但基于单位阶跃函数构建的两层模型可以将数据分开。程序由 $xor-heaviside.py$ 生成。 $\textrm{(b)}$ 包含一个隐藏层的神经网络，其中的权重由人工设计，该网络实现了抑或函数。 $h_1$ 表示 $AND$ 函数，$h_2$ 表示 $OR$ 函数。 偏置项表示为常数节点（值为 $\textrm{1}$）的连接权重。</font>
+>  <center><font size=2>图 $\textrm{13.1}$：$\textrm{(a)}$ 抑或函数无法实现线性可分，但基于单位阶跃函数构建的两层模型可以将数据分开。程序由 $xor-heaviside.py$ 生成。 $\textrm{(b)}$ 包含一个隐藏层的神经网络，其中的权重由人工设计，该网络实现了抑或函数。 $h_1$ 表示 $AND$ 函数，$h_2$ 表示 $OR$ 函数。 偏置项表示为常数节点（值为 $\textrm{1}$）的连接权重。</font></center>
 
 ```python
 import numpy as np
@@ -121,27 +140,29 @@ plt.show()
 
 ### 13.2.1 抑或问题
 
-$\textrm{《 Perceptrons》}$书中最著名的例子之一就是 $\textrm{XOR}$ 问题。 在该例子中，我们的目标是学习一个函数，该函数用于计算两个二进制输入的异或值。 表 $\textrm{13.1}$ 给出了该函数的真值表。 我们在图 $\textrm{13.1a}$ 中对该函数进行了可视化。 显然，数据并不是线性可分离的，因此感知机模型无法表示该映射函数。
+$\textrm{《 Perceptrons》}$书中最著名的例子之一就是 $\textrm{XOR}$ 问题。 在该示例中，我们的目标是学习一个函数，用于计算两个二进制输入的异或值。 表 $\textrm{13.1}$ 给出了该函数的真值表。 我们在图 $\textrm{13.1a}$ 中对真值表进行了可视化。 显然，其中的数据并不是线性可分离的，因此感知机模型无法实现对该映射函数的建模。
 
-但是，我们可以通过叠加多个感知机来克服这个问题，即 **多层感知机**（$\textrm{multilayer perceptron, MLP}$）。 例如，要解决 $\textrm{XOR}$ 问题，我们可以使用图 $\textrm{13.1b}$  所示的 $\textrm{MLP}$。 它由 $\textrm{3}$ 个感知机组成，分别为 $h_1$，$h_2$ 和 $y$。 节点 $x$ 表示输入，节点 $1$ 表示常数项， 节点 $h_1$ 和 $h_2$ 被称为 **隐藏单元** （$\textrm{hidden units}$），因为在训练数据中未观察到它们的真值。
+但是，我们可以通过叠加多个感知机模型来克服这个难点，即 **多层感知机**（$\textrm{multilayer perceptron, MLP}$）。 例如，要解决 $\textrm{XOR}$ 问题，我们可以使用图 $\textrm{13.1b}$  所示的 $\textrm{MLP}$。 它由 $\textrm{3}$ 个感知机组成，分别为 $h_1$，$h_2$ 和 $y$。 节点 $x$ 表示输入，节点 $1$ 表示常数项， 节点 $h_1$ 和 $h_2$ 被称为 **隐藏单元** （$\textrm{hidden units}$），因为在训练数据中未观察到它们的真值。
 
-第一个隐藏单元通过使用设置的合理权重来计算 $h_{1}=x_{1} \wedge x_{2}$。（ $\wedge$ 表示 $\rm{AND}$ 操作。）特别地，它的输入为 $x_1$和 $x_2$，且权重均为为 $\textrm{1.0}$，同时具有 $\textrm{-1.5}$ 的偏置项（通过虚设一个常量节点 $\textrm{1}$ 来模拟偏置项）。 因此，如果 $x_1$ 和 $x_2$ 都等于 $\textrm{1}$，则 $h_1$ 将被激活，因为
+第一个隐藏单元利用合理设置的权重来计算 $h_{1}=x_{1} \wedge x_{2}$（ $\wedge$ 表示 $\rm{AND}$ 操作）。具体而言，它的输入为 $x_1$和 $x_2$，且权重均为 $\textrm{1.0}$，同时具有 $\textrm{-1.5}$ 的偏置项（通过虚设一个常量节点 $\textrm{1}$ 来模拟偏置项）。 因此，如果 $x_1$ 和 $x_2$ 都等于 $\textrm{1}$，则 $h_1$ 将被激活，因为
 $$
 \mathbf{w}_1^{\rm{T}}\mathbf{x}-b_1=[1.0, 1.0]^{\rm{T}}[1, 1] - 1.5 =0.5 > 0 \tag{13.7}
 $$
-类似的，第二个隐藏单元计算 $h_{2}=x_{1} \vee x_{2}$，其中 $\vee$ 为 $\rm{OR}$ 操作，第三个节点计算输出 $y=\overline{h_1} \wedge h_2$，其中 $\bar{h}=\neg h$ 为 $\rm{NOT}$ 操作 （ 逻辑非）。 所以节点 $y$ 计算
+类似的，第二个隐藏单元计算 $h_{2}=x_{1} \vee x_{2}$，其中 $\vee$ 为 $\rm{OR}$ 操作，第三个节点计算输出 $y=\overline{h_1} \wedge h_2$，其中 $\bar{h}=\neg h$ 为 $\rm{NOT}$ 操作 （ 逻辑非）。 所以节点 $y$ 表示为
 $$
 y=f\left(x_{1}, x_{2}\right)=\overline{\left(x_{1} \wedge x_{2}\right)} \wedge\left(x_{1} \vee x_{2}\right) \tag{13.8}
 $$
 上式等价于 $\rm{XOR}$ 函数。
 
-通过扩展上述案例， $\textrm{MLP}$ 可以表示任何逻辑函数。 但是，我们显然希望避免手动指定权重和偏置。 在本章的其余部分，我们将讨论从数据中学习这些参数的方法。
+将上述案例一般化， $\textrm{MLP}$ 可以用来表示任何逻辑函数。 但是，我们显然希望避免手动设置权重和偏置。 在本章的其余部分，我们将讨论从数据中学习这些参数的方法。
+
+---
 
 ### 13.2.2 可微多层感知机
 
-我们在第 $\textrm{13.2.1}$ 节中讨论的 $\textrm{MLP}$ 被定义为多个感知机的叠加，每个感知机都包含不可微的 $\textrm{Heaviside}$ 函数。 这使得模型很难训练，这就是为什么它们从未被广泛使用的原因。然而，如果我们将阶跃函数 $H:\mathbb{R}\rightarrow \{0,1\}$ 替换为一个可微的 **激活函数** （$\textrm{activation function}$）$\varphi:\mathbb{R} \rightarrow \mathbb{R}$ 。：更准确地说，我们将每个层 $l$ 的隐藏单元 $\mathbf{z}_l$ 定义为通过这个激活函数进行逐元素传递的前一层的隐藏单元的线性变换的结果。
+我们在第 $\textrm{13.2.1}$ 节中讨论的 $\textrm{MLP}$ 被定义为多个感知机的叠加，每个感知机都包含不可微的 $\textrm{Heaviside}$ 函数。 这使得模型很难训练，这就是为什么它们从未被广泛使用的原因。然而，如果我们将阶跃函数 $H:\mathbb{R}\rightarrow \{0,1\}$ 替换为一个可微的 **激活函数** （$\textrm{activation function}$）$\varphi:\mathbb{R} \rightarrow \mathbb{R}$ 。：更准确地说，我们将每层 $l$ 的隐藏单元 $\mathbf{z}_l$ 定义为通过这个激活函数进行逐元素传递的前一层的隐藏单元的线性变换的结果。
 
-> More precisely, we define the hidden units $\mathbf{z}_l$ at each layer $l$ to be a linear transformation of the hidden units at the previous layer passed elementwise through this activation function.
+> <font color=red>More precisely, we define the hidden units $\mathbf{z}_l$ at each layer $l$ to be a linear transformation of the hidden units at the previous layer passed elementwise through this activation function.</font>
 
 
 $$
@@ -156,12 +177,7 @@ $$
 z_{kl}=\varphi_l \left( b_{kl}+\sum_{j=1}^{K_{l-1}}w_{jkl}z_{jl-1} \right) \tag{13.10}
 $$
 
-如式 (\ref{eq:13.5}) 中所示，如果我们现在将 $L$ 个诸如此类的激活函数叠加在一起。然后使用链式规则，计算输出关于每一层中参数的梯度，也称为 **反向传播** （$\textrm{backpropagation}$），如我们在第 $\textrm{13.3}$ 节中所解释的。 （这对于任何一种可微的激活函数都是可行的，尽管某些类型的激活函数要比其他类型的函数更适用，正如我们在第 $\textrm{13.2.3}$ 节中讨论的那样。）然后，我们可以将梯度传递给优化器，从而最小化某些训练目标，正如我们在 $\textrm{13.4}$ 节讨论的那样。 因此，术语“$\textrm{ MLP}$”几乎总是指可微的模型，而不是指具有不可微的线性阈值单位的历史版本。
-
-```tt
-不可微: non-differentiable
-优化器：optimizer
-```
+如式 $ 13.5$ 所示，如果我们现在将 $L$ 个诸如此类的激活函数叠加在一起，然后使用链式规则，计算输出关于每一层中参数的梯度，也称为 **反向传播** （$\textrm{backpropagation}$），如我们在第 $\textrm{13.3}$ 节中所解释的。 （这对于任何一种可微的激活函数都是可行的，尽管某些类型的激活函数要比其他类型的函数更适用，正如我们在第 $\textrm{13.2.3}$ 节中讨论的那样）。然后，我们可以将梯度传递给优化器，从而最小化某些训练目标，正如我们在 $\textrm{13.4}$ 节讨论的那样。 因此，术语“$\textrm{ MLP}$”几乎总是指可微的模型，而不是指具有不可微的线性阈值单位的历史版本。
 
 | $\textrm{Name}$                    | $\textrm{Definition}$                                        | $\textrm{Range}$     | $\textrm{Reference}$            |
 | ---------------------------------- | ------------------------------------------------------------ | -------------------- | ------------------------------- |
@@ -173,21 +189,23 @@ $$
 | $\textrm{Exponential linear unit}$ | $\max (a, 0)+\min \left(\alpha\left(e^{a}-1\right), 0\right)$ | $[-\infty, +\infty]$ | [CUH16][^CUH16]                 |
 | $\textrm{Swish}$                   | $a \sigma(a)$                                                | $[-\infty, +\infty]$ | [RZL17][^RZL17]                 |
 
->  表 $\textrm{13.2}$：神经网络中常用的一些激活函数
+>  <center><font size=2>表 $\textrm{13.2}$：神经网络中常用的一些激活函数</font></center>
 
-[^GBB11]: text
-[^KSH12]: text
-[^MHN13]: text
-[^CUH16]: text
-[^RZL17]: text
+[^GBB11]: $\textrm{[GBB11]}$: X. Glorot, A. Bordes, and Y. Bengio. “Deep Sparse Rectifer Neural Networks”. In: AISTATS. 2011.
+[^KSH12]: $\textrm{[KSH12]}$: A. Krizhevsky, I. Sutskever, and G. Hinton. “Imagenet classification with deep convolutional neural networks”. In: NIPS. 2012.
+[^MHN13]: $\textrm{[MHN13]}$: A. L. Maas, A. Y. Hannun, and A. Y. Ng. “Rectifier Nonlinearities Improve Neural Network Acoustic Models". In: ICML. Vol. 28. 2013.
+[^CUH16]: $\textrm{[CUH16]}$: D.-A. Clevert, T. Unterthiner, and S. Hochreiter. “Fast and Accurate Deep Network Learning by Exponential Linear Units (ELUs)”. In: ICLR. 2016.
+[^RZL17]: $\textrm{[RZL17]}$: P. Ramachandran, B. Zoph, and Q. V. Le. “Searching for Activation Functions”. In: (Oct. 2017). arXiv: 1710.05941 [cs.NE].
 
 ![activations](/assets/img/figures/activations.png)
 
->  图 $\textrm{13.2}$：$\textrm{(a)}$ 对于 $sigmoid$ 函数而言，当输入在 $0$ 附近时，输出与输入呈线性关系，但对于较大的正值或负值输入，则输出存在饱和区。图形由程序 生成。 $\textrm{(b)}$ 一些常用的非饱和激活函数的可视化。图形由程序 生成。
+>  <center><font size=2>图 $\textrm{13.2}$：$\textrm{(a)}$ 对于 $sigmoid$ 函数而言，当输入在 $0$ 附近时，输出与输入呈线性关系，但对于较大的正值或负值输入，则输出存在饱和区。图形由程序 生成。 $\textrm{(b)}$ 一些常用的非饱和激活函数的可视化。图形由程序 生成。</font></center>
+
+---
 
 ### 13.2.3 激活函数
 
-我们可以在每一层使用任何一种可微的激活函数。然而，如果我们使用 *线性* （$\textrm{linear}$）激活函数  $\varphi_l(a)=c_la$，那整个模型将退化为一个常规的线性模型。以式  (\ref{eq:13.5})为例，该模型将退化为：
+我们可以在每一层使用任何一种可微的激活函数。然而，如果我们使用 *线性* （$\textrm{linear}$）激活函数  $\varphi_l(a)=c_la$，那整个模型将退化为一个常规的线性模型。以式 $13.5$ 为例，该模型将退化为：
 
 
 $$
@@ -197,30 +215,31 @@ $$
 
 在上式中，为了符号上的简洁性，我们丢弃了偏置项。基于上述原因，使用非线性激活函数就显得十分重要。
 
-在神经网络的早期发展阶段，一个常见的选择是使用 $\textrm{S}$ 型 ($\textrm{logistic}$) 激活函数，该函数可以看做是单位阶跃函数的平滑近似版本。然而，如图 $\textrm{13.2a}$ 所示，对于较大的正值输入，$\textrm{S}$ 形函数存在饱和值 $\textrm{1}$；对于较大的负值输入，$\textrm{S}$ 形函数存在饱和值 $\textrm{0}$。 $\textrm{tanh}$ 激活函数具有相似的形状，但其饱和值分别为 $\textrm{-1}$ 和 $\textrm{+1}$。 在这些饱和区域，输出关于输入的斜率将接近于零。因此，如我们在第 $\textrm{13.4.2}$  节中所讨论的，来自深层网络的任何梯度信号都将“消失”。
+在神经网络发展的早期阶段，通常会使用 $\textrm{S}$ 型 ($\textrm{logistic}$) 激活函数，该函数可以看做是单位阶跃函数的平滑近似版本。然而，如图 $\textrm{13.2a}$ 所示，对于较大的正值输入，$\textrm{S}$ 形函数存在饱和输出 $\textrm{1}$；对于较大的负值输入，$\textrm{S}$ 形函数存在饱和输出 $\textrm{0}$。 $\textrm{tanh}$ 激活函数具有相似的形状，但其饱和输出分别为 $\textrm{-1}$ 和 $\textrm{+1}$。 在这些饱和区域，输出关于输入的斜率将接近于零。因此，如我们在第 $\textrm{13.4.2}$  节中所讨论的，来自深层网络的任何梯度信号都将“消失”。
+
+---
 
 要想成功训练一个非常深的神经网络模型，一个关键因素是使用 **非饱和激活函数** （$\textrm{non-saturating activation functions}$）。几种不同的激活函数如表 $\textrm{13.2}$ 所示。其中最常用的是 **整流线性单元** （$\textrm{rectifled linear unit, ReLU}$）。定义为
-
 
 $$
 {\rm{ReLU}}(a)=\max(a,0)=a\mathbb{I}(a>0) \tag{13.12}
 $$
 
 
-该 $\textrm{ReLU}$ 函数简单地将负值输入置零，并保持正值输入保持不变。如 $\textrm{13.3.3.2}$ 节所介绍的，这种形式至少保证对于正值输入，梯度的值为 $\textrm{1}$，从而避免了梯度的消失。
+该 $\textrm{ReLU}$ 函数简单地将负值输入置零，并保持正值输入保持不变。如 $\textrm{13.3.3.2}$ 节所介绍的，这种形式至少保证对于正值输入，梯度的值为 $\textrm{1}$，从而缓解了梯度消失的问题。
 
 不幸的是，对于负值输入，$\textrm{ReLU}$ 的梯度依然为 $\textrm{0}$，因此，该单元将永远无法获得任何反馈信号来帮助其摆脱当前的参数设置 （**译者注：**即无法逃离负值区域）； 这被称为 “$\pmb{\textrm{dying ReLU}}$” 问题。
 
-一种简单的解决方法是使用[MHN13][^MHN13]中提出的 $\pmb{\textrm{leaky ReLU}}$。 定义为
+一种简单的解决方法是使用 [$\textrm{MHN13}$][^MHN13] 中提出的 $\pmb{\textrm{leaky ReLU}}$。 定义为
 
 
 $$
 {\rm{LReLU}}(a;\alpha)=\max(\alpha a,a) \tag{13.13}
 $$
 
-其中 $0 \lt \alpha \lt 1$。该函数对于正值输入的斜率为 $\textrm{1}$，对于负值输入的斜率为 $\alpha$， 所以可以确保当输入为负值时，依然可以有信号可以从更深的网络层中反传回来。如果我们允许参数 $\alpha$ 可以学习，而非固定， $\pmb{\textrm{leaky ReLU}}$ 将被称为  $\pmb{\textrm{parametric ReLU}}$。
+其中 $0 \lt \alpha \lt 1$。该函数对于正值输入的斜率为 $\textrm{1}$，对于负值输入的斜率为 $\alpha$， 所以可以确保当输入为负值时，依然可以有信号可以从更深的网络层中反传回来。如果我们允许参数 $\alpha$ 是可学习而非固定的， $\pmb{\textrm{leaky ReLU}}$ 将被称为  $\pmb{\textrm{parametric ReLU}}$。
 
-另一个广泛的选择是 [CUH16][^CUH16] 中提出的 $\textrm{ELU}$，定义为
+另一个普遍的选择是 [$\textrm{CUH16}$][^CUH16] 中提出的 $\textrm{ELU}$，定义为
 
 
 $$
@@ -230,41 +249,44 @@ a & \text{if } a \gt 0
 \end{cases} \tag{13.14}
 $$
 
-[^CUH16]: 
-
 与 $\pmb{\textrm{leaky ReLU}}$ 相比，它具有平滑函数的优点。
 
-在[Kla+17][^Kla17]中提出了一种 $\textrm{ELU}$ 的变体，称为 $\pmb{\textrm{SELU}}$（$\textrm{self-normalizing ELU}$）。 定义为
+在 [$\textrm{Kla+17}$][^Kla17] 中提出了一种 $\textrm{ELU}$ 的变体，称为 $\pmb{\textrm{SELU}}$（$\textrm{self-normalizing ELU}$）。 定义为
 
 
 $$
 {\rm{SELU}}(a;\alpha,\lambda)=\lambda{\rm{ELU}}(a;\alpha) \tag{13.15}
 $$
 
-[^Kla17]: text
+[^Kla17]: $\textrm{[Kla+17]}$: G. Klambauer, T. Unterthiner, A. Mayr, and S.Hochreiter. “Self-Normalizing Neural Networks”. In: NIPS. 2017.
 
-出乎意料的是，他们证明了通过为 $\alpha$ 和 $\lambda$ 设置精心选择的值，即使不使用 $\textrm{batchnorm}$ 技术（见 $\textrm{13.4.5}$节），也可以确保通过激活函数来使每个网络层的输出是被标准化的（假设输入也已标准化）。 这可以加快模型的拟合。
+令人惊讶的是，他们证明了通过精心为 $\alpha$ 和 $\lambda$ 设置合理的值，即使不使用 $\textrm{batchnorm}$ 技术（见 $\textrm{13.4.5}$节），也可以确保通过激活函数来使每个网络层的输出是被标准化的（假设输入也已标准化），从而加快模型的拟合速度。
 
-作为手动发现良好的激活函数的替代方法，我们可以使用黑盒优化方法来对激活函数空间进行搜索。 [RZL17][^RZL17]使用这种方法发现了被称为 $\mathrm{swish}$ 的函数，该函数在某些图像分类数据集上似乎表现很好。该函数定义为
+作为手动发现良好的激活函数的替代方法，我们可以使用黑盒优化方法来对激活函数空间进行搜索。 [$\textrm{RZL17}$][^RZL17] 使用这种方法发现了被称为 $\mathrm{swish}$ 的函数，该函数在某些图像分类数据集上似乎表现很好。该函数定义为
 
 
 $$
 {\rm{swish}}(a;\beta)=a\sigma(\beta a)\tag{13.16}
 $$
 
-有关这些函数的可视化对比，请参见图$\textrm{13.2b}$。 我们看到，它们主要是在处理负输入的方式上存在差异。
+有关这些激活函数的可视化对比，请参见图 $\textrm{13.2b}$。 我们发现，不同的激活函数主要是在处理负值输入的方式上存在差异。
 
-[^RZL17]: 
-
-> 本节我们介绍了  
->
-> 1. 传统感知机在解决 $XOR$ 这一模式识别问题上的无效性; 
-> 2. 通过引入 $MLP$ 解决了上述难点，但其所包含的不可微的单位阶跃函数限制了其在优化方面的表现; 
-> 3. 通过使用可微的非线性激活函数，可以有效改善上述问题，但应避免使用存在饱和区的激活函数（会导致梯度消失的问题）
+---
 
 ---
 
 ### 13.2.4 案例模型
+
+> <table><tr><td bgcolor=blue>名词对照表</td></tr></table> 
+>
+> - 嵌入矩阵: embedding matrix
+> - 词嵌入: word embedding
+> - 微调: fine-tune
+> - 分类分布： categorical distribution
+>
+> <table><tr><td bgcolor=blue>内容总结</td></tr></table>
+>
+> - 介绍了 $\textrm{MLP}$ 在不同类型数据以及不同任务上的应用实例。
 
 $\textrm{MLPs}$ 可以对很多类型的数据进行分类和回归，接下来我们将给出一些案例。
 
@@ -287,47 +309,46 @@ f_0(\mathbf{x};\mathbf{\theta})=&\mathbf{x} \tag{13.21}
 \end{align}
 $$
 
-其中 $\mathbf{\theta}=(\mathbf{W}_3,\mathbf{b}_3,\mathbf{W}_2,\mathbf{b}_2,\mathbf{W}_1,\mathbf{b}_1)$ 为模型中的参数，对应于 $\textrm{3}$ 组可调节权重的边。我们看到最终（输出）层的激活函数为 $\textrm{softmax}$ 函数，$\textrm{softmax}$ 函数是分类分布的反向连接函数。对于隐藏层，我们可以自由选择所需的不同形式的激活函数，正如我们在第 $\textrm{13.2.3}$ 节中所讨论的。
-
-```tt
-分类分布: categorical distribution
-```
+其中 $\mathbf{\theta}=(\mathbf{W}_3,\mathbf{b}_3,\mathbf{W}_2,\mathbf{b}_2,\mathbf{W}_1,\mathbf{b}_1)$ 为模型中的参数，对应于 $\textrm{3}$ 组可调节权重的边。我们看到最终（输出）层的激活函数为 $\textrm{softmax}$ 函数，$\textrm{softmax}$ 函数是分类分布的反向连接函数。对于隐藏层，我们可以自由选择 $13.2.3$ 节中介绍的不同形式的激活函数。
 
 ![mlpMnist](/assets/img/figures/mlpMnist.jpg)
 
->  图 $\textrm{13.4}$：用于$\textrm{MNIST}$ 分类的 $\textrm{MLP}$ 结构。需要注意的是 $100,480=(784+1)\times128$, $16,512=(128+1)\times 128$。
+>  <center><font size=2>图 $\textrm{13.4}$：用于$\textrm{MNIST}$ 分类的 $\textrm{MLP}$ 结构。需要注意的是模型的参数量 $100,480=(784+1)\times128$, $16,512=(128+1)\times 128$。</font></center>
 
 ![mnistResult](/assets/img/figures/mnistResult.png)
 
->  图 $\textrm{13.5}$：基于 $\textrm{MLP}$（包含$2$个隐藏层和$1$个输出层，隐藏层含$128$个节点，输出层包含$10$个节点 ）  对一些 $\textrm{MNIST}$ 图片的分类结果。红色为错误预测，蓝色为正确预测。$\textrm{(a)}$ 训练 $1$ 个周期。 $\textrm{(b)}$ 训练 $2$ 个周期。
+>  <center><font size=2>图 $\textrm{13.5}$：基于 $\textrm{MLP}$（包含$2$个隐藏层和$1$个输出层，隐藏层含$128$个节点，输出层包含$10$个节点 ）  对一些 $\textrm{MNIST}$ 图片的分类结果。红色为错误预测，蓝色为正确预测。$\textrm{(a)}$ 训练 $1$ 个周期。 $\textrm{(b)}$ 训练 $2$ 个周期。</font></center>
+
+---
 
 #### 13.2.4.2 MLP用于图像分类
 
-要将 $\textrm{MLP}$ 应用于图像分类，我们需要将 $\textrm{2d}$ 输入“**展开**”（$\textrm{flatten}$）为 $\textrm{1d}$ 向量。 然后，我们可以使用类似于第$\textrm{13.2.4.1}$ 节中所述的前馈网络。 例如，考虑构建一个 $\textrm{MLP}$ 以对 $\textrm{MNIST}$ 数字进行分类（第$\textrm{3.7.2}$ 节）。 这些数字图片表示为 $28\times28 = 784$ 维向量。 如果我们使用 $\textrm{2}$ 个具有 $\textrm{128}$ 个节点的隐藏层，和 $\textrm{1}$ 个包含 $\textrm{10}$ 个输出单元的 $\textrm{softmax}$ 层，将得到如图$\textrm{13.4}$ 所示的模型。
+要将 $\textrm{MLP}$ 应用于图像分类，我们需要将 $\textrm{2d}$ 输入“**展开**”（$\textrm{flatten}$）为 $\textrm{1d}$ 向量。 然后，我们可以使用类似于第$\textrm{13.2.4.1}$ 节中所述的前馈网络。 例如，考虑构建一个 $\textrm{MLP}$ 以对 $\textrm{MNIST}$ 数字进行分类（第$\textrm{3.7.2}$ 节）。 这些数字图片表示为 $28\times28 = 784$ 维的向量。 如果我们使用 $\textrm{2}$ 个具有 $\textrm{128}$ 个单元的隐藏层，和 $\textrm{1}$ 个包含 $\textrm{10}$ 个输出单元的 $\textrm{softmax}$ 层，将得到如图 $\textrm{13.4}$ 所示的模型。
 
-我们在图 $\textrm{13.5}$ 中展示了一些该模型的预测结果。 我们对训练集仅训练两个“**周期**”（$\textrm{epochs}$, 遍历数据集的次数），但是该模型已经具备较好的性能，测试集的准确率为 $\textrm{97.1％}$。 此外，错误的预测案例似乎也是可以理解的，例如将 $\textrm{9}$ 误分类为 $\textrm{3}$。训练更多的时间可以进一步提高测试的准确性。
+我们在图 $\textrm{13.5}$ 中展示了一些该模型的预测结果。 我们对训练集仅训练两个“**周期**”（$\textrm{epochs}$, 遍历数据集的次数），但是该模型已经具备了较好的性能，测试集的准确率为 $\textrm{97.1％}$。 此外，预测错误的案例似乎也是可以理解的，例如将 $\textrm{9}$ 误分类为 $\textrm{3}$。训练更多的时间可以进一步提高模型的测试精度。
 
-在第 $\textrm{14}$ 章中，我们讨论了另一种称为卷积神经网络的模型，该模型更适用于图像数据的处理。 通过利用与图像数据空间结构相关的先验知识，它可以获得更好的性能，并使用更少的参数。相比之下，$\textrm{MLP}$ 对输入的排列具有不变性。 换句话说，我们可以随机地对像素进行排列，并且可以获得相同的结果（前提是我们对所有的输入使用相同的随机排列算法）。
+在第 $\textrm{14}$ 章中，我们将讨论另一种称为卷积神经网络的模型，该模型更适用于图像数据的处理。 通过利用与图像数据空间结构相关的先验知识，它可以获得更好的性能，并使用更少的参数。相比之下，$\textrm{MLP}$ 对输入的排列具有不变性。 换句话说，我们可以随机地对像素进行排列，并且可以获得相同的结果（前提是我们对所有的输入使用相同的随机排列算法）。
+
+><font color=red>In Chapter $14$ we discuss a different kind of model, called a convolutional neural network, which is better suited to images. This gets even better performance and uses fewer parameters, by exploiting prior knowledge about the spatial structure of images.   By contrast, the MLP is invariant to a permutation of its inputs. Put another way, we could randomly shuffle the pixels and we would get the same result (assuming we use the same random permutation for all inputs).  </font>
 
 ![mlpIMDB](/assets/img/figures/mlpIMDB.jpg)
 
->  图 $\textrm{13.6}$：用于 $\textrm{IMDB}$ 分类的 $\textrm{MLP}$ 结构。语料库大小为 $V=1000$，嵌入层大小为 $E = 16$。嵌入矩阵 $\mathbf{W}_1$ 大小为 $10,000\times16$，隐藏层（$\textrm{dense}$）的权重矩阵 $\mathbf{W}_2$ 大小为 $16 \times 16$ ，偏置 $\mathbf{b}_2$ 大小为 $16$（$16 \times 16 + 16 = 272$），最后一层 （$\textrm{dense_1}$）的权重矩阵 $\mathbf{w}_3$ 大小为 $16$，偏置 $b_3$ 大小为 $1$。全局平均池化不包含参数。
+>  <center><font size=2>图 $\textrm{13.6}$：用于 $\textrm{IMDB}$ 分类的 $\textrm{MLP}$ 结构。语料库大小为 $V=1000$，嵌入层大小为 $E = 16$。嵌入矩阵 $\mathbf{W}_1$ 大小为 $10,000\times16$，隐藏层（$\textrm{dense}$）的权重矩阵 $\mathbf{W}_2$ 大小为 $16 \times 16$ ，偏置 $\mathbf{b}_2$ 大小为 $16$（$16 \times 16 + 16 = 272$），最后一层 （$\textrm{dense_1}$）的权重矩阵 $\mathbf{w}_3$ 大小为 $16$，偏置 $b_3$ 大小为 $1$。全局平均池化不包含参数。</font></center>
+
+---
 
 #### 13.2.4.3 MLP用于电影评论的情感分析
 
-[Maa+11][^Maa11]的 $\textrm{IMDB}$ 电影评论数据集（$\textrm{IMDB}$ 表示 $\textrm{internet movie database}$）被称为 “文本分类的 $\textrm{MNIST}$”。该数据集包含 $\textrm{25k}$ 带有标签的样本用于训练，而 $\textrm{25k}$ 的样本用于测试。 每个样本都有一个二进制标签，代表积极或消极的评分。 此任务称为（二进制）**情感分析** （$\textrm{sentiment analysis}$）。 例如，以下是训练集中的两个样本：
+[$\textrm{Maa+11}$][^Maa11] 中提出的 $\textrm{IMDB}$ 电影评论数据集（$\textrm{IMDB}$ 表示 $\textrm{internet movie database}$）被称为 “文本分类界的 $\textrm{MNIST}$”。该数据集包含 $\textrm{25k}$ 带有标签的样本用于训练，另外 $\textrm{25k}$ 的样本用于测试。 每个样本都有一个二进制标签，代表积极或消极的评分。 此任务被称为（二进制）**情感分析** （$\textrm{sentiment analysis}$）。 例如，以下是训练集中的两个样本：
 
 > 1. this film was just brilliant casting location scenery story direction everyone’s really suited the part they played robert \<UNK\> is an amazing actor ...
 > 2. big hair big boobs bad music and a giant safety pin these are the words to best describe this terrible movie i love cheesy horror movies and i’ve seen hundreds...
 
-显然，第一个样本的标签为正例，第二个为负例。
+显然，第一个样本的标签为正例（积极评价），第二个为负例（消极评价）。
 
-[^Maa11]: 
+[^Maa11]: $\textrm{[Maa+11]}$: A. L. Maas, R. E. Daly, P. T. Pham, D. Huang, A. Y. Ng, and C. Potts. “Learning Word Vectors for Sentiment Analysis”. In: Proc. ACL. 2011, pp. 142–150.
 
-我们可以设计一个 $\textrm{MLP}$ 来进行情感分析，如下所示。假设输入是一个包含 $T$ 个符号（$\textrm{token}$）的序列 $\textbf{x}_{1:T}$，其中 $ \textbf{x}_t $ 是一个长度为 $ V $ 的 $ \textrm{one-hot} $ 向量， $V$ 为语料库的大小。我们将此视为无序的单词袋（第 $10.4.3.1$ 节）。模型的第一层为 $E\times V$  的嵌入矩阵 $\textbf{W}_1 $，该层将每一个稀疏的 $V $ 维向量映射到一个稠密的 $E $ 维向量 $\mathbf{e}_t=\mathbf{W}_1 \mathbf{x}_t $（见 $19.5$ 节学习更多关于词嵌入的细节）。
-
-接着我们使用 **全局平均池化**（$\textrm{global average pooling}$）将 $T\times D $ 的序列嵌入向量转化为一个固定长度的向量 $\overline{\mathbf{e}}=\frac{1}{T}\sum_{t=1}^T \mathbf{e}_t $ 。最后我们将该向量传入一个非线性隐藏层，计算一个 $K $ 维向量 $\mathbf{h} $，并将其传入最后的线性 $\textrm{logistic} $ 层。 综上所述，模型定义如下：
-
+我们可以设计一个 $\textrm{MLP}$ 实现情感分析。不妨假设输入是一个包含 $T$ 个符号（$\textrm{token}$）的序列 $\textbf{x} _{1:T}$，其中 $\textbf{x} _t$ 是一个长度为 $ V $ 的 $ \textrm{one-hot} $ 向量， $V$ 为语料库的大小，我们将这种编码方式称为无序的单词袋（第 $10.4.3.1$ 节）。模型的第一层为 $E\times V$  的嵌入矩阵 $\textbf{W} _1 $，该层将每一个稀疏的 $V $ 维向量映射到一个稠密的 $E $ 维向量 $\mathbf{e} _t=\mathbf{W} _1 \mathbf{x} _t $（ $19.5$ 节介绍了更多关于词嵌入的细节）。接着我们使用 **全局平均池化**（$\textrm{global average pooling}$）将 $T\times D $ 的序列嵌入向量转化为一个固定长度的向量 $\overline{\mathbf{e}}=\frac{1}{T}\sum _{t=1}^T \mathbf{e} _t $ 。最后我们将该向量传入一个非线性隐藏层，得到一个 $K $ 维向量 $\mathbf{h} $，并将其传入最后的线性 $\textrm{logistic} $ 层。 综上所述，模型定义如下：
 $$
 \begin{align}
 p(y|\mathbf{x};\mathbf{\theta}) = & {\rm{Ber}}(y|\sigma(\mathbf{w}_3^{\rm{T}}\mathbf{h}+b_3)) \tag{13.22} \\
@@ -338,102 +359,106 @@ p(y|\mathbf{x};\mathbf{\theta}) = & {\rm{Ber}}(y|\sigma(\mathbf{w}_3^{\rm{T}}\ma
 $$
 
 
-如果我们使用的语料库大小为 $V = 1000$，嵌入向量维度为 $E = 16$，隐藏层的维度为$\textrm{16}$，则得到的模型如图 $\textrm{13.6}$ 所示。 模型在验证集的准确度为 $\textrm{86％}$。
+如果我们令语料库大小为 $V = 1000$，嵌入向量维度为 $E = 16$，隐藏层的维度为 $\textrm{16}$，则得到的模型如图 $\textrm{13.6}$ 所示。 最终的模型在验证集的准确度为 $\textrm{86％}$。
 
-我们看到模型中大多数参数都分布在嵌入矩阵中，这可能会导致过拟合问题。 幸运的是，正如我们在第 $\textrm{19.5}$ 节中讨论的那样，我们可以执行词嵌入模型的无监督预训练，然后我们只需要微调此特定标记任务的输出层参数即可。
+我们发现模型中大多数参数都分布在嵌入矩阵中，这可能会导致过拟合问题。 幸运的是，正如我们在第 $\textrm{19.5}$ 节中讨论的那样，我们可以使用无监督预训练方法得到的词嵌入，然后我们只需要在特定任务上对输出层的参数进行微调即可。
 
 ![mlpHeter](/assets/img/figures/mlpHeter.png)
 
->  图 $\textrm{13.7}$：$\textrm{MLP}$ 包含一个共享的主干网络和两个输出头，一个用于预测期望，另一个用于预测方差。
+>  <center><font size=2>图 $\textrm{13.7}$：$\textrm{MLP}$ 包含一个共享的主干网络和两个输出头，一个用于预测期望，另一个用于预测方差。</font></center>
 
 ![heterResult](/assets/img/figures/heterResult.png)
 
->  图 $\textrm{13.8}$：使用 $\textrm{MLE}$ 的 $\textrm{MLP}$ 对 $1d$ 数据进行回归，该数据的噪声水平不断提高。$\textrm{(a)}$ 输出方差与输入有关，如图 $13.7$ 所示；$\textrm{(b)}$ 均值使用与 $\textrm{(a)}$ 一样的模型，但方差被当作是一个固定的参数 $\sigma^2$，该值使用 $\textrm{MLE}$ 估计，如 $11.2.3.6$ 所述。
+>  <center><font size=2>图 $\textrm{13.8}$：使用 $\textrm{MLE}$ 的 $\textrm{MLP}$ 对 $1d$ 数据进行回归，该数据的噪声水平不断提高。$\textrm{(a)}$ 输出方差与输入有关，如图 $13.7$ 所示；$\textrm{(b)}$ 均值使用与 $\textrm{(a)}$ 一样的模型，但方差被当作是一个固定的参数 $\sigma^2$，该值使用 $\textrm{MLE}$ 估计，如 $11.2.3.6$ 所述。</font></center>
+
+---
 
 #### 13.2.4.4 MLP用于异方差回归
 
-我们还可以使用 $\textrm{MLP}$ 实现回归任务。 图 $\textrm{13.7}$ 显示了如何为异方差 （$\textrm{heteroskedastic}$）非线性回归任务建立模型。 （术语“异方差”仅表示预测的输出方差与输入有关，如第$\textrm{3.3.3}$节中所述。）该函数具有两个输出，分别表示 $f_\mu(\mathbf{x})=\mathbb{E}[y|\mathbf{x},\mathbf{\theta}]$ 和 $f_\sigma(\mathbf{x})=\sqrt{\mathbb{V}[y|\mathbf{x},\mathbf{\theta}]}$。如图$\textrm{13.7}$所示，通过使用一个共享的**主干网络**（$\textrm{backbone}$）和两个输出**头**（$\textrm{heads}$）， 我们可以在这两个函数之间共享大多数层（因此也可以共享参数）。对于 $\mu$ 头，我们使用一个线性激活函数 $\varphi(a)=a$。对于 $\sigma$ 头，我们使用 $\textrm{softplus}$ 激活函数 $\varphi(a)=\sigma_{+}(a)$。如果我们使用线性头和一个非线性主干网络，整个模型定义为
+我们还可以使用 $\textrm{MLP}$ 实现回归任务。 图 $\textrm{13.7}$ 展示了如何为异方差 （$\textrm{heteroskedastic}$）非线性回归任务建模。 （术语“异方差”仅表示预测的输出方差与输入有关，如第 $\textrm{3.3.3}$ 节中所述。）该函数具有两个输出，分别表示 $f_\mu(\mathbf{x})=\mathbb{E}[y|\mathbf{x},\mathbf{\theta}]$ 和 $f_\sigma(\mathbf{x})=\sqrt{\mathbb{V}[y|\mathbf{x},\mathbf{\theta}]}$。如图 $\textrm{13.7}$ 所示，通过使用一个共享的**主干网络**（$\textrm{backbone}$）和两个输出**头网络**（$\textrm{heads}$）， 我们可以在这两个函数之间共享大部分层（也包括其中的参数）。对于 $\mu$ 输出头，我们使用一个线性激活函数 $\varphi(a)=a$。对于 $\sigma$ 头，我们使用 $\textrm{softplus}$ 激活函数 $\varphi(a)=\sigma_{+}(a)$。如果我们使用线性输出头和一个非线性主干网络，整个模型定义为
 $$
 p(y|\mathbf{x},\mathbf{\theta})=\mathcal{N}(y|\mathbf{w}_\mathbf{\mu}^{\rm{T}}f(\mathbf{x};\mathbf{w}_{\rm{shared}}), \sigma_{+}(\mathbf{w}_{\mathbf{\sigma}}^{\rm{T}}f(\mathbf{x};\mathbf{w}_{\rm{shared}})))\tag{13.26}
 $$
-图$\textrm{13.8}$ 显示了这种模型在某些数据集上的优势，在该数据集中，预测的期望值随时间线性增长，并且随季节波动，与此同时，数据的方差呈二次方增加趋势。（这是 **随机波动率模型** （$\textrm{stochastic volatility model}$）的一个简单示例；它可以用于对财务数据以及地球的全球温度进行建模，其中地球温度的（由于气候变化）均值和方差不断增加。）我们发现 将输出方差 $\sigma^2$ 视为固定（与输入无关）参数的回归模型置信度有时会比较低，因为模型需要适应整体的噪声水平，并且无法适应输入空间中每个点的噪声水平。
+图$\textrm{13.8}$ 显示了这种模型在某些数据集上的优势，在该数据集中，预测的期望值随时间线性增长，并且随季节波动，与此同时，数据的方差呈二次方增加趋势。（这是 **随机波动率模型** （$\textrm{stochastic volatility model}$）的一个简单示例；它可以用于对财务数据以及地球的全球温度进行建模，其中地球温度的（由于气候变化）均值和方差不断增加。）我们发现将输出方差 $\sigma^2$ 视为固定（与输入无关）参数的回归模型置信度有时会比较低，因为模型需要适应整体的噪声水平，并且无法适应输入空间中每个点的噪声水平。
+
+---
+
+---
 
 ### 13.2.5 深度的重要性
 
-研究表明包含一个隐藏层的 $\textrm{MLP}$ 是一个**通用函数逼近器**（$\textrm{universal function approximator}$），这意味着只要给定足够的隐藏单元，$\textrm{MLP}$ 就可以逼近任何平滑函数，并达到任何所需的精度水平[HSW89][^HSW89]; [cyb89][^cyb89]; [Hor91][^Hor91]。直观地讲，这样做的原因是每个隐藏的单元都可以指定一个半平面，并且这些单元的足够大的组合可以“划分”空间的任何区域，我们可以将其与任何响应相关联（这在分段使用时最容易看到 线性激活函数，如图13.9所示。
+研究表明包含一个隐藏层的 $\textrm{MLP}$ 是一个**通用函数逼近器**（$\textrm{universal function approximator}$），这意味着只要给定足够的隐藏单元，$\textrm{MLP}$ 就可以逼近任何平滑函数，并达到任何所需的精度水平[HSW89][^HSW89]; [cyb89][^cyb89]; [Hor91][^Hor91]。直观地讲，这样做的原因是每个隐藏层的单元都可以指定一个超半平面，并且这些单元的足够大的组合可以“划分”空间的任何区域，我们可以将其与任何响应相关联（这在分段使用时最容易看到线性激活函数，如图 $13.9$ 所示。
 
-但是，实验和理论上的各种观点（例如[Has87][^Has87]; [Mon+14][^Mon14]; [Rag+17][^Rag17]; [Pog+17][^Pog17]）都表明，深层网络比浅层网络更有效。 原因是更深的网络层可以利用浅层网络的所学习的特征。 也就是说，该函数是以组合或分层的方式定义的。 例如，假设我们要对 $\textrm{DNA}$ 字符串进行分类，并且正类与正则表达式 ` *AA??CGCG??AA* `相关联。 尽管我们可以使用含单个隐藏层的模型对数据进行拟合，但是从直观上来说，如果模型首先学会使用第 $\textrm{1}$ 层中的隐藏单元来检测 $\textrm{AA}$ 和 $\textrm{CG}$ “基元”（$\textrm{motifs}$），然后使用这些特征在第$2$层定义一个简单的线性分类器，类似于我们在$\textrm{13.2.1}$ 节中解决 $\textrm{XOR}$ 问题的思路。
+但是，实验和理论上的各种观点（[Has87][^Has87]; [Mon+14][^Mon14]; [Rag+17][^Rag17]; [Pog+17][^Pog17]）都表明，深层网络比浅层网络更有效。 原因是更深的网络层可以利用浅层网络的所学习的特征。 也就是说，该函数是以组合或分层的方式定义的。 例如，假设我们要对 $\textrm{DNA}$ 字符串进行分类，并且正例与正则表达式  $\textbf{\*AA??CGCG??AA\* }$相关联。 尽管我们可以使用含单个隐藏层的模型对数据进行拟合，但是从直观上来说，如果模型首先学会使用第 $\textrm{1}$ 层中的隐藏单元来检测 $\textrm{AA}$ 和 $\textrm{CG}$ “基元”（$\textrm{motifs}$），然后使用这些特征在第$2$层定义一个简单的线性分类器，类似于我们在$\textrm{13.2.1}$ 节中解决 $\textrm{XOR}$ 问题的思路。
 
-[^HSW89]: 
-[^cyb89]: 
-[^Hor91]: 
-[^Has87]: 
-[^Mon14]: 
-[^Rag17]: 
-[^Pog17]: 
+[^HSW89]: $\textrm{[HSW89]}$: 
+[^cyb89]: $\textrm{[cyb89]}$:
+[^Hor91]: $\textrm{[Hor91]}$: 
+[^Has87]: $\textrm{[Has87]}$: 
+[^Mon14]: $\textrm{[Mon+14]}$:
+[^Rag17]: $\textrm{[Rag+17]}$:
+[^Pog17]: $\textrm{[Pog+17]}$:
 
 #### 13.2.5.1 深度学习革命
 
-尽管 $\textrm{DNN}$ 背后的思想可以追溯到几十年前，但直到 $\textrm{2010}$ 年代，它们才开始被广泛使用。 突破性的时刻发生在$\textrm{2012}$ 年，当时[KSH12][^KSH12]表明深层的 $\textrm{CNN}$ 可以在具有挑战性的 $\textrm{ImageNet}$ 图像分类数据集上显着提高性能，在一年内将错误率从$\textrm{26％}$降低到$\textrm{16％}$（见图$\textrm{14.14b}$）； 与之前每年约减少 $\textrm{2％}$ 的下降幅度相比，这是一个巨大的飞跃。 大约在同一时间，[DHK13][^DHK13]表明，在各种语音识别任务上，深度神经网络可以大大优于现有技术。
+尽管 $\textrm{DNN}$ 背后的思想可以追溯到几十年前，但直到 $\textrm{2010}$ 年代，它们才开始被广泛使用。 突破性的时刻发生在$\textrm{2012}$ 年，当时 [KSH12][^KSH12] 表明深层的 $\textrm{CNN}$ 可以在具有挑战性的 $\textrm{ImageNet}$ 图像分类数据集上显著提高性能，在一年内将错误率从$\textrm{26％}$降低到$\textrm{16％}$（见图 $\textrm{14.14b}$）； 与之前每年约 $\textrm{2％}$ 的下降幅度相比，这是一个巨大的飞跃。 大约在同一时间，[DHK13][^DHK13] 表明，在各种语音识别任务上，深度神经网络可以大大优于现有技术。
 
-$\textrm{DNN}$ 的“爆发”有几个促成因素。 一是便宜的$\textrm{GPU}$（图形处理单元）的可用性。 它们最初是为了加快视频游戏的图像渲染速度而开发的，但是它们也可以大大减少训练大型 $\textrm{CNN}$ 的时间，其中包含相似的矩阵矢量计算。 另一个是大规模含标签数据集的增长，这使得我们能够拟合包含大量参数的复杂函数，同时避免过拟合的风险。 （例如，$\textrm{ImageNet}$ 具有$\textrm{130}$ 万个含标签的图像，并用于拟合具有数百万个参数的模型。）的确，如果将深度学习系统视为“火箭”，那么大规模数据集就被称为燃料[^1]。
+$\textrm{DNN}$ 的“爆发”有几个促成因素。 一是廉价的 $\textrm{GPU}$（图形处理单元）使用称为可能。 它们最初是为了加快视频游戏的图像渲染速度而开发的，但是它们也可以大大减少大型 $\textrm{CNN}$ 的训练时间，其中包含相似的矩阵矢量计算。 另一个是大规模含标签数据集的增长，这使得我们能够拟合包含大量参数的复杂函数，同时避免过拟合的风险。 （例如，$\textrm{ImageNet}$ 具有$\textrm{130}$ 万张含标签的图像，可以用于拟合具有数百万个参数的模型）。的确，如果将深度学习系统视为“火箭”，那么大规模数据集就被称为燃料[^1]。
 
 [^1]: This popular analogy is due to Andrew Ng, who mentioned it in a keynote talk at the GPU Technology Conference (GTC) in 2015. His slides are available at https://bit.ly/38RTxzH.
-由于$\textrm{DNN}$取得了巨大的经验上的成功，许多公司开始对该技术产生兴趣，并开发了高质量的开源软件库，例如$\textrm{Tensorflow}$（由 $\textrm{Google}$ 开发），$\textrm{PyTorch}$（由 $\textrm{Facebook}$ 开发）和 $\textrm{MXNet}$（由亚马逊开发）。 这些库支持复杂的微分函数的自动微分（请参阅第 $\textrm{13.3}$ 节）和可扩展的基于梯度的优化（请参见第 $\textrm{5.4}$ 节）。 在本书的各个地方，我们将使用其中的一些库来实现各种模型，而不仅仅是 $\textrm{DNN}$。
+由于 $\textrm{DNN}$ 在经验上取得了巨大的成功，许多公司开始对该技术产生兴趣，并开发了高质量的开源软件库，例如$\textrm{Tensorflow}$（由 $\textrm{Google}$ 开发），$\textrm{PyTorch}$（由 $\textrm{Facebook}$ 开发）和 $\textrm{MXNet}$（由亚马逊开发）。 这些库支持复杂的微分函数的自动微分（请参考 $\textrm{13.3}$ 节）和可扩展的基于梯度的优化（请参见 $\textrm{5.4}$ 节）。 在本书的不同地方，我们将使用其中的一些库来实现各种模型，而不仅仅是 $\textrm{DNN}$。
 
-有关“深度学习革命”历史的更多详细信息，请参见[Sej18][^Sej18]。
+有关“深度学习革命”历史的更多详细信息，请参考[Sej18][^Sej18]。
 
-[^KSH12]: 
-[^DHK13]: 
-[^Sej18]: 
+[^KSH12]: $\textrm{[KSH12]}$: 
+[^DHK13]: $\textrm{[DHK13]}$: 
+[^Sej18]: $\textrm{[Sej18]}$: 
 
 ![neurons](/assets/img/figures/neurons.jpg)
 
->  图 $13.10$: 在“电路”中连接在一起的两个神经元的图示。左侧神经元的输出轴突与右侧细胞的树突形成突触连接，电荷以离子流的形式存在，使细胞得以交流。来自 https://en.wikipedia.org/wiki/Neuron。在维基百科作者BruceBlaus的许可下使用。
+>  <center><font size=2>图 $13.10$: 在“电路”中连接在一起的两个神经元的图示。左侧神经元的输出轴突与右侧细胞的树突形成突触连接，电荷以离子流的形式存在，使细胞得以交流。来自 https://en.wikipedia.org/wiki/Neuron。在维基百科作者BruceBlaus的许可下使用。</font></center>
 
 ![networkSize](/assets/img/figures/networkSize.png)
 
->  图 $\textrm{13.11}$：神经网络大小随时间的变化趋势图。模型 $1,2,3$ 和 $4$ 表示感知机 [Ros58][^Ros58]，自适应线性单元 （$\textrm{adaptive linear unit}$）[WH60][^WH60]，神经认知机（$\textrm{neocognitron}$）[Fuk80][^Fuk80] 和第一个利用反向传播算法训练的 $\textrm{MLP}$ [RHW86][^RHW86]。图形来自 [GBC16][^GBC16]的图 $1.11$。
+>  <center><font size=2>图 $\textrm{13.11}$：神经网络大小随时间的变化趋势图。模型 $1,2,3$ 和 $4$ 表示感知机 [Ros58][^Ros58]，自适应线性单元 （$\textrm{adaptive linear unit}$）[WH60][^WH60]，神经认知机（$\textrm{neocognitron}$）[Fuk80][^Fuk80] 和第一个利用反向传播算法训练的 $\textrm{MLP}$ [RHW86][^RHW86]。图形来自 [GBC16][^GBC16]的图 $1.11$。</font></center>
 
-[^Ros58]:
-[^ WH60]:text
-[^Fuk80]:text
-[^RHW86]:
-[^GBC16]: 
+[^Ros58]:$\textrm{[Ros58]}$:
+[^ WH60]:$\textrm{[WH60]}$:
+[^Fuk80]:$\textrm{[Fuk80]}$:
+[^RHW86]:$\textrm{[RHW86]}$:
+[^GBC16]: $\textrm{[GBC16]}$: 
 
 ### 13.2.6 与生物学的联系
 
-在本节中，我们讨论上文中的各种神经网络（称为人工神经网络, $\textrm{artificial neural networks, ANN}$）与实际神经网络之间的联系。 真实的生物大脑工作细节非常复杂（例如，参见[Kan+12][^Kan12]），但是我们可以给出一个简单的“卡通”（$\textrm{cartoon}$）。我们首先考虑单个神经元的模型。 大致上，我们可以说神经元 $k$ 是否发射（用 $h_{k} \in\{0,1\}$ 表示）取决于其输入的行为（用 $\mathbf{x} \in \mathbb{R}^{D}$表示）以及连接的强度（用 $\mathbf{w}_k \in \mathbb{R}^D$表示）。 
+在本节中，我们将讨论上文介绍的各种神经网络（称为人工神经网络, $\textrm{artificial neural networks, ANN}$）与实际神经网络之间的联系。 真实的生物大脑工作细节非常复杂（参见 [Kan+12][^Kan12]），但是我们可以给出一个简单的“卡通”（$\textrm{cartoon}$）。
 
-我们可以使用 $a _{k}=\mathbf{w} _{k}^{\top} \mathbf{x}$ 来计算输入的加权和。 这些权重可以看作是将输入 $x _d$ 连接到神经元 $h _k$ 的“电线”。 这些类似于真实神经元中的树突（见图$\textrm{13.10} $）。该加权和接着被用于与阈值 $b_k $ 进行比较，如果激活超过阈值，则神经元触发； 这类似于神经元发出电输出或动作电位。 
+我们首先考虑单个神经元的模型。 近似地讲，我们可以说神经元 $k$ 是否激活（用 $h_{k} \in\{0,1\}$ 表示）取决于其输入的行为（用 $\mathbf{x} \in \mathbb{R}^{D}$表示）以及连接的强度（用 $\mathbf{w} _k \in \mathbb{R}^D$表示）。我们可以使用 $a _{k}=\mathbf{w} _{k}^{\top} \mathbf{x}$ 来计算输入的加权和。 这些权重可以看作是将输入 $x _d$ 连接到神经元 $h _k$ 的“电线”， 类似于真实神经元中的树突（见图$\textrm{13.10} $）。该加权和接着被用于与阈值 $b _k $ 进行比较，如果激活超过阈值，则神经元触发； 这类似于神经元发出电输出或动作电位。 因此，我们可以使用 $h _{k}(\mathbf{x})=H\left(\mathbf{w} _k^\top \mathbf{x}-b _k\right) $ 来模拟神经元的行为，其中 $H(a)=\mathbb{I}(a>0)$ 是$\textrm{Heaviside}$函数。，这称为神经元的 $\textrm{McCulloch-Pitts}$ 模型，于 $\textrm{1943}$ 年提出 [MP43][^MP43]。
 
-因此，我们可以使用 $h _{k}(\mathbf{x})=H\left(\mathbf{w} _k^\top \mathbf{x}-b _k\right) $ 来模拟神经元的行为，其中 $H(a)=\mathbb{I}(a>0)$ 是$\textrm{Heaviside}$函数。 这称为神经元的$\textrm{McCulloch-Pitts}$模型，并于 $\textrm{1943}$ 年提出[MP43][^MP43]。
+[^Kan12]: $\textrm{[Kan+12]}$:
+[^MP43]: $\textrm{[MP43]}$: 
 
-[^Kan12]: 
-[^MP43]: 
+我们可以将多个这样的神经元组合在一起以构成一个人工神经网络，最终的结果有时被视为大脑的模型。 但是，人工神经网络在许多方面与生物大脑存在差异，主要包括以下方面：
 
-我们可以将多个这样的神经元组合在一起以构成一个人工神经网络，最终的结果有时被视为大脑的模型。 但是，人工神经网络在许多方面与生物大脑不同，包括以下方面：
+- 大多数 $\textrm{ANN}$ 使用反向传播来修改其连接强度（请参见第 $\textrm{13.3}$ 节）。 但是，真正的大脑不会使用反向传播，因为无法沿着轴突向后发送信息 [Ben+15b][^Ben15b]; [BS16][^BS16];[KH19][^KH19]。 相反，他们使用局部更新规则来调整突触强度。
 
-- 大多数 $\textrm{ANN}$ 使用反向传播来修改其连接强度（请参阅第$\textrm{13.3}$节）。 但是，真正的大脑不会使用反向传播，因为无法沿着轴突向后发送信息[Ben+15b][^Ben15b]; [BS16][^BS16];[KH19][^KH19]。 相反，他们使用局部更新规则来调整突触强度。
+- 大多数 $\textrm{ANN}$ 都是严格的前馈，但是真实的大脑有很多反馈连接。 据信这种反馈的作用类似于先验，它们可以与来自感官系统的自下而上的似然结合起来，计算出已经包含经验信息的隐藏状态的后验，然后可以将其用于最佳决策（参考[Doy+07][^Doy07]）。
 
-- 大多数 $\textrm{ANN}$ 都是严格的前馈，但是真实的大脑有很多反馈连接。 可以相信，这种反馈的作用类似于先验，可以与来自感官系统的自下而上的可能性结合起来，计算出世界上隐藏状态的后验，然后可以将其用于最佳决策（参考[Doy+07][^Doy07]）。
+  > <font color=red>Most ANNs are strictly feedforward, but real brains have many feedback connections. It is believed that this feedback acts like a prior, which can be combined with bottom up likelihoods from the sensory system to compute a posterior over hidden states of the world, which can then be used for optimal decision making.</font>
 
-  > Most ANNs are strictly feedforward, but real brains have many feedback connections. It is believed that this feedback acts like a prior, which can be combined with bottom up likelihoods from the sensory system to compute a posterior over hidden states of the world, which can then be used for optimal decision making.
+- 大多数人工神经网络使用简化的神经元，该神经元由处理线性组合的非线性单元组成，但实际的生物神经元具有复杂的树状结构（见图 $\textrm{13.10}$），具有复杂的时空动态。
 
-- 大多数人工神经网络使用简化的神经元，该神经元由处理线性组合的非线性单元组成，但实际的生物神经元具有复杂的树状结构（见图$\textrm{13.10}$），具有复杂的时空动态。
+- 大多数人工神经网络的大小和连接数均小于生物大脑（见图$\textrm{13.11}$）。 当然，在各种新型硬件加速器（例如$\textrm{GPU}$ 和 $\textrm{TPU}$（张量处理单元）等）的推动下，人工神经网络每周都会变得越来越大。但是，即使人工神经网络在单元数量上与生物大脑相匹配，这种比较也具有误导性，因为生物神经元的处理能力远高于人工神经元（见上文）。
 
-- 大多数人工神经网络的大小和连接数均小于生物大脑（见图$\textrm{13.11}$）。 当然，在各种新型硬件加速器（例如$\textrm{GPU}$和$\textrm{TPU}$（张量处理单元）等）的推动下，人工神经网络每周都会变得越来越大。但是，即使人工神经网络在单元数量上与生物大脑相匹配，这种比较也具有误导性，因为生物神经元的处理能力远高于人工神经元（见上文）。
+- 大多数 $\textrm{ANN}$ 被设计为对单个函数建模，例如将图像映射到类别标签，或将一个单词序列映射到另一个单词序列。 相比之下，生物大脑是非常复杂的系统，由多个专门的交互模块组成，这些模块实现不同种类的功能或行为，例如感知，控制，记忆，语言等（请参见 [Sha88][^Sha88];  [Kan+12][^Kan12]）。
 
-- 大多数 $\textrm{ANN}$ 被设计为对单个函数建模，例如将图像映射到类别标签，或将一个单词序列映射到另一个单词序列。 相比之下，生物大脑是非常复杂的系统，由多个专门的交互模块组成，这些模块实现不同种类的功能或行为，例如感知，控制，记忆，语言等（请参见[Sha88][^Sha88]; [Kan+12][^Kan12]）。
+[^Ben15b]: $\textrm{[Ben+15b]}$:
+[^BS16]: $\textrm{[BS16]}$:
+[^KH19]: $\textrm{[KH19]}$:
+[^Doy07]: $\textrm{[Doy+07]}$:
+[^Sha88]: $\textrm{[Sha88]}$:
+[^Kan12]: $\textrm{[Kan+12]}$:
 
-[^Ben15b]: 
-[^BS16]: 
-[^KH19]: 
-[^Doy07]: 
-[^Sha88]: 
-[^Kan12]: 
-
-当然，我们正在努力建立逼真的生物大脑模型（例如，蓝脑计划, $\textrm{Blue Brain Project}$, [Mar06][^Mar06]; [Yon19][^Yon19]）。但是，一个有趣的问题是，以这种细致程度研究大脑是否对“解决$\textrm{AI}$”有用？通常认为，如果我们的目标是建造“智能机器”，那么生物大脑的浅层细节并不重要，就像飞机不会拍打自己的机翼一样。但是，“ $\textrm{AI}$”大概将遵循与智能生物代理类似的“智能定律”（$\textrm{laws of intelligence}$），就像飞机和鸟类遵循相同的空气动力学定律一样。 
+当然，我们正在努力建立逼真的生物大脑模型（例如，蓝脑计划, $\textrm{Blue Brain Project}$, [Mar06][^Mar06]; [Yon19][^Yon19]）。但是，一个有趣的问题是，以这种细致程度研究大脑是否对 “解决$\textrm{AI}$” 有用？通常认为，如果我们的目标是建造“智能机器”，那么生物大脑的浅层细节并不重要，就像飞机不会拍打自己的机翼一样。但是，“ $\textrm{AI}$”大概将遵循与智能生物代理类似的 “智能定律”（$\textrm{laws of intelligence}$），就像飞机和鸟类遵循相同的空气动力学定律一样。 
 
 不幸的是，我们尚不知道什么是“智能定律”，或者甚至是否存在这样的法则。在本书中，我们假设任何智能代理都应遵循信息处理和贝叶斯决策理论的基本原理，这是在不确定性下做出决策的最佳方法（请参见第 $\textrm{8.4.2}$ 节）。 
 
@@ -445,14 +470,14 @@ $\textrm{DNN}$ 的“爆发”有几个促成因素。 一是便宜的$\textrm{G
 >
 > > Of course, biological agents are subject to many constraints (e.g., computational, ecological) which often require algorithmic “shortcuts” to the optimal solution; this can explain many of the heuristics that people use in everyday reasoning [KST82; GTA00; Gri20]. As the tasks we want our machines to solve become harder, we may be able to gain insights from other areas of neuroscience and cognitive science (see e.g., [MWK16; Has+17; Lak+17]).
 
-[^Mar06]: 
-[^Yon19]: 
-[^KST82]: 
-[^GTA00]: 
-[^Gri20]: 
-[^MWK16]: 
-[^Has17]: 
-[^Lak17]: 
+[^Mar06]: $\textrm{[Mar06]}$:
+[^Yon19]: $\textrm{[Yon19]}$:
+[^KST82]: $\textrm{[KST82]}$:
+[^GTA00]: $\textrm{[GTA00]}$:
+[^Gri20]: $\textrm{[Gri20]}$:
+[^MWK16]: $\textrm{[MWK16]}$:
+[^Has17]: $\textrm{[Has+17]}$:
+[^Lak17]: $\textrm{[Lak+17]}$
 
 ## 13.3 反向传播
 
@@ -812,7 +837,7 @@ $$
 
 除了具体的实践问题，还有重要的理论问题。特别地，我们注意到 $\textrm{DNN}$ 损失不是一个凸目标，所以通常我们无法找到全局最优解。尽管如此，$\textrm{SGD}$ 总能收敛到出人意料的好的结果。具体的原因仍在研究当中，可以参考[Bah+20][^Bah20]对一些最近工作的回顾。
 
-[^HG20]:
+[^HG20]:$\textrm{[HG20]}$: J. Howard and S. Gugger. Deep Learning for Coders with Fastai and   PyTorch: AI Applications Without a PhD. en. 1st ed. O’Reilly Media, Aug. 2020.
 [^Zha19a]:
 [^Ger19]:
 [^Bah20]:
@@ -1104,3 +1129,83 @@ $$
 [^WI20]:
 [^Mur22]:
 
+## 13.6 其他形式的前馈网络
+
+### 13.6.1 径向基函数网络
+
+考虑单层神经网络，其中的隐藏层的输入定义为：
+$$
+\boldsymbol{\phi}(\mathbf{x})=\left[\mathcal{K}\left(\mathbf{x}, \boldsymbol{\mu}_{1}\right), \ldots, \mathcal{K}\left(\mathbf{x}, \boldsymbol{\mu}_{K}\right)\right] \tag{13.102}
+$$
+其中 $\boldsymbol{\mu} _{k} \in \mathcal{X}$ 为 $K$ 个**质心**（$\textrm{centroids}$）或 **代理**（$\textrm{exemplars}$），其中 $\mathcal{K}(\mathbf{x}, \boldsymbol{\mu}) \geq 0$ 为 **核函数**（$\textrm{kernel function}$）。我们将在 $17.2$ 节讨论关于核函数的细节。此处我们只给出关于 **高斯核**（$\textrm{Gaussian kernel}$） 的例子
+$$
+\mathcal{K}_{\text {gauss }}(\mathbf{x}, \mathbf{c}) \triangleq \exp \left(-\frac{1}{2 \sigma^{2}}\|\mathbf{c}-\mathbf{x}\|_{2}^{2}\right) \tag{13.103}
+$$
+参数 $\sigma$ 被称为核的 **带宽**（$\textrm{bandwidth}$）。需要注意的是高斯核具有平移不变性，意味着它只是关于距离 $r=\|\mathbf{x}-\mathbf{c}\|_{2}$ 的函数，所以我们可以等价地写成
+$$
+\mathcal{K}_{\text {gauss }}(r) \triangleq \exp \left(-\frac{1}{2 \sigma^{2}} r^{2}\right) \tag{13.104}
+$$
+所以它又被称为 **径向基函数核**（$\textrm{ radial basis function kernel, RBF kernel}$）。
+
+如果一个单层神经网络使用式 $13.102$ 定义形式作为隐藏层（包含 $\textrm{RBF}$ 核），则该神经网络被称为 $\textbf{RBF network}$ [BL88][^BL88]。形式定义为
+$$
+p(y\mid\mathbf{x} ; \boldsymbol{\theta})=p\left(y\mid\mathbf{w}^{\top} \boldsymbol{\phi}(\mathbf{x})\right) \tag{13.105}
+$$
+其中 $\boldsymbol{\theta}=(\boldsymbol{\mu}, \mathbf{w})$ 。如果质心 $\boldsymbol{\mu}$ 是固定的，我们可以使用（含正则项的）最小二乘方法求解权重 $\mathbf{w}$ 的最优解，如第 $11$ 章讨论的。如果质心是未知的，我们使用无监督聚类方法对质心进行估计，如 $\textrm{K-means}$（$21.3$ 节）。作为替代方案，我们可以为训练集中的每一个数据关联一个质心，即 $\boldsymbol{\mu} _{n}=\mathbf{x} _{n}$，此时 $K=N$，这是**非参数化模型**（$\textrm{ non-parametric model}$）的例子，因为参数的数量随着数据的数量增加（这种情况下呈线性增长关系），而非独立于数据量 $N$。如果 $K=N$，模型可以完美地拟合数据，同时也有可能发生过拟合。然而，通过确保输出的权重矩阵 $\mathbf{w}$ 稀疏化，模型可以只使用输入的样本中的有限的子集，这被称为 **稀疏核机器**（$\textrm{sparse kernel machine}$），具体细节将在 $17.6.1$ 和 $17.5$ 节讨论。另一种避免过拟合的方式是使用贝叶斯方式，通过对权重 $\mathbf{w}$ 积分；这将引出另一个模型，被称为 **高斯过程**（$\textrm{Gaussian process}$），我们将在 $17.3$ 节讨论该模型的更多细节。
+
+#### 13.6.1.1 RBF网络用于回归
+
+我们可以使用 $\textrm{RBF}$ 网络完成回归任务，定义为 $p(y \mid \mathbf{x}, \boldsymbol{\theta})=\mathcal{N}\left(\mathbf{w}^{T} \boldsymbol{\phi}(\mathbf{x}), \sigma^{2}\right)$ 。举例来说，图 $13.24$ 展示了 $\textrm{RBF}$ 拟合 $1$ 维数据的结果，其中我们使用了 $K=10$ 个均匀分布的 $\textrm{RBF}$ 代理，但相应的带宽从小到大变化。越小的带宽导致越畸变的函数，因为只有当点 $\mathbf{x}$  接近某个代理 $\boldsymbol{\mu}_{k}$ 时，预测的函数值才会是非零值。如果带宽非常大，设计矩阵将退化为元素值为 $1$ 的常数矩阵，因为每个点与每个代理的距离相同，所以最终的函数只是一条直线。
+
+#### 13.6.1.2 RBF网络用于分类
+
+我们可以使用 $\textrm{RBF}$ 网络完成二分类任务，定义为 $p(y \mid \mathbf{x}, \boldsymbol{\theta})=\operatorname{Ber}\left(\mathbf{w}^{T} \boldsymbol{\phi}(\mathbf{x})\right)$ 。作为一个例子，考虑数据来源于异或函数。这是一个具有二个位输入的二值函数。真实标签如图 $13.23(a)$ 所示。在图 $13.1(b)$ 中，我们展示了一些通过抑或函数标记的数据，但我们已经对数据进行了 $\textbf{jitter}$ [^6]，使可视化更加清晰。我们发现我们没有办法将数据分开，哪怕使用阶数为 $10$ 的多项式拟合。然而，使用 $\textrm{RBF}$ 核以及 $4$ 个代理，可以轻松地解决这个问题，如图 $13.1(c)$ 所示。
+
+[^6]:Jittering is a common visualization trick in statistics, wherein points in a plot/display that would otherwise land on top of each other are dispersed with uniform additive noise
+
+### 13.6.2 混合专家
+
+当我们在考虑回归任务时，通常情况下假设输出是一个单峰分布，比如高斯分布或者学生分布，其中的期望和方差是关于输入的某个函数，举例，
+$$
+p(\mathbf{y} \mid \mathbf{x})=\mathcal{N}\left(\mathbf{y} \mid f_{\mu}(\mathbf{x}), \operatorname{diag}\left(\sigma_{+}\left(f_{\sigma}(\mathbf{x})\right)\right)\right) \tag{13.106}
+$$
+其中函数 $f$ 可能是 $\textrm{MLPs}$ （可能包含一些共享的隐藏层单元，如图 $13.7$ 所示）。然而，这种假设对于 $\textbf{one-to-many}$ 函数可能并不奏效，在这种问题中，每个输入可能对应多种可能的输出。
+
+图 $13.25a$ 给出了类似于这个函数的例子。我们发现在图形的中间存在某些 $x$ 对应着两个同样可能的 $y$ 值。在现实世界中，也存在很多类似于这样的问题，比如， 从一个图片中预测一个人的$3d$ 姿态 [Bo+08][^Bo08]， 对一张黑白图片进行着色 [Gua+17][^Gua17]，预测视频序列的未来帧 [VT17][^VT17]，等等。任务使用单峰输出密度函数并使用最大似然进行训练的模型——哪怕是灵活的非线性模型，比如神经网络——在 $\textrm{one-to-many}$ 问题中都变现得不好，因为这类模型只是输出一个模糊的平均输出。
+
+为了防止回归均值的问题，我们可以使用 **条件混合模型**（$\textrm{ conditional mixture model }$）。也就是说，我们假设输出是 $K$ 个不同输出的加权混合，对应于每个输入 $\mathbf{x}$ 输出分布的不同峰值。在高斯分布的情况下，即
+$$
+\begin{align}
+p(\mathbf{y} \mid \mathbf{x}) &=\sum_{k=1}^{K} p(\mathbf{y} \mid \mathbf{x}, z=k) p(z=k \mid \mathbf{x}) \tag{13.107} \\
+p(\mathbf{y} \mid \mathbf{x}, z=k) &=\mathcal{N}\left(\mathbf{y} \mid f_{\mu, k}(\mathbf{x}), \operatorname{diag}\left(f_{\sigma, k}(\mathbf{x})\right)\right) \tag{13.108} \\
+p(z=k \mid \mathbf{x}) &=\operatorname{Cat}\left(z \mid \mathcal{S}\left(f_{z}(\mathbf{x})\right)\right) \tag{13.109}
+\end{align}
+$$
+其中 $f_{\mu, k}$ 为第 $k$ 个高斯分布的期望，$f_{\sigma, k}$ 为对应的方差项，$f_z$ 预测使用混合元素中的哪一个。该模型被称为 **混合专家**（$\textrm{mixture of experts, MoE}$）[Jac+91][^Jac91]；[JJ94][^JJ94]; [YWG12][^YWG12]; [ME14][^ME14]。其思想在于，第 $k$ 个子模型 $p(\mathbf{y} \mid \mathbf{x}, z=k)$ 被认为是输入空间中某个区域的“专家”。 函数 $p(z=k \mid \mathbf{x})$ 被称为 **门函数**（$\textrm{gating function}$）决定着使用哪一个专家，该函数依赖于输入值。通过为某个特定输入 $\mathbf{x}$ 指定最有可能的专家， 我们可以只用“激活”模型的一个子集。这是 **条件计算**（$\textrm{conditional computation}$）的一个例子，因为我们根据门控网络的早期计算结果决定运行哪个专家 [Sha+17][^Sha17]。
+
+我们可以使用 $\textrm{SGD}$ 训练模型，或者使用 $\textrm{EM}$ 算法（$5.7.3$介绍了后一种方法的更多细节）。
+
+#### 13.6.2.1 混合线性专家
+
+在这一节中，我们考虑一个简单的例子，其中我们使用线性回归专家和线性分类门控函数，即，模型具有形式：
+$$
+\begin{align}
+p(y \mid \mathbf{x}, z=k, \boldsymbol{\theta}) &=\mathcal{N}\left(y \mid \mathbf{w}_{k}^{\top} \mathbf{x}, \sigma_{k}^{2}\right) \tag{13.110} \\
+p(z \mid \mathbf{x}, \boldsymbol{\theta}) &=\operatorname{Cat}(z \mid \mathcal{S}(\mathbf{V} \mathbf{x})) \tag{13.111}
+\end{align}
+$$
+单独的权重项 $p(z=k \mid \mathbf{x})$ 被称为专家 $k$ 对输入 $\mathbf{x}$ 的**责任**（$\textrm{ responsibility }$）。在图 $13.25b$中，我们发现门控网络如何平滑地将输入空间划分给 $K=3$个专家。
+
+每个专家 $p(y \mid \mathbf{x}, z=k)$ 对应一个线性回归模型，且包含不同的参数。如图 $13.25c$ 所示。
+
+如果我们将专家的加权组合作为输出，我们将得到图 $13.25a$ 中的红色曲线，显然是一个不好的预测结果。如果我们仅仅使用最有可能的专家进行预测（比如，具有最高责任的专家），我们将得到黑色的不连续曲线，显然是更好的预测器。
+
+#### 13.6.2.2 混合密度网络
+
+门控函数和专家可以是任何类型的条件概率模型，而不仅仅是一个线性模型。如果我们都使用 $\textrm{DNNs}$，最终将得到一个被称为 **混合密度网络**（$\textrm{mixture density network, MDN}$）[Bis94][^Bis94]; [ZS14][^ZS14] 或者 **深度混合专家**（$\textrm{deep mixture of experts}$）[CGG17][^CGG17]。图 $13.26$ 给出了一个模型的草图。
+
+#### 13.6.2.3 层次 MOEs
+
+如果每个专家本身就是一个 $\textrm{MoE}$ 模型，最终的模型将被称为 **层次混合专家**（$\textrm{hierarchical mixture of experts}$）[JJ94][^JJ94]。图 $13.27$ 给出了层次为 $2$ 的模型结构示意图。
+
+具有 $L$ 级的 $\textrm{HME}$ 可以被认为是深度为L的“软”决策树，其中每个示例都通过树的每个分支，并且最终的预测是加权平均 （我们将在 $18.1$ 节讨论决策树）
