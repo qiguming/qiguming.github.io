@@ -56,6 +56,8 @@
   margin-top: 6rem;
   border-bottom: 1px double var(--main-border-color);
   font-size: 0.85rem;
+  // font-family: "Times New Roman", Times, serif;  // 额外加的
+
 }
 
 .post-tags {
@@ -97,6 +99,7 @@
     &::before {
       color: var(--text-muted-color);
       font-size: 0.65rem;
+      // font-family: "Times New Roman", Times, serif;  // 额外加的
       text-transform: uppercase;
       content: attr(prompt);
     }
@@ -119,6 +122,7 @@
     line-height: 1.5rem;
     margin-top: 0.3rem;
     white-space: normal;
+    // font-family: "Times New Roman", Times, serif;  // 额外加的
   }
 
 } // .post-navigation
@@ -186,6 +190,7 @@
 
   p {
     font-size: 0.9rem;
+    // font-family: "Times New Roman", Times, serif;  // 额外加的
     margin-bottom: 0.5rem;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -295,6 +300,8 @@
 
   span:last-child {
     font-size: 0.85rem;
+    // font-family: "Times New Roman", Times, serif;  // 额外加的
+
   }
 } // .license-wrapper
 
@@ -349,4 +356,13 @@
     margin-left: -.5rem;
     margin-right: -.5rem;
   }
+}
+
+
+.image-caption {
+    text-align: center;
+    width: 85%;
+    margin: 10px auto 35px;
+    line-height: 1.1;
+    color: #C0C0C0;
 }
