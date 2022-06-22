@@ -1,5 +1,5 @@
 ---
-title: 14 面向图片的神经网络
+title: 14 面向图像数据的神经网络
 author: fengliang qi
 date: 2022-06-20 11:33:00 +0800
 categories: [MLAPP-CN, PART-III]
