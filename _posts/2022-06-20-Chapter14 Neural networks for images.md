@@ -93,7 +93,7 @@ $$
 
 {:.image-caption}
 
-![3times3conv](/assets/img/figures/14.5.png)
+![3times3conv](/assets/img/figures/14_5.png)
 
 {: style="width: 100%;" class="center"}
 图 $14.5$：使用一个 $3\times3$ 的卷积核(中)对 $2d$ 图片(左)进行卷积并生成一张 $2d$ 响应图(右)。响应图中高亮的区域对应图片中包含对角线模式的右上与左下区域。图片引用自 [Cho][^Cho] 的图 $5.3$。经  Francois Chollet 许可后使用。
@@ -161,7 +161,7 @@ $$
 
 {:.image-caption}
 
-![padding_and_stride](/assets/img/figures/14.6.png)
+![padding_and_stride](/assets/img/figures/14_6.png)
 
 {: style="width: 100%;" class="center"}
 图 $14.6$：$2d$ 卷积中 $padding$ 和 $stride$ 的示意图。 $(a)$ 我们使用一个 $3\times3$ 的卷积核对一个大小为 $5\times7$ 的输入进行 "$\textit{same convolution}$" ，并得到大小为 $5\times 7$ 的输出。$(b)$ 我们将步长设置为 $2$，此时的输出大小为 $3\times 4$。图像改自 [Ger19][^Ger19] 的图 $14.3-14.4$。
@@ -192,7 +192,7 @@ $$
 
 {:.image-caption}
 
-![multi_channels_conv](/assets/img/figures/14.7.png)
+![multi_channels_conv](/assets/img/figures/14_7.png)
 
 {: style="width: 100%;" class="center"}
 图 $14.7$：将 $2d$ 卷积应用于 $2$ 个通道的输入。图片改自 [Zha+19a][^Zha+19a]的 $6.4.1$ 。
@@ -200,7 +200,7 @@ $$
 
 {:.image-caption}
 
-![multi_conv_layers](/assets/img/figures/14.8.png)
+![multi_conv_layers](/assets/img/figures/14_8.png)
 
 {: style="width: 100%;" class="center"}
 图 $14.8$：包含 $2$ 个卷积层的 $CNN$。输入包含 $3$ 个颜色通道。中间的特征图包含多个通道。圆柱体对应于超列，表示某个特定位置的特征向量。图片改自 [Ger19][^Ger19] 的图$14.6$。
@@ -224,7 +224,7 @@ $$
 
 {:.image-caption}
 
-![pointwise_conv](/assets/img/figures/14.9.png)
+![pointwise_conv](/assets/img/figures/14_9.png)
 
 {: style="width: 100%;" class="center"}
 图 $14.9$：$1\times1\times3\times2$ 卷积示意图。图片改自 [Zha+19a][^Zha+19a] 的图 $6.4.2$。
@@ -240,7 +240,7 @@ $$
 
 {:.image-caption}
 
-![max_pooling](/assets/img/figures/14.10.png)
+![max_pooling](/assets/img/figures/14_10.png)
 
 {: style="width: 100%;" class="center"}
 图 $14.10$：最大池化示意图。图像改自 [Zha+19a][^Zha+19a] 的图 $6.5.1$。
@@ -256,7 +256,7 @@ $$
 
 {:.image-caption}
 
-![normalization](/assets/img/figures/14.11.png)
+![normalization](/assets/img/figures/14_11.png)
 
 {: style="width: 100%;" class="center"}
 图 $14.11$：$CNN$ 中不同激活归一化方法示意图。每一个子图展示了一张特征图张量，其中 $N$ 表示 $batch$ 维度， $C$ 表示通道维度， $(H,W)$ 表示空间维度。蓝色的像素表示使用同样的期望和方差进行归一化。从左到右： $batch\ norm, layer\ norm, instance\ norm$ 和 $group\ norm$ (包含 $2$ 个 $3$ 通道组)。图像引用自 [WH18][^WH18]。经 $Kaiming\ He$ 允许后使用。
@@ -278,7 +278,7 @@ $$
 
 {:.image-caption}
 
-![normalization](/assets/img/figures/14.12.png)
+![normalization](/assets/img/figures/14_12.png)
 
 {: style="width: 100%;" class="center"}
 图 $14.12$：一个简单的用于分类 $MNIST$ 图片的 $CNN$。模型包含 $2$ 个卷积层， $2$ 个全连接层和$1$ 个 $\textrm{softmax}$ 输出。其中的方形框表示感受野。两个卷积核的大小为 $5\times5\times1\times n_1$ 和 $5\times 5 \times n_1 \times n_2$。两个全连接层的矩阵大小为 $(16n_2)\times n_3$ 和 $n_3 \times 10$。我们使用 $5 \times 5$ 的卷积核进行“$valid$” 卷积，意味着我们将输入的大小从 $28$ 像素每边降低到 $28-5+1=24$ (见$14.2.4$)。通过使用步长为 $2$ ，大小为 $2\times 2$ 的最大池化，我们将 $24$ 进一步降低到 $12$。第二个卷积进一步将输入大小降低到 $12-5+1=8$ 像素每边，第二个池化层将其降低到 $4$。在降低每一层的空间大小时，我们通常会增加特征的通道数 (所以 $n_2 \approx 2n_1$)。更多细节参照 $14.1$ 节。图片引用自 https: // bit. ly/ 2YB9o0H 。经  $Sumit\ Saha$ 允许后使用。
