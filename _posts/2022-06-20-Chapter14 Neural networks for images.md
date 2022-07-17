@@ -28,7 +28,7 @@ comments: true
 > - 
 > 
 ><table><tr><td bgcolor=blue>内容导读</td></tr></table> 
-> - 
+> - CNN 的结构入门
 >- 
 
 在多层感知机 ($\textrm{MLP}$) 模型中，每一个隐含层的核心操作是计算 $\mathbf{z}=\varphi(\mathbf{W} \mathbf{x})_{j}$。然而，如果输入是一张大小不定的图像 $\mathbf{x} \in \mathbb{R}^{W H C}$，其中 $W$ 表示图像的宽度，$H$ 表示高度，$C$ 表示输入的通道数 (例如, $C=3$ 表示 $\textrm{RGB}$ 三个颜色通道)。此时我们需要针对每一种输入的尺寸学习大小不同的权重矩阵。除此之外，哪怕输入的尺寸是固定的，对于一张大小合理的图像，所需的参数数量也是令人望而却步的。
