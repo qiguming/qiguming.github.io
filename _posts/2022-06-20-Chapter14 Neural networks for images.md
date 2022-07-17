@@ -31,7 +31,7 @@ comments: true
 > - 
 >- 
 
-在多层感知机 ($\textrm{MLP}$) 中，每一个隐含层的核心操作是计算 $\mathbf{z}=\varphi(\mathbf{W} \mathbf{x})_{j}$。然而，如果输入是一张大小不定的图像 $\mathbf{x} \in \mathbb{R}^{W H C}$，其中 $W$ 表示图像的宽度，$H$ 表示高度，$C$ 表示输入的通道数 (例如, $C=3$ 表示 $\textrm{RGB}$ 三个颜色通道)。此时我们需要解决的问题是针对每一种输入的尺寸学习大小不同的权重矩阵。除此之外，哪怕输入的尺寸是固定的，对于一张大小合理的图像，所需的参数数量也是令人望而却步的。
+在多层感知机 ($\textrm{MLP}$) 模型中，每一个隐含层的核心操作是计算 $\mathbf{z}=\varphi(\mathbf{W} \mathbf{x})_{j}$。然而，如果输入是一张大小不定的图像 $\mathbf{x} \in \mathbb{R}^{W H C}$，其中 $W$ 表示图像的宽度，$H$ 表示高度，$C$ 表示输入的通道数 (例如, $C=3$ 表示 $\textrm{RGB}$ 三个颜色通道)。此时我们需要针对每一种输入的尺寸学习大小不同的权重矩阵。除此之外，哪怕输入的尺寸是固定的，对于一张大小合理的图像，所需的参数数量也是令人望而却步的。
 
 ![kernel-pattern](/assets/img/figures/kernelPattern.png)
 
@@ -65,7 +65,7 @@ comments: true
 $$
 [f \circledast g](\mathbf{z})=\int_{\mathbb{R}^{D}} f(\mathbf{u}) g(\mathbf{z}-\mathbf{u}) d \mathbf{u} \tag{14.1}
 $$
-现在假设我们用长度有限的向量替换函数，换句话说，我们可以将其视为定义在有限数量的点集上的函数。举个例子，假设只考虑函数 $f$ 在点 $\{-L,-L+1,...,0,1,...,L\}$ 处的响应值，并构成权重向量 (又被称为 **滤波器** 或者 **核** ($\textrm{kernel}$)) —— $w_{-L}=f(-L)$ ... $w_L=f(L)$。现在令函数 $g$ 在点 $\{-N,...,N\}$ 处的特征向量 —— $x_{-N}=g(-N)$ ... $x_N=g(N)$。然后上述公式将转换成：
+现在假设我们用长度有限的向量替换函数，换句话说，我们可以将其视为定义在有限数量的点集上的函数。举个例子，假设只考虑函数 $f$ 在点 $\{-L,-L+1,...,0,1,...,L\}$ 处的响应值，并构成权重向量 (又被称为 **滤波器** 或者 **核** ($\textrm{kernel}$)) —— $w_{-L}=f(-L)$ ... $w_L=f(L)$。现在令函数 $g$ 在点 $\{-N,...,N\}$ 处的特征向量表示为 —— $x_{-N}=g(-N)$ ... $x_N=g(N)$。然后上述公式将转换成：
 $$
 [\mathbf{w} \circledast \mathbf{x}](i)=w_{-L} x_{i+L}+\cdots+w_{-1} x_{i+1}+w_{0} x_{i}+w_{1} x_{i-1}+\cdots+w_{L} x_{i-L} \tag{14.2}
 $$
@@ -77,11 +77,29 @@ $$
 $$
 这被称为**交叉关联** ($\textrm{cross correlation}$)；如果权重向量是对称的 (且通常是这种情况)，那么交叉关联与卷积则是相同的操作。在深度学习的文献中，术语“卷积”通常是指交叉关联；我们将遵循这一惯例。
 
-我们也可以消除下标索引的负数部分——权重 $\mathbf{w}$ 和特征 $\mathbf{x}$ 分别只考虑定义域 $\{0,1,...,L-1\}$ 和 $\{0,1,...,N-1\}$ 处的计算。此时上式将变成：
+我们也可以不考虑下标索引的负数部分——权重 $\mathbf{w}$ 和特征 $\mathbf{x}$ 分别只考虑定义域 $\{0,1,...,L-1\}$ 和 $\{0,1,...,N-1\}$ 处的计算。此时上式将变成：
 $$
 [\mathbf{w} \circledast \mathbf{x}](i)=\sum_{u=0}^{L-1} w_{u} x_{i+u} \tag{14.4}
 $$
 图 $14.3$ 给出了相应的示例。
+
+{:.image-caption}
+
+![2d-cross-correlation](/assets/img/figures/2d_crosscorr.png)
+
+{: style="width: 100%;" class="center"}
+图 $14.4$：二维交叉关联。改编自[Zha+19a][Zha19a]的图$6.2.1$。
+{:.image-caption}
+
+{:.image-caption}
+
+![3times3conv](/assets/img/figures/14.5.png)
+
+{: style="width: 100%;" class="center"}
+图 $14.5$：使用一个 $3\times3$ 的卷积核(中)对 $2d$ 图片(左)进行卷积并生成一张 $2d$ 响应图(右)。响应图中高亮的区域对应图片中包含对角线模式的右上与左下区域。图片引用自 [Cho][^Cho] 的图 $5.3$。经  Francois Chollet 许可后使用。
+{:.image-caption}
+
+
 
 ### 14.2.2 二维卷积
 
@@ -108,7 +126,7 @@ x_{7} & x_{8} & x_{9}
 $$
 图 $14.4$ 展示了这个过程。
 
-我们可以将二维卷积视为 **模板匹配** ($\textrm{template matching}$)，因为以坐标 $(i,j)$ 为中心的图像块与矩阵 $\mathbf{W}$ 越相似，则 $(i,j)$ 处的输出值越大。如果模板 $\mathbf{W}$ 对应于一个有向边，那么使用该卷积核对输入进行卷积，则输出的**热图** ($\textrm{heat map}$) 中，那些包含与模板方向一致的边的区域将会被“点亮”，如图 $14.5$ 所示。更一般地来讲，我们将卷积视作 **特征检测** ($\textrm{feature detection}$) 的一种形式，最终的输出 $\mathbf{Z}=\mathbf{W} \circledast \mathbf{X}$ 因此被称为 **特征图** ($\textrm{feature map}$)。
+我们可以将二维卷积视为 **模板匹配** ($\textrm{template matching}$)，因为以坐标 $(i,j)$ 为中心的图像块与矩阵 $\mathbf{W}$ 越相似，则 $(i,j)$ 处的响应值越大。如果模板 $\mathbf{W}$ 对应于一个有向边，那么使用该卷积核对输入进行卷积，则输出的**热图** ($\textrm{heat map}$) 中，那些包含与模板方向一致的边的区域将会被“点亮”，如图 $14.5$ 所示。更一般地来讲，我们将卷积视作 **特征检测** ($\textrm{feature detection}$) 的一种形式，最终的输出 $\mathbf{Z}=\mathbf{W} \circledast \mathbf{X}$ 因此被称为 **特征图** ($\textrm{feature map}$)。
 
 ### 14.2.3 卷积的矩阵-向量乘形式
 
@@ -141,6 +159,14 @@ w_{1} x_{5}+w_{2} x_{6}+w_{3} x_{8}+w_{4} x_{9}
 $$
 通过将 $4\times1$ 的向量 $\mathbf{z}$ 进行 $\textrm{reshape}$，我们可以回溯 $2\times2$ 的输出矩阵 $\textbf{Z}$。所以我们发现 $\textrm{CNNs}$ 与 $\textrm{MLPS}$ 是类似的，只不过前者的权重矩阵是一个特殊的稀疏结构，并且同一些矩阵元素被分布在整个矩阵空间。这一特点实现了平移不变性的思想，于此同时，相较于一个标准的全连接层或者稠密层的权重矩阵，这种方式大幅减少了参数的数量。
 
+{:.image-caption}
+
+![padding_and_stride](/assets/img/figures/14.6.png)
+
+{: style="width: 100%;" class="center"}
+图 $14.6$：$2d$ 卷积中 $padding$ 和 $stride$ 的示意图。 $(a)$ 我们使用一个 $3\times3$ 的卷积核对一个大小为 $5\times7$ 的输入进行 "$\textit{same convolution}$" ，并得到大小为 $5\times 7$ 的输出。$(b)$ 我们将步长设置为 $2$，此时的输出大小为 $3\times 4$。图像改自 [Ger19][^Ger19] 的图 $14.3-14.4$。
+{:.image-caption}
+
 ### 14.2.4 边界条件和步长
 
 在公式 $(14.7)$中 ，我们发现如果使用一个 $2\times2$ 的卷积核对 $3\times 3$ 的图像进行卷积，最终将得到一个大小为 $2\times 2$ 的输出。通常来说，如果图像的大小为 $x_h\times x_w$ ，卷积核大小为 $f_h \times f_w$，则最终的输出大小为 $(x_h-f_h+1)\times (x_w-f_w+1)$，这被称为 **有效卷积** ($\textrm{valid convolution}$)，因为只是将卷积核应用于图像的“有效”部分，换句话说，我们不让它 “从两端滑出”。如图 $14.6a$ 所示，如果我们希望输出的大小与输入保持一致，我们可以使用 $\textbf{zero-padding}$，意味着我们可以在图像的边界进行补 $0$ 操作，这被称为 $\textbf{same convolution}$。
@@ -164,6 +190,24 @@ $$
 
 [^DV16]:
 
+{:.image-caption}
+
+![multi_channels_conv](/assets/img/figures/14.7.png)
+
+{: style="width: 100%;" class="center"}
+图 $14.7$：将 $2d$ 卷积应用于 $2$ 个通道的输入。图片改自 [Zha+19a][^Zha+19a]的 $6.4.1$ 。
+{:.image-caption}
+
+{:.image-caption}
+
+![multi_conv_layers](/assets/img/figures/14.8.png)
+
+{: style="width: 100%;" class="center"}
+图 $14.8$：包含 $2$ 个卷积层的 $CNN$。输入包含 $3$ 个颜色通道。中间的特征图包含多个通道。圆柱体对应于超列，表示某个特定位置的特征向量。图片改自 [Ger19][^Ger19] 的图$14.6$。
+{:.image-caption}
+
+
+
 #### 14.2.4.1 多输入与多输出通道
 
 在图 $14.5$，输入是一张灰度图。通常情况下，输入存在多个**通道** ($\textrm{channels}$)（例如， $\textrm{RGB}$ 或者卫星图像的高光谱波段），通过对每一个通道都定义一个卷积核，我们便可以应对这种情况；所以此时的卷积核 $\mathbf{W}$ 是一个 $\textrm{3d}$ 权重矩阵或者**张量** ($\textrm{tensor}$)。在计算输出的过程中，我们使用核 $\mathbf{W}_{:,:,c}$ 来对通道 $c$ 进行卷积，然后沿着通道进行求和：
@@ -178,35 +222,67 @@ z_{i, j, d}=b_{d}+\sum_{u=0}^{H-1} \sum_{v=0}^{W-1} \sum_{c=0}^{C-1} x_{s i+u, s
 $$
 如图 $14.8$ 所示，每一个垂直的圆柱形的列表示在一个给定位置 $\mathbf{Z}_{i, j, 1: D}$ 处的输出特征；这有时也被称为一个**超列** ($\textrm{hypercolumn}$)。每个元素都是下层每个特征图的感受野中 $C$ 个特征的不同加权组合。
 
+{:.image-caption}
+
+![pointwise_conv](/assets/img/figures/14.9.png)
+
+{: style="width: 100%;" class="center"}
+图 $14.9$：$1\times1\times3\times2$ 卷积示意图。图片改自 [Zha+19a][^Zha+19a] 的图 $6.4.2$。
+{:.image-caption}
+
 #### 14.2.4.2 $1\times1$ $\textrm{(pointwise)}$ 卷积
 
-有些时候我们只需要对一个给定的位置上的特征进行加权组合，而不需要考虑跨空间区域的元素。这一点可以通过使用 $\mathbf{1\times 1}$ 卷积来实现，也被称为 **逐点卷积** ($\textrm{pointwise convolution}$)，图 $14.9$ 展示了具体过程。该卷积将通道数由 $C$ 转换成 $D$，而没有改变空间维度的大小：
+有些时候我们只需要对一个给定的位置上的特征进行加权融合，而不需要考虑跨空间区域的元素。这一点可以通过使用 $\mathbf{1\times 1}$ 卷积来实现，也被称为 **逐点卷积** ($\textrm{pointwise convolution}$)，图 $14.9$ 展示了具体过程。该卷积将通道数由 $C$ 转换成 $D$，而没有改变空间维度的大小：
 $$
 z_{i, j, d}=b_{d}+\sum_{c=0}^{C-1} x_{i, j, c} w_{0,0, c, d} \tag{14.15}
 $$
 这可以被认为并行地对每一个特征列使用一个单层的 $\textrm{MLP}$。
 
+{:.image-caption}
+
+![max_pooling](/assets/img/figures/14.10.png)
+
+{: style="width: 100%;" class="center"}
+图 $14.10$：最大池化示意图。图像改自 [Zha+19a][^Zha+19a] 的图 $6.5.1$。
+{:.image-caption}
+
 #### 14.2.5 池化层
 
-卷积可以保留输入特征的位置信息 (可以减少分辨率)，该性质被称为 $\textbf{equivariance}$。在某些情况下，我们希望关于位置具有 $\textrm{invariant}$。举个例子，在进行图像分类的过程中，我们只想知道一个感兴趣的目标 (比如，一张脸) 在图片的任意位置是否存在。
+卷积可以保留输入特征的位置信息 (同时降低分辨率)，该性质被称为 $\textbf{equivariance}$。在某些情况下，我们希望关于位置具有 $\textrm{invariant}$。举个例子，在进行图像分类的过程中，我们只想知道一个感兴趣的目标 (比如，一张脸) 在图片的任意位置是否存在。
 
 一种简单的实现方法被称为 **最大池化** ($\textrm{max pooling}$)，它只计算输入值中的最大值，如图 $14.10$ 所示。另一个替代方案是使用 **平均池化** ($\textrm{average pooling}$)，它将最大值替换成期望值。在任何一种情况下，无论输入模式出现在其感受野内的哪个位置，输出神经元都具有相同的响应 (请注意，我们将池化应用到每个特征通道上)。
 
 如果我们对特征图中的所有位置进行平均，则该方法称为**全局平均池化** ($\textrm{global average pooling}$)。 因此，我们可以将 $H\times W\times D$ 的特征图转换为 $1 \times 1 \times D$ 维的特征图，后者可以重新整形为 $D$ 维向量，可以将其传递到全连接层中，以在传递到 $\textrm{softmax}$ 输出之前将其映射到 $C$ 维向量。 使用全局平均池化意味着我们可以将分类器应用于任何大小的图像，因为最终的特征图在映射到 $C$ 类上的分布之前总是会转换为固定的 $D$ 维向量。
 
+{:.image-caption}
+
+![normalization](/assets/img/figures/14.11.png)
+
+{: style="width: 100%;" class="center"}
+图 $14.11$：$CNN$ 中不同激活归一化方法示意图。每一个子图展示了一张特征图张量，其中 $N$ 表示 $batch$ 维度， $C$ 表示通道维度， $(H,W)$ 表示空间维度。蓝色的像素表示使用同样的期望和方差进行归一化。从左到右： $batch\ norm, layer\ norm, instance\ norm$ 和 $group\ norm$ (包含 $2$ 个 $3$ 通道组)。图像引用自 [WH18][^WH18]。经 $Kaiming\ He$ 允许后使用。
+{:.image-caption}
+
 ### 14.2.6 $\textbf{Normalization}$ 层
 
-在 $13.4.5$ 节我们讨论了 $\textbf{batch normalization}$，它将给定特征通道内的所有激活标准化为零均值和单位方差。 这可以极大地帮助培训。 然而，尽管批量归一化效果很好，但当批量较小时，它会遇到困难，因为估计的均值和方差参数可能不可靠。
+在 $13.4.5$ 节我们讨论了 $\textbf{batch normalization}$ (批量归一化)，它将给定特征通道内的所有激活标准化为零均值和单位方差。 这可以极大地帮助模型训练。 然而，尽管批量归一化效果很好，但当批量较小时，它会遇到困难，因为估计的均值和方差参数可能不可靠。
 
-一种解决方案是通过汇集张量其他维度的统计数据来计算均值和方差，而不是跨批次中的样本。 更准确地说，令 $z_i$ 表示张量的第 $i$ 个元素； 在二维图像的情况下，索引 $i$ 有 $4$ 个分量，分别表示批次、通道、高度和宽度：$i = (i_N, i_C, i_H, i_W )$。 我们计算每个索引 $z_i$ 的均值和标准差，如下所示：
+一种解决方案是通过汇集张量其他维度的统计数据来计算均值和方差，而不是批次中的其他样本。 更准确地说，令 $z_i$ 表示张量的第 $i$ 个元素； 在二维图像的情况下，索引 $i$ 有 $4$ 个分量，分别表示批次、通道、高度和宽度：$i = (i_N, i_C, i_H, i_W )$。 我们计算每个索引 $z_i$ 的均值和标准差，如下所示：
 $$
 \mu_{i}=\frac{1}{\left|\mathcal{S}_{i}\right|} \sum_{k \in \mathcal{S}_{i}} z_{k}, \sigma_{i}=\sqrt{\frac{1}{\left|\mathcal{S}_{i}\right|} \sum_{k \in \mathcal{S}_{i}}\left(z_{k}-\mu_{i}\right)^{2}+\epsilon} \tag{14.16}
 $$
 式中 $\mathcal{S}_i$ 表示被平均的元素集合。我们然后计算 $\hat{z}_{i}=\left(z_{i}-\mu_{i}\right) / \sigma_{i}$ 和 $\tilde{z}_{i}=\gamma_{c} \hat{x}_{i}+\beta_{c}$，其中 $c$ 表示对应于索引 $i$ 的通道。
 
-在 $\textrm{batch norm}$中，我们将批次、高度、宽度汇集在一起，因此 $\mathcal{S}_i$ 是张量中与 $i$ 的通道索引匹配的所有位置的集合。 为了避免小批量的问题，我们可以改为对通道、高度和宽度进行池化，但在批量索引上进行匹配。 这被称为**层归一化** ($\textrm{layer normalization}$) [$\textrm{BKH16}$][^BKH16]。 或者，我们可以为批处理中的每个样本和每个通道设置单独的归一化参数。 这被称为**实例归一化** ($\textrm{instance normalization}$) [$\textrm{UVL16}$][^UVL16]。
+在 $\textrm{batch norm}$中，我们将批次、高度、宽度汇集在一起，因此 $\mathcal{S}_i$ 是张量中与 $i$ 的通道索引匹配的所有位置的集合。 为了避免小批量的问题，我们可以改为对通道、高度和宽度进行融合，但在批量索引上进行匹配。 这被称为**层归一化** ($\textrm{layer normalization}$) [$\textrm{BKH16}$][^BKH16]。 或者，我们可以为批处理中的每个样本和每个通道设置单独的归一化参数。 这被称为**实例归一化** ($\textrm{instance normalization}$) [$\textrm{UVL16}$][^UVL16]。
 
 上述方法的自然推广称为**组归一化** ($\textrm{group normalization}$) [$\textrm{WH18}$][^WH18]，我们将所有通道与 $i$ 所在组中的所有位置汇集在一起。 如图 $14.11$ 所示。 层归一化是一种特殊情况，其中有一个包含所有通道的组。 实例归一化是一种特殊情况，其中有 $C$ 个组，每个通道一个。 在 [$\textrm{WH18}$][^WH18] 中，他们通过实验表明，使用大于单个通道但小于所有通道的组可能会更好（在训练速度以及训练和测试精度方面）。
+
+{:.image-caption}
+
+![normalization](/assets/img/figures/14.12.png)
+
+{: style="width: 100%;" class="center"}
+图 $14.12$：一个简单的用于分类 $MNIST$ 图片的 $CNN$。模型包含 $2$ 个卷积层， $2$ 个全连接层和$1$ 个 $\textrm{softmax}$ 输出。其中的方形框表示感受野。两个卷积核的大小为 $5\times5\times1\times n_1$ 和 $5\times 5 \times n_1 \times n_2$。两个全连接层的矩阵大小为 $(16n_2)\times n_3$ 和 $n_3 \times 10$。我们使用 $5 \times 5$ 的卷积核进行“$valid$” 卷积，意味着我们将输入的大小从 $28$ 像素每边降低到 $28-5+1=24$ (见$14.2.4$)。通过使用步长为 $2$ ，大小为 $2\times 2$ 的最大池化，我们将 $24$ 进一步降低到 $12$。第二个卷积进一步将输入大小降低到 $12-5+1=8$ 像素每边，第二个池化层将其降低到 $4$。在降低每一层的空间大小时，我们通常会增加特征的通道数 (所以 $n_2 \approx 2n_1$)。更多细节参照 $14.1$ 节。图片引用自 https: // bit. ly/ 2YB9o0H 。经  $Sumit\ Saha$ 允许后使用。
+{:.image-caption}
 
 ### 14.2.7 组装在一起
 
@@ -249,6 +325,113 @@ $\textrm{ImageNet}$ 数据集被用作 $\textrm{ImageNet Large Sclae Visual Reco
 $\textrm{ML}$ 研究论文中常用的还有许多其他图像数据集。 例如，在研究生成模型 (相对于图像分类器) 时，通常使用 $\textbf{CelebA}$ 数据集 [Liu+15][^Liu15]，其中包含 $10,177$ 位名人的 $202,599$ 张图像。每张图像都用 $40$ 个二进制属性进行注注，例如“戴眼镜”或“卷发”。 有关该数据集的一些案例，请参见图 $14.16$，我们在第 $20.2.6.1$ 和 $20.3.5.2$ 节中使用了这些示例。(数据集的高分辨率版本，称为 $\textbf{CelebA-HQ}$，可在 [Kar+18][^Kar18] 中获得。)
 
 ### 14.3.2 常用模型
+
+在本节中，我们将简要回顾多年来为解决图像分类任务而开发的各种 $\textrm{CNN}$。 有关图像分类器的更广泛综述，请参见例如 [Gu+18b][^Gu18b]。
+
+#### 14.3.2.1 LeNet
+
+最早的 $\textrm{CNN}$ 之一创建于 $1998$ 年，被称为 $\textbf{LeNet}$ [LeC+98][^LeC98]，以其创建者 $\textrm{Yann LeCun}$ 的名字命名。 它旨在对手写数字的图像进行分类，并在 $3.7.2$ 节中介绍的 $\textrm{MNIST}$ 数据集上进行了训练。 该模型如图 $14.17a$ 所示。 该模型的一些预测如图 $14.18$ 所示。 仅仅 $1$ 个 $\textrm{epoch}$ 之后，测试准确率就已经达到了 $98.8\%$。 相比之下，$13.2.4.2$ 中的 $\textrm{MLP}$ 在 1 个 $\textrm{epoch}$ 后的准确率为 $95.9\%$。 更多轮次的训练可以进一步提高准确性，使其性能与标签噪声无法区分。
+
+当然，对孤立数字进行分类的适用性有限：在现实世界中，人们通常会写出一串数字或其他字母。 这需要分割和分类。 $\textrm{LeCun}$ 及其同事设计了一种将卷积神经网络与类似于条件随机场的模型相结合的方法来解决这个问题。 该系统由美国邮政局部署。 有关该系统的更详细说明，请参见 [LeC+98][^Lec98]。
+
+#### 14.3.2.2 AlexNet
+
+虽然 $\textrm{CNN}$ 已经存在很多年了，但直到 $2012$ 年 [KSH12][^KSH12] 的论文，主流计算机视觉研究人员才开始关注它们。 在那篇论文中，作者展示了如何将 $\textrm{ImageNet}$ 挑战（第 $14.3.1.2$ 节）的 (前 $5$ 名) 错误率从之前的 $26\%$ 降低到 $15\%$，这是一个巨大的进步。 该模型被称为 $\textbf{AlexNet}$ 模型，以其创建者 $\textrm{Alex Krizhevsky}$ 的名字命名。
+
+图 $14.17b(b)$ 显示了架构。 它与图 $14.17a$ 所示的 $\textrm{LeNet}$ 非常相似，但有以下区别：它更深（$8$ 层可调参数（即不包括池化层）而不是 $5$ 层）； 它使用 $\textrm{ReLU}$ 非线性而不是$\textrm{tanh}$（请参阅第 $13.2.3$ 节了解为什么这很重要）； 它使用 $\textrm{dropout}$（第 $13.5.4$ 节）进行正则化而不是权重衰减； 并且它将几个卷积层堆叠在一起，而不是在卷积和池化之间严格交替。 将多个卷积层堆叠在一起的优点是，随着一层的输出被馈送到另一层，感受野变得更大（例如，连续三个 $3\times3$ 滤波器的感受野大小为 $7\times7$）。 这比使用具有更大感受野的单层要好，因为多层之间也存在非线性。此外，三个  $3\times3$ 滤波器的参数少于一个 $7\times7$ 滤波器。
+
+请注意，$\textrm{AlexNet}$ 有 $\textrm{60M}$ 的自由参数（比 $\textrm{1M}$ 标记的示例多得多），主要是由于输出端的三个全连接层。 拟合这个模型依赖于使用两个 $\textrm{GPU}$（由于当时 $\textrm{GPU}$ 的内存有限），并且被广泛认为是工程杰作。 图 $14.14a$ 显示了模型对来自 $\textrm{ImageNet}$ 的一些图像所做的一些预测。
+
+#### 14.3.2.3 GoogLeNet (Inception)
+
+谷歌开发了一种称为 $\textbf{GoogLeNet}$ [Sze+15a][^Sze15a] 的模型 (这个名字是 $\textrm{Google}$ 和 $\textrm{LeNet}$ 的双关语)。与早期模型的主要区别在于 $\textrm{GoogLeNet}$ 使用了一种新的 $\textrm{block}$，称为 $\textbf{inception block}$ [^5]，它采用多个并行路径，每个路径都有一个不同尺寸的卷积滤波器。 有关说明，请参见图 $14.19$。 这让模型可以学习每一层的最佳滤波器的大小。 整个模型由 $9$ 个 $\textrm{inception block}$ 组成，然后是全局平均池化层。 请参见图 $14.20$ 中的说明。 自从该模型首次问世以来，就提出了各种扩展； 详情可见[IS15][^IS15]; [Sze+15b][^Sze15b];[SIV17][^SIV17]。
+
+#### 14.3.2.4 ResNet
+
+2015 年 $\textrm{ImageNet}$ 分类挑战赛的获胜者是微软的一个团队，他们提出了一个名为 $\textbf{ResNet}$ [He+16a][He16a] 的模型。其核心思想是将 $\mathbf{x}_{l+1}=\mathcal{F}_{l}\left(\mathbf{x}_{l}\right)$ 替换为
+$$
+\mathbf{x}_{l+1}=\varphi\left(\mathbf{x}_{l}+\mathcal{F}_{l}\left(\mathbf{x}_{l}\right)\right) \tag{14.17}
+$$
+这被称为 $\textbf{residual block}$，因为 $\mathcal{F}_l$ 只需要学习输入与输出之间的残差或者差异——这是个更简单的任务。在 [He+16a][^He16a] 中， $\mathcal{F}$ 的结构为 $\textrm{conv-BN-relu-conv-BN}$，其中 $\textrm{conv}$ 是一个卷积层， $\textrm{BN}$ 是一个 $\textrm{batch norm}$ 层 ($13.4.5$ 节)。(如果需要，我们可以在跨连路径上添加 $1\times1$ 卷积，以补偿 $\mathbf{x}_{l}$ 和 $\mathcal{F}\left(\mathbf{x}_{l}\right)$ 之间不同数量的通道)。图 $\textrm{14.21}$ 为对应示意图。
+
+$\textrm{residual block}$ 的使用使我们能够训练非常深的模型。 例如，[He+16a][^He16a] 在  $\textrm{ImageNet}$ 上训练了一个 $152$ 层的 $\textrm{ResNet}$。 这可能的原因是梯度可以通过跳过连接直接从输出层到更浅的层，原因在 $13.4.4$ 节中解释。
+
+在 [He+16b][^He16b] 中，他们展示了如何对上述方案进行小幅修改，从而使我们能够训练多达 $1001$ 层的模型。 关键的思路是，由于在加法步骤 $\mathbf{x}_{l+1}=\varphi\left(\mathbf{x}_{l}+\mathcal{F}_{l}\left(\mathbf{x}_{l}\right)\right)$ 之后使用了非线性激活函数，跳过连接上的信号仍在衰减。 他们表明，以下类型的 $\textrm{residual block}$ 效果更好：
+$$
+\mathbf{x}_{l+1}=\mathbf{x}_{l}+\mathcal{F}_{l}^{\prime}\left(\mathbf{x}_{l}\right) \tag{14.18}
+$$
+其中 $\mathcal{F}^{\prime}\left(\mathbf{x}_{l}\right)$ 是 $\textrm{Conv-BN-Relu-Conv-BN-Relu}$。这称为$\textbf{preactivation resnet}$ 或简称 $\textbf{PreResnet}$，因为它在通过非线性传递函数 $\varphi$ 之前返回激活。
+
+非常深的 $\textrm{ResNet}$ 模型的问题在于，没有什么可以强制模型使用残差块，因此可能会浪费很多层。 $\textbf{wide resnet}$ 模型 [ZK16][^ZK16] 通过使用较少数量的“更宽”残差层（即具有更多卷积通道）来修改  $\textrm{ResNet}$。
+
+## 14.4 使用 CNNs 解决其他判别式视觉任务
+
+在本节中，我们将简要讨论如何使用 $\textrm{CNN}$ 处理各种其他视觉任务。 针对每个不同任务，在原有的模型基础构建模块库内引入了新的创新结构。 有关用于计算机视觉的 $\textrm{CNN}$ 的更多详细信息，请参见 [Bro19][^Bro19]。
+
+### 14.4.1 Image tagging
+
+图像分类将单个标签与整个图像相关联，即假设输出是互斥的。 在许多问题中，一张图像中可能存在多个目标，我们要标记所有目标——这被称为**图像标记**（$\textrm{image tagging}$），是多标签分类的一种应用。 在这种情况下，我们将输出空间定义为 $\mathcal{Y}=\{0,1\}^{C}$ ，其中 $C$ 是标签类型的数量。 由于输出的每个槽位是独立的（给定图像），我们应该用 $C$ 个逻辑单元替换最终的 $\textrm{softmax}$。
+
+$\textrm{Instagram}$ 等社交媒体网站的用户经常为他们的图片创建哈希标签； 因此，这提供了一种创建大型有标注数据集的“免费”方式。 当然，很多标签的使用可能相当稀疏，它们的含义在视觉上也可能没有很好的定义 (例如，有人可能会在接受 $\textrm{COVID}$ 测试后给自己拍照并将图像标记为 $\textrm{“#covid”}$；但是，在视觉上它与其他图像并无二异）。因此这种用户生成的标签通常被认为含噪的。 然而，正如 [Mah+18][^Mah18] 中所讨论的，它对于模型“预训练”很有用。
+
+最后，值得注意的是，图像标记通常是比图像分类更符合直觉的任务，因为许多图像中包含多个目标，并且很难知道我们应该标记哪个目标。 事实上，在 $\textrm{ImageNet}$ 上创建 “$\textrm{human performance benchmark}$” 的 $\textrm{Andrej Karpathy}$ 指出[^6]:
+
+```markdown
+Both [CNNs] and humans struggle with images that contain multiple ImageNet classes (usually many more than five), with little indication of which object is the focus of the image. This error is only present in the classification setting, since every image is constrained to have exactly one correct label. In total, we attribute 16% of human errors to this category.
+```
+
+### 14.4.2 Object detection
+
+在某些情况下，我们希望模型产生可变数量的输出，对应于图像中可能存在的可变数量的感兴趣目标。(这是一个**开放世界** ($\textrm{open world}$) 问题的案例——对象数量未知)。
+
+一个典型的例子是**目标检测** ($\textrm{object detection}$)，我们必须返回一组表示感兴趣目标位置的边界框，以及它们的类别标签。一个特殊情况是**人脸检测** ($\textrm{face detection}$)，其中图像中只有一类感兴趣目标，如图 $14.22a$ 所示[^7]。
+
+解决此类检测问题的最简单方法是将其转换为封闭世界问题，其中任何对象都可以存在有限数量的候选位置（和方向）。这些候选位置称为**锚框** ($\textrm{anchor boxes}$)。 我们可以在多个位置、比例和纵横比上创建锚框，如图 $14.22b$ 所示。 对于每个锚框，我们训练系统预测它包含的对象类别（如果有的话)；我们还可以使用回归来预测对象位置与锚点中心的偏移量 (这些残差回归项允许更加精细的空间定位)。
+
+抽象地，我们正在学习形式的函数
+$$
+f_{\theta}: \mathbb{R}^{H \times W \times K} \rightarrow[0,1]^{A \times A} \times\{1, \ldots, C\}^{A \times A} \times\left(\mathbb{R}^{4}\right)^{A \times A}\tag{14.19}
+$$
+其中 $A$ 是每个维度中锚框的数量，$C$ 是对象类型（类标签）的数量。 对于每个框位置 $(i, j)$，我们预测三个输出：对象存在概率 $p_{ij} \in [0, 1]$，对象类别 $y_{ij}\in\{1, . . . , C\}$ 和两个 $2d$ 偏移向量 $\bold{δ}_{ij}\in \mathbb{R}^4$，可以与锚框的质心相加以获得左上角和右下角坐标。
+
+业内已经提出了几种这种类型的模型，包括 [Liu+16][^Liu16] 的 $\textbf{single shot detector}$ 和 [Red+16][^Red16] 的 $\textbf{YOLO}$（$\textrm{you only look once}$）模型。 多年来，人们提出了许多其他的目标检测方法。 这些模型在速度、准确性、简单性等方面做出了不同的权衡。参见 [Hua+17][^Hua17] 进行的经验比较，参见 [Zha+18][^Zha18] 获得最近的综述。
+
+### 14.4.3 Human pose estimation
+
+我们可以训练一个物体检测器来检测人。 我们还可以训练它来预测它们的 $2d$ 形状——由一组固定的骨骼关键点的位置表示，例如头部或手部的位置。 这称为**人体姿态估计** ($\textrm{human pose estimation}$)，如图 $14.23a$ 所示。 有几种技术，例如 $\textbf{PersonLab}$ [Pap+18][^Pap18] 和 $\textbf{OpenPose}$ [Cao+18][^Cao18]。 有关最近的评论，请参阅 [Bab19][^Bab19]。
+
+我们还可以预测每个检测到的对象的 $3d$ 属性。 主要限制是收集足够标记训练数据的能力，因为人类注释者很难在 $3d$ 中标记事物。 但是，我们可以使用计算机图形引擎创建具有无限真实 $3d$ 注释的模拟图像（参见 [GNK18][^GNK18]）。
+
+### 14.4.4 Image segmentation
+
+我们可以为每个输入像素创建一个输出标签，以二维网格排列。这可以用于**语义分割** ($\textrm{semantic segmentation}$)，我们必须为每个像素预测一个类标签 $y_{i} \in\{1, \ldots, C\}$ (这不应与我们在 $14.4.4.3$ 节中讨论的实例分割相混淆)。 
+
+处理语义分割的一种常见方法是使用**编码器-解码器** ($\textrm{encoder-decoder}$)架构，如 $14.4.4$ 节所示。编码器使用标准卷积将输入映射到一个小的 $2d$ $\textrm{bottleneck}$，它以粗略的空间分辨率捕获输入的高级属性。这使用了一种称为空洞卷积的技术，我们在 $14.4.4.1$ 节中进行了解释。解码器使用我们在第 $14.4.4.2$ 节中解释的称为转置卷积的技术将小的 $2d$ $\textrm{bottleneck}$映射回全尺寸输出图像。由于 $\textrm{bottleneck}$ 会丢失信息，我们还可以添加从输入层到输出层的旁路连接。整体结构类似于字母 $\textrm{U}$，因此也称为 $\textbf{U-net}$ [RFB15][^RFB15]。 
+
+类似的架构可用于其他**密集预测** ($\textrm{dense prediction}$)或**图像到图像** ($\textrm{image-to-image}$) 的任务，例如**深度预测** ($\textrm{depth prediction}$)（对于每个像素 $i$, 预测与相机的距离，$z_i\in\mathbb{R}$）、**表面法线预测** ($\textrm{surface normal prediction}$)（对每一个图像块，预测表面的方向, $\mathbf{z}_i \in \mathbb{R}^3$) 等等。我们当然可以训练一个模型来同时解决所有这些任务，使用多个输出头，如图 $14.25$ 所示 (详见 [Kok17][^Kok17]）。
+
+#### 14.4.4.1 Dilated convolution
+
+卷积是一种组合局部邻域中的像素值的操作。 通过使用跨步，并将多层卷积堆叠在一起，我们可以扩大每个神经元的感受野，这是每个神经元响应的输入空间区域。 然而，我们需要很多层来为每个神经元提供足够的上下文来覆盖整个图像（除非我们使用非常大的过滤器，这会很慢并且需要太多参数）。
+
+作为替代方案，我们可以使用带孔的卷积 [Mal99]，有时以法语术语 à trous 算法而闻名，最近更名为扩张卷积 [YK16]。 这种方法在执行卷积时只取每个 r'th 输入元素，其中 r 被称为速率或膨胀因子。 例如，在 1d 中，使用速率 r = 2 与滤波器 w 进行卷积等价于使用滤波器 w~ = [w1, 0, w2, 0, w3] 进行常规卷积，其中我们插入了 0 来扩展感受野（因此 术语“带孔的卷积”）。 这使我们能够在不增加参数数量或计算量的情况下获得增加的感受野的好处。
+
+更准确地说，2d 中的空洞卷积定义如下：
+$$
+z_{i, j, d}=b_{d}+\sum_{u=0}^{H-1} \sum_{v=0}^{W-1} \sum_{c=0}^{C-1} x_{i+r u, j+r v, c} w_{u, v, c, d} \tag{14.20}
+$$
+为简单起见，我们假设高度和宽度的比率 r 相同。 将此与方程式进行比较。 (14.14)，其中步幅参数使用 xsi+u,sj+v,c。
+
+#### 14.4.4.2  Transposed convolution
+
+在第 14.4.4.1 节中，我们讨论了扩张卷积，其中我们在过滤器权重中放置 0（或“孔”）（以扩大其视野），然后应用常规卷积。 我们也可以想象做相反的事情，我们在输入图像中放置 0 以使其更大，然后应用常规卷积。 这称为转置卷积，因为对应的矩阵运算因为它从小输入映射到大输出。 请注意，转置卷积有时也称为反卷积，但这是对该术语的错误用法：反卷积是“取消”卷积效果的过程
+过滤器，例如模糊过滤器。
+
+#### 14.4.4.3 Instance segmentation
+
+在语义分割中，我们为每个像素附加一个标签，但我们没有将像素分组为对象。 因此，输出的大小与输入的大小相同。 相比之下，在实例分割中，目标是预测图像中每个对象实例的标签和 2d 形状，如图 14.23b 所示。 在这种情况下，输出的数量是可变的。 我们可以将“东西”的语义分割和“事物”的实例分割组合成一个连贯的框架，称为“全景分割”[Kir+19]。
+
+
 
 在本书的部分 $\mathrm{II}$， 我们讨论了线性模型在回归和分类任务的应用。在第 $\textrm{11}$ 章，我们讨论了线性回归模型$p(y|\mathbf{x}, \mathbf{w})=\mathcal{N}\left(y|\mathbf{w}^{\top}\mathbf{x}, \sigma^{2}\right)$  。在第 $\textrm{10}$ 章，我们讨论了逻辑回归，其中对于二分类情况，模型定义为 $p(y|\mathbf{x}, \mathbf{w})={\rm{Ber}}(y|\sigma(\mathbf{w}^{\top}\mathbf{x}))$；在多分类任务中，模型定义为 $ p(y|\mathbf{x},\mathbf{w})=\operatorname{Cat}(y|\mathcal{S}(\mathbf{W} \mathbf{x}))$。在第 $\textrm{12}$ 章，我们进一步讨论了广义线性模型，定义为:
 $$
