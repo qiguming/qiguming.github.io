@@ -286,7 +286,7 @@ $$
 
 ### 14.2.7 组装在一起
 
-一种常见的设计模式是通过交替卷积层和最大池化层来创建 CNN，最后是最终的线性分类层。 如图 $14.12$ 所示。 （在这个例子中我们省略了归一化层，因为模型很浅）。这种设计模式首先出现在 $\textrm{Fukushima}$ 的 $\textbf{neocognitron}$ [$\textrm{Fuk75}$][^Fuk75] 中，并受到 $\textrm{Hubel}$ 和 $\textrm{Wiesel}$ 的人类视觉皮层中简单和复杂细胞模型的启发 [$\textrm{HW62}$][^HW62] 。 $1998$ 年，$\textrm{Yann LeCun}$ 在他的同名 $\textbf{LeNet}$ 模型 [$\textrm{LeC+98}$][^LeC+98] 中使用了类似的设计，该模型使用反向传播和 $\textrm{SGD}$ 来估计参数。 这种设计模式在视觉对象识别的神经启发模型 [$\textrm{RP99}$][^RP99] 以及各种实际应用中继续流行（参见第 $14.3$ 节和第 $14.4$ 节）。
+一种常见的设计模式是通过交替卷积层和最大池化层来创建 CNN，最后是最终的线性分类层。 如图 $14.12$ 所示。 （在这个例子中我们省略了归一化层，因为模型深度很小）。这种设计模式首先出现在 $\textrm{Fukushima}$ 的 $\textbf{neocognitron}$ [$\textrm{Fuk75}$][^Fuk75] 中，并受到 $\textrm{Hubel}$ 和 $\textrm{Wiesel}$ 的人类视觉皮层中简单和复杂细胞模型的启发 [$\textrm{HW62}$][^HW62] 。 $1998$ 年，$\textrm{Yann LeCun}$ 在他的同名 $\textbf{LeNet}$ 模型 [$\textrm{LeC+98}$][^LeC+98] 中使用了类似的设计，该模型使用反向传播和 $\textrm{SGD}$ 来估计参数。 这种设计模式在视觉对象识别的神经启发模型 [$\textrm{RP99}$][^RP99] 以及各种实际应用中继续流行（参见第 $14.3$ 节和第 $14.4$ 节）。
 
 [^BKH16]:
 [^UVL16]:
