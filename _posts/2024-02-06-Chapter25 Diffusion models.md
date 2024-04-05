@@ -563,8 +563,15 @@ $$
 
 ### 25.3.3 与 DDPM 的等价性
 
-我们现在展示 score-based generative model 的训练目标与DDPM损失函数是等价的。为了验证这一点，首先使用 $q_0\left(\boldsymbol{x}_0\right)$ 替换 $p_{\mathcal{D}}(\boldsymbol{x})$，用 $\boldsymbol{x}_t$ 替换 $\tilde{\boldsymbol{x}}$ ，并用 $\boldsymbol{s}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right)$ 替换 $\boldsymbol{s}_{\boldsymbol{\theta}}(\tilde{\boldsymbol{x}}, \sigma)$。我们还将使用随机地均匀采样一个时间点来计算等式(25.36)。那么等式(25.36)变成了以下形式：
+我们现在展示 score-based generative model 的训练目标与DDPM损失函数是等价的。为了验证这一点，首先使用
 
+ $q_0\left(\boldsymbol{x}_0\right)$ 替换
+
+ $p_{\mathcal{D}}(\boldsymbol{x})$，用 $\boldsymbol{x}_t$ 替换 $\tilde{\boldsymbol{x}}$ ，并用
+
+ $\boldsymbol{s}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right)$ 替换
+
+ $\boldsymbol{s}_{\boldsymbol{\theta}}(\tilde{\boldsymbol{x}}, \sigma)$。我们还将使用随机地均匀采样一个时间点来计算等式(25.36)。那么等式(25.36)变成了以下形式：
 
 $$
 \mathcal{L}=\mathbb{E}_{\boldsymbol{x}_0 \sim q_0\left(\boldsymbol{x}_0\right), \boldsymbol{x}_t \sim q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_0\right), t \sim \operatorname{Unif}(1, T)}\left[\lambda_t\left\|\boldsymbol{s}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right)+\frac{\left(\boldsymbol{x}_t-\boldsymbol{x}_0\right)}{\sigma_t^2}\right\|_2^2\right] \tag{25.37}
