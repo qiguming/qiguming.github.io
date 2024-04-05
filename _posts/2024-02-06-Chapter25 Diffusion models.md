@@ -378,15 +378,7 @@ $$
 [^3]: 此处的loss采用了简化的形式，即连续时间极限情况下的结果。极限情况下的loss形式我们将在25.4节讨论。
 [^Kin21]: D. P. Kingma, T. Salimans, B. Poole, and J. Ho. “Variational Diffusion Models”. In: NIPS. July 2021.
 
-由于信噪比(SNR)函数是可逆的——因为单调性假设，我们可以进行变量替换，并且使一切变量都成为关于 $v=R(t)$ 的函数而不是 $t$ 的函数。具体而言，令
-
-$$\boldsymbol{z}_v=\alpha_v \boldsymbol{x}_0+\sigma_v \boldsymbol{\epsilon}$$
-
-，以及
-
-$$\tilde{\boldsymbol{x}}_{\boldsymbol{\theta}}(\boldsymbol{z}, v)=\hat{\boldsymbol{x}}_{\boldsymbol{\theta}}\left(\boldsymbol{z}, R^{-1}(v)\right)$$。
-
-则公式（25.28）可以重写成
+由于信噪比(SNR)函数是可逆的——因为单调性假设，我们可以进行变量替换，并且使一切变量都成为关于 $v=R(t)$ 的函数而不是 $t$ 的函数。具体而言，令 $$\boldsymbol{z}_v=\alpha_v \boldsymbol{x}_0+\sigma_v \boldsymbol{\epsilon}$$，以及 $$\tilde{\boldsymbol{x}}_{\boldsymbol{\theta}}(\boldsymbol{z}, v)=\hat{\boldsymbol{x}}_{\boldsymbol{\theta}}\left(\boldsymbol{z}, R^{-1}(v)\right)$$。则公式（25.28）可以重写成
 
 $$
 \mathcal{L}_D\left(\boldsymbol{x}_0\right)=\frac{1}{2} \mathbb{E}_{\boldsymbol{\epsilon} \sim \mathcal{N}(\boldsymbol{0}, \mathbf{I})} \int_{R_{\min }}^{R_{\max }}\left\|\boldsymbol{x}_0-\tilde{\boldsymbol{x}}_{\boldsymbol{\theta}}\left(z_v, v\right)\right\|_2^2 d v \tag{25.29}
