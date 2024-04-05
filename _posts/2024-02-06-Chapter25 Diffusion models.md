@@ -2,11 +2,11 @@
 title: 25 扩散模型
 author: fengliang qi
 date: 2023-02-06 11:33:00 +0800
-categories: [MLAPP-CN, BOOK-2, PART-IV]
+categories: [MLAPP-CN, PART-IV]
 tags: [diffusion model, generative model]
 math: true
 mermaid: true
-toc: true
+toc: false
 comments: true
 ---
 
