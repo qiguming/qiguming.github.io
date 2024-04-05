@@ -20,7 +20,7 @@ comments: true
 
 本章，我们将讨论**扩散模型**（diffusion model）。这类生成模型最近引起了广泛关注，因为它能够生成多样且高质量的样本，同时由于训练方法相对简单，使得训练一个超大规模的扩散模型成为可能。接下来，我们将会看到，扩散模型与VAE（第21章），归一化流（第23章）以及EBM（第24章）存在着密切关联。
 
-扩散模型背后的基本思想主要是基于如下的观察：将噪声转换成具备结构化特征的正常数据很难，但将正常数据转换成噪声却很容易。具体而言，通过反复执行一个随机编码器 $q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}\right)$   $T$ 步，我们可以逐渐将观察到的正常数据 $\boldsymbol{x}_0$ 转换成对应的噪声版本 $\boldsymbol{x}_T$，且如果 $T$ 足够大， $\boldsymbol{x}_T \sim \mathcal{N}(\bold{0}, \bold{I})$，或者其他一些方便分析的参考分布，这个将正常数据转化成噪声的过程被称为 **前向过程**（forwards process）或 **扩散过程**（diffusion process）。接下来，我们可以学习 一个**逆向过程**（reverse process）来反转前向过程——即通过执行解码器 $p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right)$  $T$ 步，将噪声转换成正常的数据 $\boldsymbol{x}_0$。图25.1展示了上述两个过程。在以下内容中，我们将更详细地讨论扩散模型。我们的讨论基于[KGV22][^KGV22]的优秀教程。更多细节可以参考最近的综述论文[Yan+22][^Yan22]; [Cao+22][^Cao22]以及专业论文[Kar+22][^Kar22]。还有许多其他优秀的在线资源，如https://github.com/heejkoo/Awesome-Diffusion-Models 和https://scorebasedgenerativemodeling.github.io/。
+扩散模型背后的基本思想主要是基于如下的观察：将噪声转换成具备结构化特征的正常数据很难，但将正常数据转换成噪声却很容易。具体而言，通过反复执行一个随机编码器 $q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}\right)$   $T$ 步，我们可以逐渐将观察到的正常数据 $\boldsymbol{x}_0$ 转换成对应的噪声版本 $\boldsymbol{x}_T$，且如果 $T$ 足够大， $\boldsymbol{x}_T \sim \mathcal{N}(\bold{0}, \bold{I})$，或者其他一些方便分析的参考分布，这个将正常数据转化成噪声的过程被称为 **前向过程**（forwards process）或 **扩散过程**（diffusion process）。接下来，我们可以学习一个**逆向过程**（reverse process）来反转前向过程——即通过执行解码器 $p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right)$  $T$ 步，将噪声转换成正常的数据 $\boldsymbol{x}_0$。图25.1展示了上述两个过程。在以下内容中，我们将更详细地讨论扩散模型。我们的讨论基于[KGV22][^KGV22]的优秀教程。更多细节可以参考最近的综述论文[Yan+22][^Yan22]; [Cao+22][^Cao22]以及专业论文[Kar+22][^Kar22]。还有许多其他优秀的在线资源，如https://github.com/heejkoo/Awesome-Diffusion-Models 和https://scorebasedgenerativemodeling.github.io/。
 
 ![ddpm](/assets/img/figures/book2/25.1.png)
 
@@ -309,7 +309,6 @@ $$
 
 {: style="width: 100%;" class="center"}
 
-
 ----
 
 
@@ -369,9 +368,9 @@ $$
 其中 $R^{\prime}(t)$  是 SNR 函数的导数，$\boldsymbol{z}_t=\alpha_t \boldsymbol{x}_0+\sigma_t \boldsymbol{\epsilon}_t$​。（具体推导参考[Kin+21][^Kin21]）。
 
 [^3]: 此处的loss采用了简化的形式，即连续时间极限情况下的结果。极限情况下的loss形式我们将在25.4节讨论。
-[^Kin+21]: D. P. Kingma, T. Salimans, B. Poole, and J. Ho. “Variational Diffusion Models”. In: NIPS. July 2021.
+[^Kin21]: D. P. Kingma, T. Salimans, B. Poole, and J. Ho. “Variational Diffusion Models”. In: NIPS. July 2021.
 
-由于信噪比(SNR)函数是可逆的——因为单调性假设，我们可以进行变量替换，并且使一切变量都成为关于 $v=R(t)$ 的函数而不是 $t$ 的函数。具体而言，令 $\boldsymbol{z}_v=\alpha_v \boldsymbol{x}_0+\sigma_v \boldsymbol{\epsilon}$，$\tilde{\boldsymbol{x}}_{\boldsymbol{\theta}}(\boldsymbol{z}, v)=\hat{\boldsymbol{x}}_{\boldsymbol{\theta}}\left(\boldsymbol{z}, R^{-1}(v)\right)$。则公式（25.28）可以重写成
+由于信噪比(SNR)函数是可逆的——因为单调性假设，我们可以进行变量替换，并且使一切变量都成为关于 $v=R(t)$ 的函数而不是 $t$ 的函数。具体而言，令 $\boldsymbol{z}_v=\alpha_v \boldsymbol{x}_0+\sigma_v \boldsymbol{\epsilon}$，以及 $\tilde{\boldsymbol{x}}_{\boldsymbol{\theta}}(\boldsymbol{z}, v)=\hat{\boldsymbol{x}}_{\boldsymbol{\theta}}\left(\boldsymbol{z}, R^{-1}(v)\right)$。则公式（25.28）可以重写成
 
 
 $$
@@ -386,7 +385,6 @@ $$
 ---
 
 <table><tr><td bgcolor=blue>译者注（kimi读文）</td></tr></table>
-
 
 这篇论文介绍了一类基于变分扩散模型（Variational Diffusion Models，简称VDMs，https://arxiv.org/pdf/2107.00630.pdf）的生成模型，并展示了它们在标准图像密度估计基准测试中的优异性能。以下是该论文的主要贡献点：
 
@@ -420,8 +418,6 @@ $$
 
 扩散模型经常被用来生成图像。图像生成最常用的结构基于U-net模型[RFB15][^RFB15]，如图25.3所示。时间节点 $t$​​ 被编码为一个向量，使用的是正弦位置编码或随机傅里叶特征，随后被输入到残差模块，使用简单的空间加法或通过对组归一化层进行条件化[DN21a][^DN21a]。当然，除了U-net之外，还有其他的架构。例如，最近的研究[PX22][^PX22]; [Li+22][^Li+22]; [Bao+22a][^Bao+22a]提出使用transformer来取代卷积层和反卷积层。
 
-
-
 ![25.4](/assets/img/figures/book2/25.4.png)
 
 {: style="width: 100%;" class="center"}
@@ -435,7 +431,6 @@ $$
 ---
 
 <table><tr><td bgcolor=blue>译者注（位置编码如何计算）</td></tr></table>
-
 
 在 transformer 的原文中，位置编码的计算方式为：
 
