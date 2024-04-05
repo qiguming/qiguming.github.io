@@ -6,11 +6,11 @@ categories: [MLAPP-CN, PART-IV]
 tags: [diffusion model, generative model]
 math: true
 mermaid: true
-toc: false
+toc: true
 comments: true
 ---
 
-> 本章, to do, 列出本章重点dai dai
+> 本章，我们将介绍扩散模型
 >
 
 [toc]
