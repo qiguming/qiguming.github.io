@@ -21,8 +21,6 @@ comments: true
 
 扩散模型背后的基本思想主要是基于如下的观察：将噪声转换成具备结构化特征的正常数据很难，但将正常数据转换成噪声却很容易。具体而言，通过反复执行一个随机编码器 $q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}\right)$  $T$ 步，我们可以逐渐将观察到的正常数据 $\boldsymbol{x}_0$ 转换成对应的噪声版本 $\boldsymbol{x}_T$，且如果 $T$ 足够大， $\boldsymbol{x}_T \sim \mathcal{N}(\bold{0}, \bold{I})$，或者其他一些方便分析的参考分布，这个将正常数据转化成噪声的过程被称为 **前向过程**（forwards process）或 **扩散过程**（diffusion process）。接下来，我们可以*学习*一个**逆向过程**（reverse process）来反转前向过程——即通过执行解码器 $p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right)$ $T$ 步，将噪声转换成正常的数据 $\boldsymbol{x}_0$。图25.1展示了上述两个过程。在以下内容中，我们将更详细地讨论扩散模型。我们的讨论基于[KGV22][^KGV22]的优秀教程。更多细节可以参考最近的综述论文[Yan+22][^Yan22]; [Cao+22][^Cao22]以及专业论文[Kar+22][^Kar22]。还有许多其他优秀的在线资源，如https://github.com/heejkoo/Awesome-Diffusion-Models 和https://scorebasedgenerativemodeling.github.io/。
 
-{:.image-caption}
-
 ![ddpm](/assets/img/figures/book2/25.1.png)
 
 {: style="width: 100%;" class="center"}
@@ -61,8 +59,6 @@ q\left(\boldsymbol{x}_t\right)=\int q_0\left(\boldsymbol{x}_0\right) q\left(\bol
 $$
 如图25.2所示，随着 $t$ 的增加，上述的边际分布会变得越来越简单。在图像领域，这个过程首先会消除图像中的高频信息（即低级的细节，如纹理），随后会消除低频信息（即高级的或“语义级别的”信息，如形状），如图25.1所示。
 
-{:.image-caption}
-
 ![ddpm-on-1d](/assets/img/figures/book2/25.2.png)
 
 {: style="width: 100%;" class="center"}
@@ -90,14 +86,10 @@ These constants were chosen to be small relative to data scaled to [−1, 1], en
 
 线性变换的形式相对简单，但也存在一些问题，在 《Improved Denoising Diffusion Probabilistic Models》中，作者指出，线性变换导致 $\bar{\alpha}_t$ 存在突变，如图N25.1所示，线性变换的情况下，$\bar{\alpha}_t$ 在最后的阶段几乎没有变化，反应在图像上的变化可参考图N25.2。
 
-{:.image-caption}
-
 ![N25.1](/assets/img/figures/book2/N25.1.png)
 
 {: style="width: 100%;" class="center"}
 图  N25.1: 线性变换与余弦变换下对应的 $\bar{\alpha}_t$ 的变化。
-{:.image-caption}
-
 {:.image-caption}
 
 ![N25.2](/assets/img/figures/book2/N25.2.png)
@@ -238,7 +230,7 @@ $$
 
 模型训练完成后，我们可以使用**始祖抽样**（ancestral sampling）来生成数据，如算法25.2所示。
 
-{:.image-caption}
+
 
 ![A25.1](/assets/img/figures/book2/A25.1.png)
 
@@ -246,7 +238,7 @@ $$
 ""
 {:.image-caption}
 
-{:.image-caption}
+
 
 ![A25.2](/assets/img/figures/book2/A25.2.png)
 
@@ -332,7 +324,7 @@ $$
 
 ### 25.2.5 案例：图像生成
 
-{:.image-caption}
+
 
 ![25.3](/assets/img/figures/book2/25.3.png)
 
@@ -344,7 +336,7 @@ $$
 
 扩散模型经常被用来生成图像。图像生成最常用的结构基于U-net模型[RFB15][^RFB15]，如图25.3所示。时间节点 $t$​​ 被编码为一个向量，使用的是正弦位置编码或随机傅里叶特征，随后被输入到残差模块，使用简单的空间加法或通过对组归一化层进行条件化[DN21a][^DN21a]。当然，除了U-net之外，还有其他的架构。例如，最近的研究[PX22][^PX22]; [Li+22][^Li+22]; [Bao+22a][^Bao+22a]提出使用transformer来取代卷积层和反卷积层。
 
-{:.image-caption}
+
 
 ![25.4](/assets/img/figures/book2/25.4.png)
 
@@ -402,7 +394,7 @@ pe[:, 1::2] = torch.cos(k * div_term)
 
 在第24.3节中，我们讨论了如何使用score matching来拟合能量模型（EBMs）。该方法通过调整EBM的参数，使得模型的**评分函数**（score function）$\nabla_{\boldsymbol{x}} \log p_{\boldsymbol{\theta}}(\boldsymbol{x})$，匹配真实数据的评分函数 $\nabla_{\boldsymbol{x}} \log p_{\mathcal{D}}(\boldsymbol{x})$。一个替代*先估计标量能量函数再计算其评分* 的方法是直接学习一个**评分函数**，该方法被称为 **score-based generative model**（SGM）[SE19][^SE19]; [SE20b][^SE20b]; [Son+21b][^Son+21b]。我们可以使用basic score matching（第24.3.1节）、sliced score matching（第24.3.3节）或 denoising score matching（第24.3.2节）来优化评分函数 $s_{\boldsymbol{\theta}}(\boldsymbol{x})$​​。我们将在下文中更详细地讨论这类模型。（关于与EBMs的比较，参见[SH21][^SH21]。）
 
-{:.image-caption}
+
 
 ![25.5](/assets/img/figures/book2/25.5.png)
 
@@ -490,7 +482,7 @@ d \boldsymbol{x}=\underbrace{\boldsymbol{f}(\boldsymbol{x}, t)}_{\text {drift }}
 $$
 上述SDE中的第一项被称为**漂移系数**（drift coefficient），第二项被称为**扩散系数**（diffusion coefficient）。
 
-{:.image-caption}
+
 
 ![25.6](/assets/img/figures/book2/25.6.png)
 
@@ -528,7 +520,7 @@ $$
 $$
 图25.7b展示了样本轨迹的可视化效果。如果我们从不同的随机状态 $\boldsymbol{x}(0)$​ 开始求解，那么产生的路径的边际分布将与SDE模型产生的边际分布相同。参见图25.6中的热图以获得说明。
 
-{:.image-caption}
+
 
 ![25.7](/assets/img/figures/book2/25.7.png)
 
@@ -564,7 +556,7 @@ $$
 $$
 参见图25.7a作为示例。
 
-{:.image-caption}
+
 
 ![25.8](/assets/img/figures/book2/25.8.png)
 
@@ -575,8 +567,6 @@ $$
 {:.image-caption}
 
 
-
-{:.image-caption}
 
 ![25.9](/assets/img/figures/book2/25.9.png)
 
@@ -616,8 +606,6 @@ d \boldsymbol{x}_t=\underbrace{-\frac{1}{2} \beta(t)\left[\boldsymbol{x}_t+\bold
 $$
 连续的噪声注入可以补偿ODE项数值积分引入的误差。因此，最终生成的样本通常看起来更好。然而，ODE方法可能更快。幸运的是，有可能结合这些技术，正如[Kar+22][^Kar22]中提出的那样。基本思想如图25.9所示：我们交替执行使用ODE求解器的确定性步骤，然后在结果中添加少量噪声。这可以重复进行一定次数。（我们将在第25.5节中讨论减少所需步骤数量的方法。）
 
-{:.image-caption}
-
 ![25.10](/assets/img/figures/book2/25.10.png)
 
 {: style="width: 100%;" class="center"}
@@ -648,8 +636,6 @@ $$
 
 请注意，该模型的加权负变分下确界（VLB）与第25.2节中的 $L_{\text{simple}}$​​ 相同，因此 DDIM 采样器可以应用于训练过的 DDPM 模型。
 
-{:.image-caption}
-
 ![25.11](/assets/img/figures/book2/25.11.png)
 
 {: style="width: 100%;" class="center"}
@@ -660,8 +646,6 @@ $$
 
 
 
-{:.image-caption}
-
 ![25.12](/assets/img/figures/book2/25.12.png)
 
 {: style="width: 100%;" class="center"}
@@ -671,8 +655,6 @@ $$
 {:.image-caption}
 
 
-
-{:.image-caption}
 
 ![A25.3-25.4](/assets/img/figures/book2/A25.3-25.4.png)
 
@@ -687,8 +669,6 @@ $$
 ### 25.5.3 蒸馏
 
 在这一节中，我们讨论了[SH22][^SH22]的渐进式蒸馏方法，它提供了一种创建扩散模型的方法，该模型只需要少量步骤即可生成高质量的样本。基本思路如下：首先我们以通常的方式训练一个DDPM模型，并且使用DDIM方法从中采样；我们将其视为teacher模型。我们使用这个模型生成中间隐变量状态，并训练一个student模型来预测teacher模型每隔一步的输出，如图25.12所示。在student模型训练完成后，它可以生成与teacher模型一样好的结果，但步骤减半。然后，这个student可以教导新一代更快的student。具体的伪代码见算法25.4，应与标准训练过程的算法25.3进行比较。请注意，每一轮教学变得更快，因为teacher变得更小，因此执行蒸馏的总时间相对较短。最终的模型可以在短短4步内生成高质量样本。
-
-{:.image-caption}
 
 ![25.13](/assets/img/figures/book2/25.13.png)
 
@@ -754,8 +734,6 @@ $$
 $$
 更大的权重 $w$​ 通常会导致更好的单个样本质量，但多样性会变低。
 
-{:.image-caption}
-
 ![25.14](/assets/img/figures/book2/25.14.png)
 
 {: style="width: 100%;" class="center"}
@@ -773,8 +751,6 @@ $$
 ## 25.7 离散隐空间内的扩散模型
 
 截至目前，在本章中，我们主要关注用于生成实数域数据的高斯扩散模型。实际上，我们也可以定义用于离散数据的扩散模型，例如文本或语义分割的标签，这可以通过使用一个连续的潜在嵌入空间来实现（见第25.5.4节），或者直接在离散状态空间上定义扩散操作，我们将在下文讨论。
-
-{:.image-caption}
 
 ![25.15](/assets/img/figures/book2/25.15.png)
 
@@ -811,8 +787,6 @@ $$
 q\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t, \boldsymbol{x}_0\right)=\frac{q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}, \boldsymbol{x}_0\right) q\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_0\right)}{q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_0\right)}=\operatorname{Cat}\left(\boldsymbol{x}_{t-1} \left\lvert\, \frac{\boldsymbol{x}_t \mathbf{Q}_t^{\top} \odot \boldsymbol{x}_0 \overline{\mathbf{Q}}_{t-1}}{\boldsymbol{x}_0 \overline{\mathbf{Q}}_t \boldsymbol{x}_t^{\top}}\right.\right) \tag{25.70}
 $$
 我们将在第25.7.3节讨论如何定义生成过程 $p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right)$​。由于两个分布都可以进行因式分解，我们可以通过对每个维度的KL求和，轻松计算方程(25.67)中的KL分布。
-
-{:.image-caption}
 
 ![25.16](/assets/img/figures/book2/25.16.png)
 
@@ -866,8 +840,6 @@ $$
 ### 25.7.4 噪声计划表
 
 在这一节中，我们讨论如何为 $\beta_t$ 选择噪声进度表。对于离散化高斯扩散，[Aus+21] 建议在离散化步骤之前线性增加高斯噪声的方差。对于均匀扩散，我们可以使用如下形式的余弦进度表 $\alpha_t=\cos \left(\frac{t / T+s}{1+s} \frac{\pi}{2}\right)$，其中 $s=0.08$，正如 [ND21] 所建议的。（回想一下 $\beta_t=1-\alpha_t$，所以随着时间的推移噪声会增加。）对于掩码扩散，我们可以使用如下形式的进度表 $\beta_t=1 /(T-t+1)$​，正如 [SD+15b] 所建议的。
-
-{:.image-caption}
 
 ![25.17](/assets/img/figures/book2/25.17.png)
 
