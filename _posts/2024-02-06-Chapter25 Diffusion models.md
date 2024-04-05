@@ -308,8 +308,6 @@ $$
 
 模型训练完成后，我们可以使用**始祖抽样**（ancestral sampling）来生成数据，如算法25.2所示。
 
-
-
 ![A25.1](/assets/img/figures/book2/A25.1.png)
 
 {: style="width: 100%;" class="center"}
