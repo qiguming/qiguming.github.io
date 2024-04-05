@@ -26,7 +26,9 @@ $$q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}\right)$$，
 
 执行 $T$ 步后，我们可以逐渐将观察到的正常数据 $\boldsymbol{x}_0$ 转换成对应的噪声版本 $\boldsymbol{x}_T$，且如果 $T$ 足够大， $\boldsymbol{x}_T\sim\mathcal{N}(\mathbf{0},\mathbf{I})$，或者其他一些方便分析的参考分布，这个将正常数据转化成噪声的过程被称为 **前向过程**（forwards process）或 **扩散过程**（diffusion process）。接下来，我们可以学习一个**逆向过程**（reverse process）来反转前向过程——即通过执行解码器
 
- $p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1}\mid\boldsymbol{x}_t\right)$  ，将噪声转换成正常的数据 $\boldsymbol{x}_0$。图25.1展示了上述两个过程。在以下内容中，我们将更详细地讨论扩散模型。我们的讨论基于[KGV22][^KGV22]的优秀教程。更多细节可以参考最近的综述论文[Yan+22][^Yan22]; [Cao+22][^Cao22]以及专业论文[Kar+22][^Kar22]。还有许多其他优秀的在线资源，如https://github.com/heejkoo/Awesome-Diffusion-Models 和https://scorebasedgenerativemodeling.github.io/。
+ $$p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1}\mid\boldsymbol{x}_t\right)$$ ，
+
+将噪声转换成正常的数据 $\boldsymbol{x}_0$。图25.1展示了上述两个过程。在以下内容中，我们将更详细地讨论扩散模型。我们的讨论基于[KGV22][^KGV22]的优秀教程。更多细节可以参考最近的综述论文[Yan+22][^Yan22]; [Cao+22][^Cao22]以及专业论文[Kar+22][^Kar22]。还有许多其他优秀的在线资源，如https://github.com/heejkoo/Awesome-Diffusion-Models 和https://scorebasedgenerativemodeling.github.io/。
 
 ![ddpm](/assets/img/figures/book2/25.1.png)
 
@@ -89,7 +91,7 @@ $$
 ![ddpm-on-1d](/assets/img/figures/book2/25.2.png)
 
 {: style="width: 100%;" class="center"}
-图25.2: 1维数据下的扩散模型示意图。前向过程逐渐将经验分布 $q(\boldsymbol{x}_0)$ 转换成一个简单的目标分布，此处即 $q\left(\boldsymbol{x}_T\right)=\mathcal{N}(\mathbf{0}, \mathbf{I})$。为了从模型中生成样本，我们采样一个样本 $\boldsymbol{x}_T \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$ ，然后执行马尔可夫链的反向过程 $\boldsymbol{x}_t \sim p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t+1}\right)$，直到我们得到原始输入空间的样本 $\boldsymbol{x}_0$。图片引用自 [KGV22][^KGV22]。经Arash Vahdat允许后使用。
+图25.2: 1维数据下的扩散模型示意图。前向过程逐渐将经验分布 $q(\boldsymbol{x}_0)$ 转换成一个简单的目标分布，此处即 $q\left(\boldsymbol{x}_T\right)=\mathcal{N}(\mathbf{0}, \mathbf{I})$。为了从模型中生成样本，我们采样一个样本 $\boldsymbol{x}_T \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$ ，然后执行马尔可夫链的反向过程 $$\boldsymbol{x}_t \sim p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t+1}\right)$$，直到我们得到原始输入空间的样本 $\boldsymbol{x}_0$。图片引用自 [KGV22][^KGV22]。经Arash Vahdat允许后使用。
 {:.image-caption}
 
 ---
@@ -208,7 +210,7 @@ $$
 
 通常我们令 $\boldsymbol{\Sigma}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right)=\sigma_t^2 \mathbf{I}$（译者注：即各向同性的对角协方差矩阵）。我们将在 25.2.4 节讨论如何学习 $\sigma_t^2$，但两种容易想到的选择是令 $\sigma_t^2=\beta_t$ 和 $\sigma_t^2=\tilde{\beta}_t$，两种选择分别对应于在[HJA20][^HJA20]中介绍的反向过程熵的上限和下限。
 
-在生成过程中产生的所有隐变量的联合概率分布为 $p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{0: T}\right)= p\left(\boldsymbol{x}_T\right) \prod_{t=1}^T p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right) $ ，其中我们令 $p\left(\boldsymbol{x}_T\right)=\mathcal{N}(\mathbf{0}, \mathbf{I})$​。根据算法25.2提供的伪代码，我们可以从分布中采样得到新的样本。
+在生成过程中产生的所有隐变量的联合概率分布为 $$p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{0: T}\right)= p\left(\boldsymbol{x}_T\right) \prod_{t=1}^T p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right)$$​ ，其中我们令 $p\left(\boldsymbol{x}_T\right)=\mathcal{N}(\mathbf{0}, \mathbf{I})$​。根据算法25.2提供的伪代码，我们可以从分布中采样得到新的样本。
 
 [^2]: 我们只需要使用高斯分布的贝叶斯规则。例如，可以参考 https://lilianweng.github.io/posts/2021-07-11-diffusion-models/ 来查看详细的推导过程。
 
