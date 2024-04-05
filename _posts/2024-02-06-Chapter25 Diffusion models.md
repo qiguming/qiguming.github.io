@@ -13,13 +13,13 @@ comments: true
 > 本章, to do, 列出本章重点dai dai
 >
 
-
+[toc]
 
 ## 25.1 简介
 
 本章，我们将讨论**扩散模型**（diffusion model）。这类生成模型最近引起了广泛关注，因为它能够生成多样且高质量的样本，同时由于训练方法相对简单，使得训练一个超大规模的扩散模型成为可能。接下来，我们将会看到，扩散模型与VAE（第21章），归一化流（第23章）以及EBM（第24章）存在着密切关联。
 
-扩散模型背后的基本思想主要是基于如下的观察：将噪声转换成具备结构化特征的正常数据很难，但将正常数据转换成噪声却很容易。具体而言，通过反复执行一个随机编码器 $q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}\right)$  $T$ 步，我们可以逐渐将观察到的正常数据 $\boldsymbol{x}_0$ 转换成对应的噪声版本 $\boldsymbol{x}_T$，且如果 $T$ 足够大， $\boldsymbol{x}_T \sim \mathcal{N}(\bold{0}, \bold{I})$，或者其他一些方便分析的参考分布，这个将正常数据转化成噪声的过程被称为 **前向过程**（forwards process）或 **扩散过程**（diffusion process）。接下来，我们可以*学习*一个**逆向过程**（reverse process）来反转前向过程——即通过执行解码器 $p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right)$ $T$ 步，将噪声转换成正常的数据 $\boldsymbol{x}_0$。图25.1展示了上述两个过程。在以下内容中，我们将更详细地讨论扩散模型。我们的讨论基于[KGV22][^KGV22]的优秀教程。更多细节可以参考最近的综述论文[Yan+22][^Yan22]; [Cao+22][^Cao22]以及专业论文[Kar+22][^Kar22]。还有许多其他优秀的在线资源，如https://github.com/heejkoo/Awesome-Diffusion-Models 和https://scorebasedgenerativemodeling.github.io/。
+扩散模型背后的基本思想主要是基于如下的观察：将噪声转换成具备结构化特征的正常数据很难，但将正常数据转换成噪声却很容易。具体而言，通过反复执行一个随机编码器 $q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}\right)$   $T$ 步，我们可以逐渐将观察到的正常数据 $\boldsymbol{x}_0$ 转换成对应的噪声版本 $\boldsymbol{x}_T$，且如果 $T$ 足够大， $\boldsymbol{x}_T \sim \mathcal{N}(\bold{0}, \bold{I})$，或者其他一些方便分析的参考分布，这个将正常数据转化成噪声的过程被称为 **前向过程**（forwards process）或 **扩散过程**（diffusion process）。接下来，我们可以学习 一个**逆向过程**（reverse process）来反转前向过程——即通过执行解码器 $p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right)$  $T$ 步，将噪声转换成正常的数据 $\boldsymbol{x}_0$。图25.1展示了上述两个过程。在以下内容中，我们将更详细地讨论扩散模型。我们的讨论基于[KGV22][^KGV22]的优秀教程。更多细节可以参考最近的综述论文[Yan+22][^Yan22]; [Cao+22][^Cao22]以及专业论文[Kar+22][^Kar22]。还有许多其他优秀的在线资源，如https://github.com/heejkoo/Awesome-Diffusion-Models 和https://scorebasedgenerativemodeling.github.io/。
 
 ![ddpm](/assets/img/figures/book2/25.1.png)
 
@@ -27,7 +27,7 @@ comments: true
 图25.1：降噪概率扩散模型。前向过程实现（无可学习参数）推理网络；该过程只是在每一个时间点增加噪声。逆向过程实现解码器；这是一个可学习的高斯模型。图片引用自[KGV22][^KGV22]。经Arash Vahdat允许后使用。
 {:.image-caption}
 
-## 25.2 降噪扩散概率模型（Denoising diffusion probabilistic models, DDPMs）
+## 25.2 降噪扩散概率模型（DDPMs）
 
 本节，我们将讨论**降噪扩散概率模型**（Denoising diffusion probabilistic models，DDPM），该模型首先在[SD+15b][^SD15b]中被提出，并在[HJA20][^HJA20]; [Kin+21][^Kin21]和许多其他工作中进行了扩展。我们可以将DDPM看作类似于分层变分自编码器（第21.5节）的模型，区别在于，在扩散模型中，所有的隐变量（表示为 $\boldsymbol{x}_t$，$t=1:T$）与输入$\boldsymbol{x}_0$具有相同的维度。（在维度是否一致方面，DDPM又类似于第23章的归一化流，然而，在扩散模型中，隐层的输出是随机的，并且不需要使用可逆变换。）此外，编码器 $q$ 是一个简单的线性高斯模型，而不是通过学习得到的[^1]，解码器 $p$​ 在不同时间节点（timestep）之间共享模型参数。这些限制使得我们可以获得一个非常简单的训练目标，进而使更深层的模型训练变得简单，从而避免了后验坍塌（第21.4节）的风险。特别是在第25.2.3节中，我们将看到，扩散模型的优化最终可以归结为加权版本的非线性最小二乘问题。
 
@@ -62,7 +62,7 @@ $$
 ![ddpm-on-1d](/assets/img/figures/book2/25.2.png)
 
 {: style="width: 100%;" class="center"}
-图25.1：图25.2: 1维数据下的扩散模型示意图。前向过程逐渐将经验分布 $q(\boldsymbol{x}_0)$ 转换成一个简单的目标分布，此处即 $q\left(\boldsymbol{x}_T\right)=\mathcal{N}(\mathbf{0}, \mathbf{I})$。为了从模型中生成样本，我们采样一个样本 $\boldsymbol{x}_T \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$ ，然后执行马尔可夫链的反向过程 $\boldsymbol{x}_t \sim p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t+1}\right)$，直到我们得到原始输入空间的样本 $\boldsymbol{x}_0$。图片引用自 [KGV22][^KGV22]。经Arash Vahdat允许后使用。
+图25.2: 1维数据下的扩散模型示意图。前向过程逐渐将经验分布 $q(\boldsymbol{x}_0)$ 转换成一个简单的目标分布，此处即 $q\left(\boldsymbol{x}_T\right)=\mathcal{N}(\mathbf{0}, \mathbf{I})$。为了从模型中生成样本，我们采样一个样本 $\boldsymbol{x}_T \sim \mathcal{N}(\mathbf{0}, \mathbf{I})$ ，然后执行马尔可夫链的反向过程 $\boldsymbol{x}_t \sim p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t+1}\right)$，直到我们得到原始输入空间的样本 $\boldsymbol{x}_0$。图片引用自 [KGV22][^KGV22]。经Arash Vahdat允许后使用。
 {:.image-caption}
 
 ---
@@ -235,16 +235,12 @@ $$
 ![A25.1](/assets/img/figures/book2/A25.1.png)
 
 {: style="width: 100%;" class="center"}
-""
-{:.image-caption}
-
 
 
 ![A25.2](/assets/img/figures/book2/A25.2.png)
 
 {: style="width: 100%;" class="center"}
-""
-{:.image-caption}
+
 
 ----
 
@@ -411,35 +407,55 @@ pe[:, 1::2] = torch.cos(k * div_term)
 ### 25.3.2 分层加噪
 
 通常，当存在低密度数据区域时，score matching 可能会遇到困难。为了了解这一点，假设 $p_{\mathcal{D}}(\mathbf{x})=\pi p_0(\mathbf{x})+(1-\pi) p_1(\mathbf{x})$。令 $\mathcal{S}_0:=\left\{\mathbf{x} \mid p_0(\mathbf{x})>0\right\}$ 和 $\mathcal{S}_1:=\left\{\mathbf{x} \mid p_1(\mathbf{x})>0\right\}$ 分别对应 $p_0(\mathbf{x})$ 和 $p_1(\mathbf{x})$ 的支撑集。当两个支撑集不相交时，$p_{\mathcal{D}}(\mathbf{x})$ 的score为：
+
+
 $$
 \nabla_{\mathbf{x}} \log p_{\mathcal{D}}(\mathbf{x})= \begin{cases}\nabla_{\mathbf{x}} \log p_0(\mathbf{x}), & \mathbf{x} \in \mathcal{S}_0 \\ \nabla_{\mathbf{x}} \log p_1(\mathbf{x}), & \mathbf{x} \in \mathcal{S}_1\end{cases} \tag{25.30}
 $$
+
+
 这个score不依赖于权重$\pi$。因此，score matching不能正确地还原真实的分布。此外，朗之万采样在模式（mode）之间转换时也存在困难。（在实践中，即使不同模式的支撑集之间只存在大致的不相交，也会发生上述的情况。）
 
 Song和Ermon [SE19][^SE19]; [SE20b][^SE20b]以及Song等人[Son+21b][Son21b]通过使用不同强度的噪声扰动训练数据来克服这一困难。具体来说，他们使用以下的方法：
+
+
 $$
 \begin{align}
 q_\sigma(\tilde{\boldsymbol{x}} \mid \boldsymbol{x}) & =\mathcal{N}\left(\tilde{\boldsymbol{x}} \mid \boldsymbol{x}, \sigma^2 \mathbf{I}\right) \tag{25.31}\\
 q_\sigma(\tilde{\boldsymbol{x}}) & =\int p_{\mathcal{D}}(\boldsymbol{x}) q_\sigma(\tilde{\boldsymbol{x}} \mid \boldsymbol{x}) d \boldsymbol{x} \tag{25.32}
 \end{align}
 $$
+
+
 对于较强的噪声扰动，由于添加了噪声，不同模式的支撑集之间产生了连通，此时估算的权重是准确的。对于强度较小的噪声扰动，不同模式的支撑集不连通，但噪声扰动后的分布更接近原始未扰动的数据分布。使用诸如退火朗之万动力学[SE19][^SE19]; [SE20b][^SE20b]; [Son+21b][^Son21b]或扩散采样[SD+15a][^SD+15a]; [HJA20][^HJA20]; [Son+21b][^Son21b]等采样方法，我们可以首先从被最大噪声强度扰动后的分布中采样，然后平滑地减小噪声的强度，直到抵达最小噪声强度。这个过程有助于利用来自所有噪声强度层的信息，并在从弱噪声扰动分布中采样时保持强噪声扰动分布下获得的正确的权重估计。
 
 在具体实现中，所有评分模型共享权重，并且用一个以噪声强度为条件的神经网络实现；这被称为**噪声条件评分网络**（noise conditional score network），形式为 $\boldsymbol{s}_{\boldsymbol{\theta}}(\boldsymbol{x}, \sigma)$ 。通过训练所有噪声强度下的score matching目标——每个噪声强度对应一个匹配目标——来估计不同强度下的评分函数。如果我们使用等式(24.33)中的denoising score matching目标，将得到：
+
+
 $$
 \begin{align}
 \mathcal{L}(\boldsymbol{\theta} ; \sigma) & =\mathbb{E}_{q(\mathbf{x}, \tilde{\mathbf{x}})}\left[\frac{1}{2}\left\|\nabla_{\mathbf{x}} \log p_{\boldsymbol{\theta}}(\tilde{\mathbf{x}}, \sigma)-\nabla_{\mathbf{x}} \log q_\sigma(\tilde{\mathbf{x}} \mid \mathbf{x})\right\|_2^2\right] \tag{25.33} \\
 & =\frac{1}{2} \mathbb{E}_{p_{\mathcal{D}}(\mathbf{x})} \mathbb{E}_{\tilde{\mathbf{x}} \sim \mathcal{N}\left(\boldsymbol{x}, \sigma^2 \mathbf{I}\right)}\left\{\left\|\boldsymbol{s}_{\boldsymbol{\theta}}(\tilde{\mathbf{x}}, \sigma)+\frac{(\tilde{\mathbf{x}}-\boldsymbol{x})}{\sigma^2}\right\|_2^2\right\} \tag{25.34}
 \end{align}
 $$
+
+
 其中我们使用了这样一个事实，即高斯分布的评分函数为：
+
+
 $$
 \nabla_{\boldsymbol{x}} \log \mathcal{N}\left(\tilde{\boldsymbol{x}} \mid \boldsymbol{x}, \sigma^2 \mathbf{I}\right)=-\nabla_{\boldsymbol{x}} \frac{1}{2 \sigma^2}(\boldsymbol{x}-\tilde{\boldsymbol{x}})^{\top}(\boldsymbol{x}-\tilde{\boldsymbol{x}})=\frac{\boldsymbol{x}-\tilde{\boldsymbol{x}}}{\sigma^2} \tag{25.35}
 $$
+
+
 如果我们有 $T$​ 个不同的噪声强度，我们可以使用加权的方式组合损失：
+
+
 $$
 \mathcal{L}\left(\boldsymbol{\theta} ; \sigma_{1: T}\right)=\sum_{t=1}^T \lambda_t \mathcal{L}\left(\boldsymbol{\theta} ; \sigma_t\right) \tag{25.36}
 $$
+
+
 其中我们选择 $\sigma_1>\sigma_2>\cdots>\sigma_T$ ，并且权重项满足 $\lambda_t>0$​。
 
 ### 25.3.3 与 DDPM 的等价性
