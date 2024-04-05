@@ -502,15 +502,9 @@ pe[:, 1::2] = torch.cos(k * div_term)
 
 ### 25.3.2 分层加噪
 
-通常，当存在低密度数据区域时，score matching 可能会遇到困难。为了了解这一点，假设 $p_{\mathcal{D}}(\mathbf{x})=\pi p_0(\mathbf{x})+(1-\pi) p_1(\mathbf{x})$。令
+通常，当存在低密度数据区域时，score matching 可能会遇到困难。为了了解这一点，假设 $p_{\mathcal{D}}(\mathbf{x})=\pi p_0(\mathbf{x})+(1-\pi) p_1(\mathbf{x})$。令$$\mathcal{S}_0:=\left\{\mathbf{x} \mid p_0(\mathbf{x})>0\right\}$$ 和 
 
-$$\mathcal{S}_0:=\left\{\mathbf{x} \mid p_0(\mathbf{x})>0\right\}$$
-
-和 
-
-$$\mathcal{S}_1:=\left\{\mathbf{x} \mid p_1(\mathbf{x})>0\right\}$$
-
-分别对应 $p_0(\mathbf{x})$ 和 $p_1(\mathbf{x})$ 的支撑集。当两个支撑集不相交时，$p_{\mathcal{D}}(\mathbf{x})$ 的score为：
+$$\mathcal{S}_1:=\left\{\mathbf{x} \mid p_1(\mathbf{x})>0\right\}$$ 分别对应 $$p_0(\mathbf{x})$$ 和 $$p_1(\mathbf{x})$$ 的支撑集。当两个支撑集不相交时，$p_{\mathcal{D}}(\mathbf{x})$ 的score为：
 
 $$
 \nabla_{\mathbf{x}} \log p_{\mathcal{D}}(\mathbf{x})= \begin{cases}\nabla_{\mathbf{x}} \log p_0(\mathbf{x}), & \mathbf{x} \in \mathcal{S}_0 \\ \nabla_{\mathbf{x}} \log p_1(\mathbf{x}), & \mathbf{x} \in \mathcal{S}_1\end{cases} \tag{25.30}
