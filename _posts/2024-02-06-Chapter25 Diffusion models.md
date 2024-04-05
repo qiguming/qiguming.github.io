@@ -36,27 +36,47 @@ comments: true
 ### 25.2.1 编码器（前向扩散）
 
 在扩散模型中，前向编码过程定义了一个简单的线性高斯模型：
+
+
 $$
 q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}\right)=\mathcal{N}\left(\boldsymbol{x}_t \mid \sqrt{1-\beta_t} \boldsymbol{x}_{t-1}, \beta_t \mathbf{I}\right) \tag{25.1}
 $$
+
+
 其中， $\beta_t \in (0,1)$ 取决于**噪声时间表**（noise schedule，25.2.4节进行讨论）。以输入$\boldsymbol{x}_0$为条件，所有中间过程产生的隐变量的联合概率分布定义为：
+
+
 $$
 q\left(\boldsymbol{x}_{1: T} \mid \boldsymbol{x}_0\right)=\prod_{t=1}^T q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}\right) \tag{25.2}
 $$
+
+
 由于上式定义了一个线性高斯马尔可夫链，我们可以计算任意时间节点隐变量的边际分布，该分布具有封闭解。具体而言，我们有
+
+
 $$
 q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_0\right)=\mathcal{N}\left(\boldsymbol{x}_t \mid \sqrt{\bar{\alpha}_t} \boldsymbol{x}_0,\left(1-\bar{\alpha}_t\right) \mathbf{I}\right) \tag{25.3}
 $$
+
+
 其中我们定义：
+
+
 $$
 \alpha_t \triangleq 1-\beta_t, \bar{\alpha}_t=\prod_{s=1}^t \alpha_s \tag{25.4}
 $$
+
+
 我们可以选择一种噪声时间表使得 $\bar{\alpha}_T \approx 0$，这样 $q\left(\boldsymbol{x}_T \mid \boldsymbol{x}_0\right) \approx \mathcal{N}(\textbf{0}, \textbf{I})$。
 
 分布 $q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_0\right)$ 又被称为**扩散核**（diffusion kernel）。将其应用于输入的数据分布并计算无条件边际分布，这个过程等同于高斯卷积：
+
+
 $$
 q\left(\boldsymbol{x}_t\right)=\int q_0\left(\boldsymbol{x}_0\right) q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_0\right) d \boldsymbol{x}_0 \tag{25.5}
 $$
+
+
 如图25.2所示，随着 $t$ 的增加，上述的边际分布会变得越来越简单。在图像领域，这个过程首先会消除图像中的高频信息（即低级的细节，如纹理），随后会消除低频信息（即高级的或“语义级别的”信息，如形状），如图25.1所示。
 
 ![ddpm-on-1d](/assets/img/figures/book2/25.2.png)
@@ -101,9 +121,13 @@ These constants were chosen to be small relative to data scaled to [−1, 1], en
 
 
 这种突变导致很多扩散步数实际上是无效的，为了缓解这一点，作者直接针对  $\bar{\alpha}_t$​ 进行建模，令 
+
+
 $$
 \bar{\alpha}_t=\frac{f(t)}{f(0)}, \quad f(t)=\cos \left(\frac{t / T+s}{1+s} \cdot \frac{\pi}{2}\right)^2 \tag{N.1}
 $$
+
+
 余弦变换的特点在于，在中间区段， $\bar{\alpha}_t$ 趋向于线性变化，而在 $t=0$ 和 $t=T$ 附件，$\bar{\alpha}_t$  的变化十分缓慢。关于上式中其他参数的选择，可以参考原文相关章节。根据 diffuser 库的代码，具体的实现为：
 
 ```python
@@ -157,6 +181,7 @@ def betas_for_alpha_bar(
 
 在逆向过程中，我们希望反转正向的扩散过程。如果我们提前知道输入 $\boldsymbol{x}_0$，我们可以推导出单步正向过程的反向过程[^2]：
 
+
 $$
 \begin{align}
 q\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t, \boldsymbol{x}_0\right) & =\mathcal{N}\left(\boldsymbol{x}_{t-1} \mid \tilde{\mu}_t\left(\boldsymbol{x}_t, \boldsymbol{x}_0\right), \tilde{\beta}_t \mathbf{I}\right) \tag{25.6} \\
@@ -164,10 +189,16 @@ q\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t, \boldsymbol{x}_0\right) & =\m
 \tilde{\beta}_t & =\frac{1-\bar{\alpha}_{t-1}}{1-\bar{\alpha}_t} \beta_t \tag{25.8}
 \end{align}
 $$
+
+
 当然，在生成一个新的数据时，我们并不知道 $\boldsymbol{x}_0$，但我们可以训练生成器来近似上述分布在 $\boldsymbol{x}_0$ 上平均结果。因此，我们选择的生成器具有以下形式:
+
+
 $$
 p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right)=\mathcal{N}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{\mu}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right), \boldsymbol{\Sigma}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right)\right) \tag{25.9}
 $$
+
+
 通常我们令 $\boldsymbol{\Sigma}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right)=\sigma_t^2 \mathbf{I}$（译者注：即各向同性的对角协方差矩阵）。我们将在 25.2.4 节讨论如何学习 $\sigma_t^2$，但两种容易想到的选择是令 $\sigma_t^2=\beta_t$ 和 $\sigma_t^2=\tilde{\beta}_t$，两种选择分别对应于在[HJA20][^HJA20]中介绍的反向过程熵的上限和下限。
 
 在生成过程中产生的所有隐变量的联合概率分布为 $p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{0: T}\right)= p\left(\boldsymbol{x}_T\right) \prod_{t=1}^T p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right) $ ，其中我们令 $p\left(\boldsymbol{x}_T\right)=\mathcal{N}(\mathbf{0}, \mathbf{I})$​。根据算法25.2提供的伪代码，我们可以从分布中采样得到新的样本。
@@ -177,6 +208,8 @@ $$
 ### 25.2.3 模型拟合
 
 我们将通过最大化**证据下确界**（evidence lower bound，ELBO）来拟合模型，类似于我们训练VAE的方式（参见第21.2节）。具体而言，对于每个数据样本 $\boldsymbol{x}_0$，我们有
+
+
 $$
 \begin{align}
 \log p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_0\right) & =\log \left[\int d \boldsymbol{x}_{1: T} q\left(\boldsymbol{x}_{1: T} \mid \boldsymbol{x}_0\right) \frac{p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{0: T}\right)}{q\left(\boldsymbol{x}_{1: T} \mid \boldsymbol{x}_0\right)}\right] \tag{25.10}\\
@@ -184,15 +217,27 @@ $$
 & =\mathbb{E}_q\left[\log p\left(\boldsymbol{x}_T\right)+\sum_{t=1}^T \log \frac{p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right)}{q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}\right)}\right] \triangleq \text { Ł }\left(x_0\right) \tag{25.12}
 \end{align}
 $$
+
+
 我们现在讨论如何计算ELBO中的各个分项。基于马尔可夫属性，我们有 $q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}\right)=q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}, \boldsymbol{x}_0\right)$，同时根据贝叶斯定理，我们有
+
+
 $$
 q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}, \boldsymbol{x}_0\right)=\frac{q\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t, \boldsymbol{x}_0\right) q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_0\right)}{q\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_0\right)} \tag{25.13}
 $$
+
+
 将公式（25.13）代入ELBO中，我们有
+
+
 $$
 \mathrm{L}\left(\boldsymbol{x}_0\right)=\mathbb{E}_{q\left(\boldsymbol{x}_{1: T} \mid \boldsymbol{x}_0\right)}\bigg[\log p\left(\boldsymbol{x}_T\right)+\sum_{t=2}^T \log \frac{p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right)}{q\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t, \boldsymbol{x}_0\right)}+\underbrace{\sum_{t=2}^T \log \frac{q\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_0\right)}{q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_0\right)}}_*+\log \frac{p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_0 \mid \boldsymbol{x}_1\right)}{q\left(\boldsymbol{x}_1 \mid \boldsymbol{x}_0\right)}\bigg] \tag{25.14}
 $$
+
+
 标记为*的项是一个折叠求和，可以简化如下：
+
+
 $$
 \begin{align}
 * & =\log q\left(\boldsymbol{x}_{T-1} \mid \boldsymbol{x}_0\right)+\cdots+\log q\left(\boldsymbol{x}_2 \mid \boldsymbol{x}_0\right)+\log q\left(\boldsymbol{x}_1 \mid \boldsymbol{x}_0\right) \tag{25.15}\\
@@ -200,7 +245,11 @@ $$
 & =-\log q\left(\boldsymbol{x}_T \mid \boldsymbol{x}_0\right)+\log q\left(\boldsymbol{x}_1 \mid \boldsymbol{x}_0\right) \tag{25.17}
 \end{align}
 $$
+
+
 所以负ELBO（变分上确界）定义为：
+
+
 $$
 \begin{align}
 \mathcal{L}\left(\boldsymbol{x}_0\right) & =-\mathbb{E}_{q\left(\boldsymbol{x}_{1: T} \mid \boldsymbol{x}_0\right)}\left[\log \frac{p\left(\boldsymbol{x}_T\right)}{q\left(\boldsymbol{x}_T \mid \boldsymbol{x}_0\right)}+\sum_{t=2}^T \log \frac{p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right)}{q\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t, \boldsymbol{x}_0\right)}+\log p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_0 \mid \boldsymbol{x}_1\right)\right] \tag{25.18} \\
@@ -208,22 +257,40 @@ $$
 & +\sum_{t=2}^T \mathbb{E}_{q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_0\right)} \underbrace{D_{\mathbb{K L}}\left(q\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t, \boldsymbol{x}_0\right) \| p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right)\right)}_{L_{t-1}\left(\boldsymbol{x}_0\right)}-\underbrace{\mathbb{E}_{q\left(\boldsymbol{x}_1 \mid \boldsymbol{x}_0\right)} \log p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_0 \mid \boldsymbol{x}_1\right)}_{L_0\left(\boldsymbol{x}_0\right)} \tag{25.20}
 \end{align}
 $$
+
+
 这些 KL 项中每一项都存在解析解，因为所有的分布都是高斯分布。接下来我们将聚焦在 $L_{t-1}$ 项。考虑到 $\boldsymbol{x}_t=\sqrt{\overline{\alpha_t}} \boldsymbol{x}_0+\sqrt{\left(1-\bar{\alpha}_t\right)} \boldsymbol{\epsilon}$，式（25.7）可以写成：
+
+
 $$
 \tilde{\mu}_t\left(\boldsymbol{x}_t, \boldsymbol{x}_0\right)=\frac{1}{\sqrt{\alpha_t}}\left(\boldsymbol{x}_t-\frac{\beta_t}{\sqrt{1-\bar{\alpha}_t}} \boldsymbol{\epsilon}\right) \tag{25.21}
 $$
+
+
 因此，除了训练模型直接根据含噪输入 $\boldsymbol{x}_t$ 预测去噪后的 $\boldsymbol{x}_{t-1}$ 的均值，我们也可以训练模型来直接预测噪声，然后再根据下式计算均值：
+
+
 $$
 \boldsymbol{\mu}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, \boldsymbol{x}_0\right)=\frac{1}{\sqrt{\alpha_t}}\left(\boldsymbol{x}_t-\frac{\beta_t}{\sqrt{1-\bar{\alpha}_t}} \boldsymbol{\epsilon}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right)\right) \tag{25.22}
 $$
+
+
 基于上述的参数化形式，最终的损失函数将变成
+
+
 $$
 L_{t-1}=\mathbb{E}_{\boldsymbol{x}_0 \sim q_0\left(\boldsymbol{x}_0\right), \boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})}\bigg[\underbrace{\frac{\beta_t^2}{2 \sigma_t^2 \alpha_t\left(1-\bar{\alpha}_t\right)}}_{\lambda_t}\|\boldsymbol{\epsilon}-\epsilon_{\boldsymbol{\theta}}(\underbrace{\sqrt{\bar{\alpha}_t} \boldsymbol{x}_0+\sqrt{1-\bar{\alpha}_t} \boldsymbol{\epsilon}}_{\boldsymbol{x}_t}, t)\|^2\bigg] \tag{25.23}
 $$
+
+
 与时间相关的权重 $\lambda_t$ 确保训练目标对应于最大似然估计（假设变分确界是紧凑的）。然而，经验表明，如果我们设置$\lambda_t=1$，模型输出的样本看起来更好。由此产生的简化版本的损失（在整个优化目标中同时需要考虑时间点 $t$ ）由以下公式给出：
+
+
 $$
 L_{\text {simple }}=\mathbb{E}_{\boldsymbol{x}_0 \sim q_0\left(\boldsymbol{x}_0\right), \boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \mathbf{I}), t \sim \operatorname{Unif}(1, T)}\bigg[\|\boldsymbol{\epsilon}-\boldsymbol{\epsilon}_{\boldsymbol{\theta}}(\underbrace{\sqrt{\bar{\alpha}_t} \boldsymbol{x}_0+\sqrt{1-\bar{\alpha}_t} \boldsymbol{\epsilon}}_{\boldsymbol{x}_t}, t)\|^2\bigg] \tag{25.24}
 $$
+
+
 整体训练过程展示在算法25.1中。我们可以使用更先进的加权方案来提高样本的感知质量，这在[Cho+22][^Cho22]中讨论过。相反，如果目标是提高似然分数，我们可以同时优化噪声时间表，如第25.2.4节所讨论的。
 
 [^Cho+22]: J. Choi, J. Lee, C. Shin, S. Kim, H. Kim, and S. Yoon. “Perception Prioritized Training of Diffusion Models”. In: CVPR. Apr. 2022.
@@ -265,32 +332,52 @@ $$
 在本节中，我们将介绍一种方法，该方法可以同时优化在编码器中所使用的噪声时间表，以实现最大化ELBO；这种方法被称为**变分扩散模型**（variational diffusion model）或VDM [Kin+21][^Kin21]（译者注：默认的扩散模型在编码器中不存在可学习参数，而VDM在编码器中存在可学习参数）。
 
 我们将使用如下的参数化方式来实现编码器：
+
+
 $$
 q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_0\right)=\mathcal{N}\left(\boldsymbol{x}_t \mid \hat{\alpha}_t \boldsymbol{x}_0, \hat{\sigma}_t^2 \mathbf{I}\right) \tag{25.25}
 $$
+
+
 （需要注意的是此处的$\hat{\alpha}_t$，$\hat{\sigma}_t$ 与25.2.1节中的参数 $\alpha_t$，$\sigma_t$ 是不同的）。我们将学习预测两个参数的比率，而不是分别处理 $\hat{\alpha}_t$ 和 $\hat{\alpha}_t^2$，这个比率被称为**信噪比**（signal to noise ratio，SNR）：
+
+
 $$
 R(t)=\hat{\alpha}_t^2 / \hat{\sigma}_t^2 \tag{25.26}
 $$
+
+
 上式需要随着 $t$ 的增加而单调递减。这一点可以通过定义 $R(t)=\exp \left(-\gamma_\phi(t)\right)$ 来实现，其中$\gamma_\phi(t)$ 是一个单调神经网络。我们通常令 $\hat{\alpha}_t=\sqrt{1-\sigma_t^2}$，这对应于25.4节讨论的variance preserving SDE。
 
 沿用25.2.3节的推导，负ELBO（变分上确界）可以写成：
+
+
 $$
 \mathcal{L}\left(\boldsymbol{x}_0\right)=\underbrace{D_{\mathrm{KL}}\left(q\left(\boldsymbol{x}_T \mid \boldsymbol{x}_0\right) \| p\left(\boldsymbol{x}_T\right)\right)}_{\text {prior loss }}+\underbrace{\mathbb{E}_{q\left(\boldsymbol{x}_1 \mid \boldsymbol{x}_0\right)}\left[-\log p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_0 \mid \boldsymbol{x}_1\right)\right]}_{\text {reconstruction loss }}+\underbrace{\mathcal{L}_D\left(\boldsymbol{x}_0\right)}_{\text {diffusion loss }} \tag{25.27}
 $$
+
+
 其中前两项类似于标准VAE中出现的情况，最后的扩散损失为[^3]：
+
+
 $$
 \mathcal{L}_D\left(\boldsymbol{x}_0\right)=\frac{1}{2} \mathbb{E}_{\boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})} \int_0^1 R^{\prime}(t)\left\|\boldsymbol{x}_0-\hat{\boldsymbol{x}}_{\boldsymbol{\theta}}\left(z_t, t\right)\right\|_2^2 d t \tag{25.28}
 $$
+
+
 其中 $R^{\prime}(t)$  是 SNR 函数的导数，$\boldsymbol{z}_t=\alpha_t \boldsymbol{x}_0+\sigma_t \boldsymbol{\epsilon}_t$​。（具体推导参考[Kin+21][^Kin21]）。
 
 [^3]: 此处的loss采用了简化的形式，即连续时间极限情况下的结果。极限情况下的loss形式我们将在25.4节讨论。
 [^Kin+21]: D. P. Kingma, T. Salimans, B. Poole, and J. Ho. “Variational Diffusion Models”. In: NIPS. July 2021.
 
 由于信噪比(SNR)函数是可逆的——因为单调性假设，我们可以进行变量替换，并且使一切变量都成为关于 $v=R(t)$ 的函数而不是 $t$ 的函数。具体而言，令 $\boldsymbol{z}_v=\alpha_v \boldsymbol{x}_0+\sigma_v \boldsymbol{\epsilon}$，$\tilde{\boldsymbol{x}}_{\boldsymbol{\theta}}(\boldsymbol{z}, v)=\hat{\boldsymbol{x}}_{\boldsymbol{\theta}}\left(\boldsymbol{z}, R^{-1}(v)\right)$。则公式（25.28）可以重写成
+
+
 $$
 \mathcal{L}_D\left(\boldsymbol{x}_0\right)=\frac{1}{2} \mathbb{E}_{\boldsymbol{\epsilon} \sim \mathcal{N}(\boldsymbol{0}, \mathbf{I})} \int_{R_{\min }}^{R_{\max }}\left\|\boldsymbol{x}_0-\tilde{\boldsymbol{x}}_{\boldsymbol{\theta}}\left(z_v, v\right)\right\|_2^2 d v \tag{25.29}
 $$
+
+
 其中 $R_{\min }=R(1)$，$R_{\max }=R(0)$。所以我们发现SNR时间表的形状（即中间状态值）对结果没有影响，只有2个端点起作用。
 
 等式（25.29）中的积分可以通过随机均匀采样时间点来估计。当处理 $k$ 个样例的小批量训练数据时，我们可以使用**低偏差采样器**（low-discrepancy sampler，参见，第11.6.5节）来产生一个变分确界的低方差估计。在这种方法中，我们不是独立地对时间点进行抽样，而是抽样一个均匀随机数 $u_0 \sim \operatorname{Unif}(0,1)$，然后将第 $i$ 个样本的时间 $t$ 设置为 $t^i=\bmod \left(u_0+i / k, 1\right)$​。我们也可以对噪声时间表本身进行优化，以减少扩散损失的方差。
@@ -461,13 +548,21 @@ $$
 ### 25.3.3 与 DDPM 的等价性
 
 我们现在展示 score-based generative model 的训练目标与DDPM损失函数是等价的。为了验证这一点，首先使用 $q_0\left(\boldsymbol{x}_0\right)$ 替换 $p_{\mathcal{D}}(\boldsymbol{x})$，用 $\boldsymbol{x}_t$ 替换 $\tilde{\boldsymbol{x}}$ ，并用 $\boldsymbol{s}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right)$ 替换 $\boldsymbol{s}_{\boldsymbol{\theta}}(\tilde{\boldsymbol{x}}, \sigma)$。我们还将使用随机地均匀采样一个时间点来计算等式(25.36)。那么等式(25.36)变成了以下形式：
+
+
 $$
 \mathcal{L}=\mathbb{E}_{\boldsymbol{x}_0 \sim q_0\left(\boldsymbol{x}_0\right), \boldsymbol{x}_t \sim q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_0\right), t \sim \operatorname{Unif}(1, T)}\left[\lambda_t\left\|\boldsymbol{s}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right)+\frac{\left(\boldsymbol{x}_t-\boldsymbol{x}_0\right)}{\sigma_t^2}\right\|_2^2\right] \tag{25.37}
 $$
+
+
 如果我们使用 $\boldsymbol{x}_t=\boldsymbol{x}_0+\sigma_t \boldsymbol{\epsilon}$，并定义 $\boldsymbol{s}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right)=-\frac{\boldsymbol{\epsilon}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right)}{\sigma_t}$​，我们可以将其重写为
+
+
 $$
 \mathcal{L}=\mathbb{E}_{\boldsymbol{x}_0 \sim q_0\left(\boldsymbol{x}_0\right), \boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \mathbf{I}), t \sim \operatorname{Unif}(1, T)}\left[\frac{\lambda_t}{\sigma_t^2}\left\|\boldsymbol{\epsilon}-\boldsymbol{\epsilon}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right)\right\|_2^2\right] \tag{25.38}
 $$
+
+
 如果我们令 $\lambda_t=\sigma_t^2$，我们就可以得到等式(25.24)中的损失$L_{\text{simple}}$​。
 
 ## 25.4 使用微分方程建模连续时间模型
@@ -477,25 +572,45 @@ $$
 ### 25.4.1 前向扩散随机微分方程
 
 首先考虑前向扩散过程，$t$ 时刻的噪声强度 $\beta_t$ 被重写为 $\beta(t) \Delta t$，其中 $\Delta t$​ 表示步长，此时 $t$ 时刻的含噪样本表示为：
+
+
 $$
 \boldsymbol{x}_t=\sqrt{1-\beta_t} \boldsymbol{x}_{t-1}+\sqrt{\beta_t} \mathcal{N}(\mathbf{0}, \mathbf{I})=\sqrt{1-\beta(t) \Delta t} \boldsymbol{x}_{t-1}+\sqrt{\beta(t) \Delta t} \mathcal{N}(\mathbf{0}, \mathbf{I}) \tag{25.39}
 $$
+
+
 如果 $\Delta t$ 足够小，我们可以使用一阶泰勒级数展开来近似第一项，得到
+
+
 $$
 \boldsymbol{x}_t \approx \boldsymbol{x}_{t-1}-\frac{\beta(t) \Delta t}{2} \boldsymbol{x}_{t-1}+\sqrt{\beta(t) \Delta t} \mathcal{N}(\mathbf{0}, \mathbf{I}) \tag{25.40}
 $$
+
+
 因此对于足够小的 $\Delta t$，我们有
+
+
 $$
 \frac{\boldsymbol{x}_t-\boldsymbol{x}_{t-1}}{\Delta t} \approx-\frac{\beta(t)}{2} \boldsymbol{x}_{t-1}+\frac{\sqrt{\beta(t)}}{\sqrt{\Delta t}} \mathcal{N}(\mathbf{0}, \mathbf{I}) \tag{25.41}
 $$
+
+
 我们现在可以考虑**连续时间**（continuous time）下的极限情况，并将上式改写成如下随机微分方程（SDE）：
+
+
 $$
 \frac{d \boldsymbol{x}(t)}{d t}=-\frac{1}{2} \beta(t) \boldsymbol{x}(t)+\sqrt{\beta(t)} \frac{d \boldsymbol{w}(t)}{d t} \tag{25.42}
 $$
+
+
 其中 $\boldsymbol{w}(t)$ 代表标准**维纳过程**（Wiener process），也被称为**布朗噪声**（Brownian noise）。更一般地，我们可以使用Itô微积分表示法将此类SDEs写成如下形式(参见例如[SS19][^SS19])：
+
+
 $$
 d \boldsymbol{x}=\underbrace{\boldsymbol{f}(\boldsymbol{x}, t)}_{\text {drift }} d t+\underbrace{g(t)}_{\text {diffusion }} d \boldsymbol{w} \tag{25.43}
 $$
+
+
 上述SDE中的第一项被称为**漂移系数**（drift coefficient），第二项被称为**扩散系数**（diffusion coefficient）。
 
 
@@ -509,31 +624,51 @@ $$
 {:.image-caption}
 
 图25.6展示了一维空间中的数据是如何进行扩散的。我们可以通过如下的步骤绘制多条扩散路径：从数据分布中采样得到初始状态，然后使用**欧拉-马鲁亚马**（Euler-Maruyama）方法对时间进行积分：
+
+
 $$
 \boldsymbol{x}(t+\Delta t)=\boldsymbol{x}(t)+\boldsymbol{f}(\boldsymbol{x}(t), t) \Delta t+g(t) \sqrt{\Delta t} \mathcal{N}(\mathbf{0}, \mathbf{I}) \tag{25.44}
 $$
+
+
 我们可以看到，$t=0$的左侧的数据分布是如何逐渐转变为$t=1$​右侧的纯噪声分布的。
 
 在[Son+21b][^Son21b]中，他们展示了在 $T \rightarrow \infty$​ 极限下DDPMs对应的SDE：
+
+
 $$
 d \boldsymbol{x}=-\frac{1}{2} \beta(t) \boldsymbol{x} d t+\sqrt{\beta(t)} d \boldsymbol{\omega} \tag{25.45}
 $$
+
+
 其中 $\beta(t / T)=T \beta_t$。这里的漂移项与 $-\boldsymbol{x}$ 成正比，即鼓励最终的样本在扩散的过程中返回到0。因此，DDPM对应于一个**方差保持**（variance preserving）的过程。相比之下，SGMs对应的SDE表示为：
+
+
 $$
 d \boldsymbol{x}=\sqrt{\frac{d\left[\sigma(t)^2\right]}{d t}} d \boldsymbol{\omega} \tag{25.46}
 $$
+
+
 其中 $\sigma(t / T)=\sigma_t$。此时的SDE的漂移项为0，所以对应于一个**方差爆炸**（variance exploding）的过程。
 
 ### 25.4.2 前向扩散常微分方程
 
 我们可以不在每一步的扩散步骤中都添加高斯噪声，而是只对初始状态进行采样，然后根据下面的常微分方程（ODE）使样本随时间*确定性* 地进行演变：
+
+
 $$
 d \boldsymbol{x}=\underbrace{\left[f(\boldsymbol{x}, t)-\frac{1}{2} g(t)^2 \nabla_{\boldsymbol{x}} \log p_t(\boldsymbol{x})\right]}_{h(\boldsymbol{x}, t)} d t \tag{25.47}
 $$
+
+
 这被称为**概率流常微分方程**（probability flow ODE） [Son+21b][^Son21b], Sec D.3。我们可以使用任何一个ODE求解器计算任意时刻下的样本状态：
+
+
 $$
 \boldsymbol{x}(t)=\boldsymbol{x}(0)+\int_0^t h(\boldsymbol{x}, \tau) d \tau \tag{25.48}
 $$
+
+
 图25.7b展示了样本轨迹的可视化效果。如果我们从不同的随机状态 $\boldsymbol{x}(0)$​ 开始求解，那么产生的路径的边际分布将与SDE模型产生的边际分布相同。参见图25.6中的热图以获得说明。
 
 
@@ -549,27 +684,47 @@ $$
 ### 25.4.3 逆扩散随机微分方程
 
 为了从SDE模型中生成样本，我们需要能够逆转SDE。[And82][^And82]中一个值得注意的结果表明，任何形式如方程(25.43)的正向SDE都可以被逆转，并获得如下的**逆时SDE**（reverse-time SDE）：
+
+
 $$
 d \boldsymbol{x}=\left[f(\boldsymbol{x}, t)-g(t)^2 \nabla_{\boldsymbol{x}} \log q_t(\boldsymbol{x})\right] d t+g(t) d \overline{\boldsymbol{w}} \tag{25.49}
 $$
+
+
 其中 $\overline{\boldsymbol{w}}$ 是当时间向后流动时的标准维纳过程，$dt$表示一个无穷小的负时间步长， $\nabla_{\boldsymbol{x}} \log q_t(\boldsymbol{x})$​ 为前文介绍的评分函数。
 
 在DDPM的设定下，逆时SDE具有以下形式：
+
+
 $$
 d \boldsymbol{x}_t=\left[-\frac{1}{2} \beta(t) \boldsymbol{x}_t-\beta(t) \nabla_{\boldsymbol{x}_t} \log q_t\left(\boldsymbol{x}_t\right)\right] d t+\sqrt{\beta(t)} d \overline{\boldsymbol{w}}_t \tag{25.50}
 $$
+
+
 为了估计评分函数，正如我们在第25.3节中讨论的那样，我们可以使用denoising score matching，得到
+
+
 $$
 \nabla_{\boldsymbol{x}_t} \log q_t\left(\boldsymbol{x}_t\right) \approx \boldsymbol{s}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right) \tag{25.51}
 $$
+
+
 （实际操作中，建议使用方差衰减技术，例如重要性采样，如[Son+21a][^Son21a]中所讨论的。）SDE变为
+
+
 $$
 d \boldsymbol{x}_t=-\frac{1}{2} \beta(t)\left[\boldsymbol{x}_t+2 \boldsymbol{s}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right)\right] d t+\sqrt{\beta(t)} d \overline{\boldsymbol{w}}_t \tag{25.52}
 $$
+
+
 在拟合完评分函数后，我们可以使用始祖抽样（如第25.2节中所述）对其进行抽样，或者我们可以使用方程（25.44）中的欧拉-马鲁亚马积分方案，得到
+
+
 $$
 \boldsymbol{x}_{t-1}=\boldsymbol{x}_t+\frac{1}{2} \beta(t)\left[\boldsymbol{x}_t+2 \boldsymbol{s}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right)\right] \Delta t+\sqrt{\beta(t) \Delta t} \mathcal{N}(\mathbf{0}, \mathbf{I}) \tag{25.53}
 $$
+
+
 参见图25.7a作为示例。
 
 
@@ -595,17 +750,29 @@ $$
 ### 25.4.4 逆扩散ODE
 
 基于第25.4.2节中的结果，我们可以从方程（25.49）中的反向时间SDE推导出概率流ODE，得到
+
+
 $$
 d \boldsymbol{x}_t=\left[f(\boldsymbol{x}, t)-\frac{1}{2} g(t)^2 \boldsymbol{s}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right)\right] d t \tag{25.54}
 $$
+
+
 如果我们像DDPM中那样设定 $f(\boldsymbol{x}, t)=-\frac{1}{2} \beta(t)$ 和 $g(t)=\sqrt{\beta(t)}$​，这将变成
+
+
 $$
 d \boldsymbol{x}_t=-\frac{1}{2} \beta(t)\left[\boldsymbol{x}_t+\boldsymbol{s}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right)\right] d t \tag{25.55}
 $$
+
+
 参见图25.7b作为示例。一种简单的求解此ODE的方法是使用欧拉方法
+
+
 $$
 \boldsymbol{x}_{t-1}=\boldsymbol{x}_t+\frac{1}{2} \beta(t)\left[\boldsymbol{x}_t+\boldsymbol{s}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right)\right] \Delta t \tag{25.56}
 $$
+
+
 然而，在实践中，使用更高阶的ODE求解器，比如Heung方法[Kar+22][^Kar22]，可以得到更好的结果。
 
 该模型是神经ODE的一个特例，也称为连续归一化流（请参见第23.2.6节）。因此，我们可以推导出精确的边际对数似然。但是，我们没有直接最大化这个（这样做代价很大），而是使用 score matching 来拟合模型。
@@ -617,9 +784,13 @@ $$
 ### 25.4.5 SDE与ODE方法对比
 
 在第25.4.3节中，我们将反向扩散过程描述为一个SDE，在25.4.4节中，我们将其描述为一个ODE。我们可以按照下面的方式重写方程（25.49）中的SDE，从而看到两种方法之间的联系：
+
+
 $$
 d \boldsymbol{x}_t=\underbrace{-\frac{1}{2} \beta(t)\left[\boldsymbol{x}_t+\boldsymbol{s}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right)\right] d t}_{\text {probability flow ODE }} \underbrace{-\frac{1}{2} \beta(t) \boldsymbol{s}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right) d t+\sqrt{\beta(t)} d \overline{\boldsymbol{w}}_t}_{\text {Langevin diffusion SDE }} \tag{25.57}
 $$
+
+
 连续的噪声注入可以补偿ODE项数值积分引入的误差。因此，最终生成的样本通常看起来更好。然而，ODE方法可能更快。幸运的是，有可能结合这些技术，正如[Kar+22][^Kar22]中提出的那样。基本思想如图25.9所示：我们交替执行使用ODE求解器的确定性步骤，然后在结果中添加少量噪声。这可以重复进行一定次数。（我们将在第25.5节中讨论减少所需步骤数量的方法。）
 
 ![25.10](/assets/img/figures/book2/25.10.png)
@@ -641,13 +812,21 @@ Winnie Xu编写的一个简单的JAX实现上述想法可以在diffusion_mnist.i
 ### 25.5.1 DDIM 采样
 
 在这一节中，我们将描述[SME21][^SME21]中的**去噪扩散隐式模型**（denoising diffusion implicit model，DDIM），它可用于高效的确定性地样本生成。具体而言，DDIM的第一步是使用非马尔可夫前向扩散过程，所以它总是以输入样本本身以及前一步的样本为条件：
+
+
 $$
 q\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t, \boldsymbol{x}_0\right)=\mathcal{N}\left(\sqrt{\bar{\alpha}_{t-1}} \boldsymbol{x}_0+\sqrt{1-\bar{\alpha}_{t-1}-\tilde{\sigma}_t^2} \frac{\boldsymbol{x}_t-\sqrt{\bar{\alpha}_t}}{\sqrt{1-\bar{\alpha}_t}}, \tilde{\sigma}_t^2 \mathbf{I}\right) \tag{25.58}
 $$
+
+
 对应的反向过程是
+
+
 $$
 p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right)=\mathcal{N}\left(\sqrt{\bar{\alpha}_{t-1}} \hat{\boldsymbol{x}}_0+\sqrt{1-\bar{\alpha}_{t-1}-\tilde{\sigma}_t^2} \frac{\boldsymbol{x}_t-\sqrt{\bar{\alpha}_t} \hat{\boldsymbol{x}}_0}{\sqrt{1-\bar{\alpha}_t}}, \tilde{\sigma}_t^2 \mathbf{I}\right) \tag{25.59}
 $$
+
+
 其中 $\hat{\boldsymbol{x}}_0=\hat{\boldsymbol{x}}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right)$ 是模型预测的输出。通过令 $\tilde{\sigma}_t^2=0$，反向过程在给定初始先验样本（其方差由 $\tilde{\sigma}_T^2$ 控制）的情况下变得完全确定。与第25.4.4节中讨论的方法相比，由此产生的概率流ODE在使用少量步骤时可以得到更好的结果。
 
 请注意，该模型的加权负变分下确界（VLB）与第25.2节中的 $L_{\text{simple}}$​​ 相同，因此 DDIM 采样器可以应用于训练过的 DDPM 模型。
@@ -675,8 +854,6 @@ $$
 ![A25.3-25.4](/assets/img/figures/book2/A25.3-25.4.png)
 
 {: style="width: 100%;" class="center"}
-
-{:.image-caption}
 
 ### 25.5.2 非高斯解码器网络
 
