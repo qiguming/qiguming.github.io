@@ -13,7 +13,8 @@ comments: true
 > 本章，我们将介绍扩散模型
 >
 
-[toc]
+* TOC
+{:toc}
 
 ## 25.1 简介
 
