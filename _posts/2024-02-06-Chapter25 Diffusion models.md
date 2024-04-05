@@ -10,7 +10,7 @@ toc: true
 comments: true
 ---
 
-> 本章，我们将介绍扩散模型
+> 本章，我们将介绍扩散模型，漫长的调试
 >
 
 * TOC
@@ -385,7 +385,6 @@ $$
 ---
 
 <table><tr><td bgcolor=blue>译者注（kimi读文）</td></tr></table>
-
 这篇论文介绍了一类基于变分扩散模型（Variational Diffusion Models，简称VDMs，https://arxiv.org/pdf/2107.00630.pdf）的生成模型，并展示了它们在标准图像密度估计基准测试中的优异性能。以下是该论文的主要贡献点：
 
 1. **新的生成模型家族**：作者提出了一种基于扩散的生成模型，这些模型在标准图像数据集（如CIFAR-10和ImageNet）上取得了最先进的对数似然（log-likelihood）结果。这些模型通过结合傅里叶特征（Fourier features）和可学习的扩散过程规范，实现了对图像的高质量生成。
@@ -431,7 +430,6 @@ $$
 ---
 
 <table><tr><td bgcolor=blue>译者注（位置编码如何计算）</td></tr></table>
-
 在 transformer 的原文中，位置编码的计算方式为：
 
 对于序列中的第 $k$ 个 token, 其位置编码的目标维度为 $d_{model}$, 每个维度 $i$ 的数值计算方式为:
