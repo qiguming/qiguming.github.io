@@ -1,3 +1,4 @@
+---
 title: 25 扩散模型
 author: fengliang qi
 date: 2023-02-06 11:33:00 +0800
@@ -7,6 +8,7 @@ math: true
 mermaid: true
 toc: true
 comments: true
+---
 
 > 本章, to do
 >
@@ -72,7 +74,6 @@ $$
 
 
 <table><tr><td bgcolor=blue>译者注（关于噪声时间表如何定义）</td></tr></table>
-
 在 DDPM 中，作者使用了**线性**的变换方式定义$\beta_t$。具体而言，作者令 $T=1000$，$\beta_1=10^{-4}, \beta_T=0.02$。任意时刻的 $\beta_t$ 由如下方式生成：
 
 ```python
@@ -258,7 +259,6 @@ $$
 
 
 <table><tr><td bgcolor=blue>译者注（kimi读文）</td></tr></table>
-
 文章《Perception Prioritized Training of Diffusion Models》的主要贡献点如下：
 
 1. **新的训练目标权重方案**：文章提出了一种名为感知优先（Perception Prioritized, P2）的权重方案，用于优化扩散模型的训练目标。这种方案通过重新设计损失函数的权重分配，使得模型在训练过程中更加关注于学习感知上重要的特征。
@@ -312,7 +312,6 @@ $$
 <table><tr><td bgcolor=blue>译者注（kimi读文）</td></tr></table>
 
 
-
 这篇论文介绍了一类基于变分扩散模型（Variational Diffusion Models，简称VDMs，https://arxiv.org/pdf/2107.00630.pdf）的生成模型，并展示了它们在标准图像密度估计基准测试中的优异性能。以下是该论文的主要贡献点：
 
 1. **新的生成模型家族**：作者提出了一种基于扩散的生成模型，这些模型在标准图像数据集（如CIFAR-10和ImageNet）上取得了最先进的对数似然（log-likelihood）结果。这些模型通过结合傅里叶特征（Fourier features）和可学习的扩散过程规范，实现了对图像的高质量生成。
@@ -360,7 +359,6 @@ $$
 ---
 
 <table><tr><td bgcolor=blue>译者注（位置编码如何计算）</td></tr></table>
-
 
 
 在 transformer 的原文中，位置编码的计算方式为：
