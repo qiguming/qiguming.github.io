@@ -570,7 +570,7 @@ $$
 $$
 
 
-如果我们使用 $\boldsymbol{x}_t=\boldsymbol{x}_0+\sigma_t \boldsymbol{\epsilon}$，并定义 $\boldsymbol{s}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right)=-\frac{\boldsymbol{\epsilon}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right)}{\sigma_t}$​，我们可以将其重写为
+如果我们使用 $$\boldsymbol{x}_t=\boldsymbol{x}_0+\sigma_t \boldsymbol{\epsilon}$$，并定义 $$\boldsymbol{s}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right)=-\frac{\boldsymbol{\epsilon}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right)}{\sigma_t}$$​，我们可以将其重写为
 
 
 $$
