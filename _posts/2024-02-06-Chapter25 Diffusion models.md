@@ -875,7 +875,6 @@ $$
 
 
 ### 25.5.2 非高斯解码器网络
-
 如图25.11所示，如果反向过程采用更大的采样步长，则在给定含噪输入的情况下，清晰输出的诱导分布（induced distribution）将变得多峰值。这需要对分布 $$p_\boldsymbol{\theta}(\boldsymbol{x}_{t-1}|\boldsymbol{x}_t)$$ 使用更复杂的建模形式。在 [Gao+21][^Gao21] 中，他们使用EBM来拟合这个分布。然而，这仍然需要使用MCMC（马尔科夫链蒙特卡罗）来抽取样本。在 [XKV22][^XKV22] 中，他们使用GAN（生成对抗网络，第26章）来拟合这个分布。这使我们能够通过将高斯噪声传递给生成器来轻松地抽取样本。相比于单阶段生成对抗网络（GAN），其优势在于生成器和判别器都在解决一个更为简单的问题，这导致了更高的模态覆盖率和更好的训练稳定性。与标准扩散模型相比，我们可以用更少的步骤中生成高质量的样本。
 
 [^Gao21]: 【Gao+21】
@@ -911,12 +910,9 @@ $$
 
 ### 25.6.1 条件扩散模型
 
-控制生成模型样本生成的最简单方式是在 $(\boldsymbol{c}, \boldsymbol{x})$ 对上训练它，以最大化条件似然 $p(\boldsymbol{x} \mid \boldsymbol{c})$ 。如果条件信号 $c$ 是一个标量（例如，一个类别标签），它可以被映射到一个嵌入向量，然后通过spatial addition 或使用它来调节group normalization层来整合到网络中。如果输入 $\boldsymbol{c}$ 是一张图片，我们可以简单地将其作为额外的通道与$\boldsymbol{x}_t$连接起来。如果输入$c$是文本提示，我们可以得到它的 embedding，然后使用 spatial addition 或交叉注意力（见图25.13作为示例）。
-
-
+控制生成模型样本生成的最简单方式是在 $(\boldsymbol{c}, \boldsymbol{x})$ 对上训练它，以最大化条件似然 $p(\boldsymbol{x} \mid \boldsymbol{c})$ 。如果条件信号 $c$ 是一个标量（例如，一个类别标签），它可以被映射到一个嵌入向量，然后通过spatial addition 或使用它来调节group normalization层来整合到网络中。如果输入 $\boldsymbol{c}$ 是一张图片，我们可以简单地将其作为额外的通道与$\boldsymbol{x}_t$连接起来。如果输入$c$是文本提示，我们可以得到它的 embedding，然后使用 spatial addition 或交叉注意力（见图25.13 作为示例）。
 
 ### 25.6.2 Classifier guidance
-
 条件扩散模型的一个问题是，我们需要对每种想要使用的条件进行重新训练。一种替代方法，被称为**分类器引导**（classifier guidance），该方法在[DN21b][^DN21b]中提出，它允许我们利用一个预训练的判别式分类器 $p(c|\boldsymbol{x})$ 来控制样本生成的过程。其思想如下。首先我们使用贝叶斯定理得到：
 
 
