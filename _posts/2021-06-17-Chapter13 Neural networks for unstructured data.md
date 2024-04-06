@@ -2,7 +2,7 @@
 title: 13 面向非结构数据的神经网络
 author: fengliang qi
 date: 2021-06-17 11:33:00 +0800
-categories: [MLAPP-CN, BOOK-1, PART-III]
+categories: [BOOK-1, PART-III]
 tags: [ml, dnn]
 math: true
 mermaid: true
