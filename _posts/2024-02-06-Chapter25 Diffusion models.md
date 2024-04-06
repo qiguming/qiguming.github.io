@@ -20,7 +20,7 @@ comments: true
 
 本章，我们将讨论**扩散模型**（diffusion model）。这类生成模型最近引起了广泛关注，因为它能够生成多样且高质量的样本，同时由于训练方法相对简单，使得训练一个超大规模的扩散模型成为可能。接下来，我们将会看到，扩散模型与VAE（第21章），归一化流（第23章）以及EBM（第24章）存在着密切关联。
 
-扩散模型背后的基本思想主要是基于如下的观察：将噪声转换成具备结构化特征的正常数据很难，但将正常数据转换成噪声却很容易。具体而言，通过反复执行随机编码器 $$q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}\right)$$，执行 $$T$$ 步后，我们可以逐渐将观察到的正常数据 $$\boldsymbol{x}_0$$ 转换成对应的噪声版本 $$\boldsymbol{x}_T$$，且如果 $$T$$ 足够大， $$\boldsymbol{x}_T\sim\mathcal{N}(\mathbf{0},\mathbf{I})$$，或者其他一些方便分析的参考分布，这个将正常数据转化成噪声的过程被称为 **前向过程**（forwards process）或 **扩散过程**（diffusion process）。接下来，我们可以学习一个**逆向过程**（reverse process）来反转前向过程——即通过执行解码器  $$p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1}\mid\boldsymbol{x}_t\right)$$ ，将噪声转换成正常的数据 $$\boldsymbol{x}_0$$。图25.1展示了上述两个过程。在以下内容中，我们将更详细地讨论扩散模型。我们的讨论基于[KGV22][^KGV22]的优秀教程。更多细节可以参考最近的综述论文[Yan+22][^Yan22]; [Cao+22][^Cao22]以及专业论文[Kar+22][^Kar22]。还有许多其他优秀的在线资源，如 https://github.com/heejkoo/Awesome-Diffusion-Models 和 https://scorebasedgenerativemodeling.github.io/。
+扩散模型背后的基本思想主要是基于如下的观察：将噪声转换成具备结构化特征的正常数据很难，但将正常数据转换成噪声却很容易。具体而言，通过反复执行随机编码器 $$q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}\right)$$，执行 $$T$$ 步后，我们可以逐渐将观察到的正常数据 $$\boldsymbol{x}_0$$ 转换成对应的噪声版本 $$\boldsymbol{x}_T$$，且如果 $$T$$ 足够大， $$\boldsymbol{x}_T\sim\mathcal{N}(\mathbf{0},\mathbf{I})$$，或者其他一些方便分析的参考分布，这个将正常数据转化成噪声的过程被称为 **前向过程**（forwards process）或 **扩散过程**（diffusion process）。接下来，我们可以学习一个**逆向过程**（reverse process）来反转前向过程——即通过执行解码器  $$p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1}\mid\boldsymbol{x}_t\right)$$ $T$ 步，将噪声转换成正常的数据 $$\boldsymbol{x}_0$$。图25.1展示了上述两个过程。在以下内容中，我们将更详细地讨论扩散模型。我们的讨论基于[KGV22][^KGV22]的优秀教程。更多细节可以参考最近的综述论文[Yan+22][^Yan22]; [Cao+22][^Cao22]以及专业论文[Kar+22][^Kar22]。还有许多其他优秀的在线资源，如 [https://github.com/heejkoo/Awesome-Diffusion-Models](https://github.com/heejkoo/Awesome-Diffusion-Models)和 [https://scorebasedgenerativemodeling.github.io/](https://scorebasedgenerativemodeling.github.io/)。
 
 ![ddpm](/assets/img/figures/book2/25.1.png)
 
@@ -28,18 +28,18 @@ comments: true
 图25.1：降噪概率扩散模型。前向过程实现（无可学习参数）推理网络；该过程只是在每一个时间点增加噪声。逆向过程实现解码器；这是一个可学习的高斯模型。图片引用自[KGV22][^KGV22]。经Arash Vahdat允许后使用。
 {:.image-caption}
 
-[^Yan22]:[Yan+22]
-[^Cao22]:[Cao+22]
-[^ Kar22]:[Kar+22]
-[^KGV22]:[KGV22]
+[^Yan22]:【Yan+22】
+[^Cao22]:【Cao+22】
+[^ Kar22]:【Kar+22】
+[^KGV22]:【KGV22】
 
 ## 25.2 降噪扩散概率模型（DDPMs）
 
 本节，我们将讨论**降噪扩散概率模型**（Denoising diffusion probabilistic models，DDPM），该模型首先在[SD+15b][^SD15b]中被提出，并在[HJA20][^HJA20]; [Kin+21][^Kin21]和许多其他工作中进行了扩展。我们可以将DDPM看作类似于分层变分自编码器（第21.5节）的模型，区别在于，在扩散模型中，所有的隐变量（表示为 $\boldsymbol{x}_t$，$t=1:T$）与输入$\boldsymbol{x}_0$具有相同的维度。（在维度是否一致方面，DDPM又类似于第23章的归一化流，然而，在扩散模型中，隐层的输出是随机的，并且不需要使用可逆变换。）此外，编码器 $q$ 是一个简单的线性高斯模型，而不是通过学习得到的[^1]，解码器 $p$​ 在不同时间节点（timestep）之间共享模型参数。这些限制使得我们可以获得一个非常简单的训练目标，进而使更深层的模型训练变得简单，从而避免了后验坍塌（第21.4节）的风险。特别是在第25.2.3节中，我们将看到，扩散模型的优化最终可以归结为加权版本的非线性最小二乘问题。
 
-[^SD15b]:[SD+15b]
-[^HJA20]:[HJA20]
-[^Kin21]:[Kin+21]
+[^SD15b]:【SD+15b】
+[^HJA20]:【HJA20】
+[^Kin21]:【Kin+21】
 [^1]: 稍后我们将讨论一些扩展内容，其中包括编码器的噪音水平也可以学习。尽管如此，编码器的设计仍然很简单。
 
 ### 25.2.1 编码器（前向扩散）
@@ -213,8 +213,8 @@ $$
 
 在生成过程中产生的所有隐变量的联合概率分布为 $$p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{0: T}\right)= p\left(\boldsymbol{x}_T\right) \prod_{t=1}^T p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right)$$​ ，其中我们令 $p\left(\boldsymbol{x}_T\right)=\mathcal{N}(\mathbf{0}, \mathbf{I})$​。根据算法25.2提供的伪代码，我们可以从分布中采样得到新的样本。
 
-[^2]: 我们只需要使用高斯分布的贝叶斯规则。例如，可以参考 https://lilianweng.github.io/posts/2021-07-11-diffusion-models/ 来查看详细的推导过程。
-[^HJA20]:[HJA20]
+[^2]: 我们只需要使用高斯分布的贝叶斯规则。例如，可以参考 [https://lilianweng.github.io/posts/2021-07-11-diffusion-models/](https://lilianweng.github.io/posts/2021-07-11-diffusion-models/) 来查看详细的推导过程。
+[^HJA20]:【HJA20】
 
 ### 25.2.3 模型拟合
 
@@ -304,7 +304,7 @@ $$
 
 整体训练过程展示在算法25.1中。我们可以使用更先进的加权方案来提高样本的感知质量，这在[Cho+22][^Cho22]中讨论过。相反，如果目标是提高似然分数，我们可以同时优化噪声时间表，如第25.2.4节所讨论的。
 
-[^Cho22]: [Cho22] J. Choi, J. Lee, C. Shin, S. Kim, H. Kim, and S. Yoon. “Perception Prioritized Training of Diffusion Models”. In: CVPR. Apr. 2022.
+[^Cho22]: 【Cho22】 J. Choi, J. Lee, C. Shin, S. Kim, H. Kim, and S. Yoon. “Perception Prioritized Training of Diffusion Models”. In: CVPR. Apr. 2022.
 
 模型训练完成后，我们可以使用**始祖抽样**（ancestral sampling）来生成数据，如算法25.2所示。
 
@@ -376,7 +376,7 @@ $$
 其中 $R^{\prime}(t)$  是 SNR 函数的导数，$$\boldsymbol{z}_t=\alpha_t \boldsymbol{x}_0+\sigma_t \boldsymbol{\epsilon}_t$$​。（具体推导参考[Kin+21][^Kin21]）。
 
 [^3]: 此处的loss采用了简化的形式，即连续时间极限情况下的结果。极限情况下的loss形式我们将在25.4节讨论。
-[^Kin21]: [Kin21] D. P. Kingma, T. Salimans, B. Poole, and J. Ho. “Variational Diffusion Models”. In: NIPS. July 2021.
+[^Kin21]: 【Kin21】 D. P. Kingma, T. Salimans, B. Poole, and J. Ho. “Variational Diffusion Models”. In: NIPS. July 2021.
 
 由于信噪比(SNR)函数是可逆的——因为单调性假设，我们可以进行变量替换，并且使一切变量都成为关于 $$v=R(t)$$ 的函数而不是 $t$ 的函数。具体而言，令 $$\boldsymbol{z}_v=\alpha_v \boldsymbol{x}_0+\sigma_v \boldsymbol{\epsilon}$$，以及 $$\tilde{\boldsymbol{x}}_{\boldsymbol{\theta}}(\boldsymbol{z}, v)=\hat{\boldsymbol{x}}_{\boldsymbol{\theta}}\left(\boldsymbol{z}, R^{-1}(v)\right)$$。则公式（25.28）可以重写成
 
