@@ -2,7 +2,7 @@
 title: 13 面向非结构数据的神经网络
 author: fengliang qi
 date: 2021-06-17 11:33:00 +0800
-categories: [MLAPP-CN, PART-III]
+categories: [MLAPP-CN, BOOK-1, PART-III]
 tags: [ml, dnn]
 math: true
 mermaid: true
@@ -29,9 +29,8 @@ comments: true
 > - 特征提取器： feature extractor.
 > 
 ><table><tr><td bgcolor=blue>内容导读</td></tr></table> 
-> 
->- 引入了 "$\textrm{DNN}$" 的概念，其背后的动机在于: 通过给于特征提取器更加复杂的结构（更多的可学习参数），提高模型在特征提取方面的能力；
-> - "$\textrm{DNN}$" 又被称为前馈神经网络，所谓前馈神经网络一般是指模型的结构是一个有向无环图。与之对应的是循环神经网络。前馈神经网络中主要包括：（单层）感知机，多层感知机，径向基网络等。
+> - 引入了 "$\textrm{DNN}$" 的概念，其背后的动机在于: 通过给于特征提取器更加复杂的结构（更多的可学习参数），提高模型在特征提取方面的能力；
+>- "$\textrm{DNN}$" 又被称为前馈神经网络，所谓前馈神经网络一般是指模型的结构是一个有向无环图。与之对应的是循环神经网络。前馈神经网络中主要包括：（单层）感知机，多层感知机，径向基网络等。
 
 在本书的部分 $\mathrm{II}$， 我们讨论了线性模型在回归和分类任务的应用。在第 $\textrm{11}$ 章，我们讨论了线性回归模型$p(y|\mathbf{x}, \mathbf{w})=\mathcal{N}\left(y|\mathbf{w}^{\top}\mathbf{x}, \sigma^{2}\right)$  。在第 $\textrm{10}$ 章，我们讨论了逻辑回归，其中对于二分类情况，模型定义为 $p(y|\mathbf{x}, \mathbf{w})={\rm{Ber}}(y|\sigma(\mathbf{w}^{\top}\mathbf{x}))$；在多分类任务中，模型定义为 $ p(y|\mathbf{x},\mathbf{w})=\operatorname{Cat}(y|\mathcal{S}(\mathbf{W} \mathbf{x}))$。在第 $\textrm{12}$ 章，我们进一步讨论了广义线性模型，定义为:
 $$
@@ -84,9 +83,8 @@ $\textrm{MLP}$ 假定输入是一个维度固定的矢量，即 $\mathbf{x} \in 
 > - 优化器：optimizer
 > 
 ><table><tr><td bgcolor=blue>内容导读</td></tr></table> 
-> 
->- 传统感知机模型并不能有效解决 $\textrm{XOR}$ 这一模式识别问题; 
-> - 多层感知机 $\textrm{MLP}$ 可以有效解决上述难点，但其所包含的不可微的单位阶跃激活函数限制了其被大规模使用的可能;
+> - 传统感知机模型并不能有效解决 $\textrm{XOR}$ 这一模式识别问题; 
+>- 多层感知机 $\textrm{MLP}$ 可以有效解决上述难点，但其所包含的不可微的单位阶跃激活函数限制了其被大规模使用的可能;
 > - 通过使用可微的非线性激活函数，可以有效改善上述问题，但应避免使用存在饱和区的激活函数（会导致梯度消失的问题）。
 
 在第 $\textrm{10.2.5}$ 节，我们介绍了 **感知机** ($\textrm{perceptron}$) 模型， 它实际上就是逻辑回归模型的一个确定性版本（$\textrm{deterministic version}$）。具体而言，它是一个具备如下形式的映射函数:

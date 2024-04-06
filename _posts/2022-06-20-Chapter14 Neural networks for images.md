@@ -2,7 +2,7 @@
 title: 14 面向图像数据的神经网络
 author: fengliang qi
 date: 2022-06-20 11:33:00 +0800
-categories: [MLAPP-CN, PART-III]
+categories: [MLAPP-CN, BOOK-1, PART-III]
 tags: [ml, dnn，cnn]
 math: true
 mermaid: true
