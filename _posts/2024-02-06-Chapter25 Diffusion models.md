@@ -108,7 +108,7 @@ torch.linspace(beta_start, beta_end, timesteps) # timesteps=T, beta_start=beta_1
 
 作者选择这么做的动机为：
 
-```markdown
+```text
 These constants were chosen to be small relative to data scaled to [−1, 1], ensuring that reverse and forward processes have approximately the same functional form while keeping the signal-to-noise ratio at xT as small as possible.
 ```
 
@@ -187,9 +187,9 @@ def betas_for_alpha_bar(
 ---
 
 
-### 25.2.2 解码器（逆向扩散）
+### 25.2.2 解码器（逆向生成）
 
-在逆向过程中，我们希望反转正向的扩散过程。如果我们提前知道输入 $\boldsymbol{x}_0$，我们可以推导出单步正向过程的反向过程[^2]：
+在逆向过程中，我们希望反转正向的扩散过程。如果我们提前知道输入 $\boldsymbol{x}_0$，我们可以推导出单步正向过程对应的逆向过程[^2]：
 
 
 $$
@@ -201,7 +201,7 @@ q\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t, \boldsymbol{x}_0\right) & =\m
 $$
 
 
-当然，在生成一个新的数据时，我们并不知道 $\boldsymbol{x}_0$，但我们可以训练生成器来近似上述分布在 $\boldsymbol{x}_0$ 上平均结果。因此，我们选择的生成器具有以下形式:
+当然，在生成一个新的数据时，我们并不知道 $\boldsymbol{x}_0$，但我们可以训练生成器来近似上述分布在 $\boldsymbol{x}_0$ 上的平均结果。因此，我们选择的生成器具有以下形式:
 
 
 $$
@@ -214,11 +214,11 @@ $$
 在生成过程中产生的所有隐变量的联合概率分布为 $$p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{0: T}\right)= p\left(\boldsymbol{x}_T\right) \prod_{t=1}^T p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right)$$​ ，其中我们令 $p\left(\boldsymbol{x}_T\right)=\mathcal{N}(\mathbf{0}, \mathbf{I})$​。根据算法25.2提供的伪代码，我们可以从分布中采样得到新的样本。
 
 [^2]: 我们只需要使用高斯分布的贝叶斯规则。例如，可以参考 https://lilianweng.github.io/posts/2021-07-11-diffusion-models/ 来查看详细的推导过程。
-[^HJA20]:
+[^HJA20]:[HJA20]
 
 ### 25.2.3 模型拟合
 
-我们将通过最大化**证据下确界**（evidence lower bound，ELBO）来拟合模型，类似于我们训练VAE的方式（参见第21.2节）。具体而言，对于每个数据样本 $\boldsymbol{x}_0$，我们有
+我们将通过最大化**证据下确界**（evidence lower bound，ELBO）来拟合模型，类似于我们训练VAE的方式（第21.2节）。具体而言，对于每个数据样本 $\boldsymbol{x}_0$，我们有
 
 
 $$
@@ -304,7 +304,7 @@ $$
 
 整体训练过程展示在算法25.1中。我们可以使用更先进的加权方案来提高样本的感知质量，这在[Cho+22][^Cho22]中讨论过。相反，如果目标是提高似然分数，我们可以同时优化噪声时间表，如第25.2.4节所讨论的。
 
-[^Cho22]: J. Choi, J. Lee, C. Shin, S. Kim, H. Kim, and S. Yoon. “Perception Prioritized Training of Diffusion Models”. In: CVPR. Apr. 2022.
+[^Cho22]: [Cho22] J. Choi, J. Lee, C. Shin, S. Kim, H. Kim, and S. Yoon. “Perception Prioritized Training of Diffusion Models”. In: CVPR. Apr. 2022.
 
 模型训练完成后，我们可以使用**始祖抽样**（ancestral sampling）来生成数据，如算法25.2所示。
 
@@ -338,7 +338,7 @@ $$
 
 ### 25.2.4 学习噪声时间表
 
-在本节中，我们将介绍一种方法，该方法可以同时优化在编码器中所使用的噪声时间表，以实现最大化ELBO；这种方法被称为**变分扩散模型**（variational diffusion model）或VDM [Kin+21][^Kin21]（译者注：默认的扩散模型在编码器中不存在可学习参数，而VDM在编码器中存在可学习参数）。
+在本节中，我们将介绍一种方法，该方法可以同时优化在编码器中所使用的噪声时间表，以实现最大化ELBO；这种方法被称为**变分扩散模型**（variational diffusion model, VDM） [Kin+21][^Kin21]（译者注：默认的扩散模型在编码器中不存在可学习参数，而VDM在编码器中存在可学习参数）。
 
 我们将使用如下的参数化方式来实现编码器：
 
@@ -376,7 +376,7 @@ $$
 其中 $R^{\prime}(t)$  是 SNR 函数的导数，$$\boldsymbol{z}_t=\alpha_t \boldsymbol{x}_0+\sigma_t \boldsymbol{\epsilon}_t$$​。（具体推导参考[Kin+21][^Kin21]）。
 
 [^3]: 此处的loss采用了简化的形式，即连续时间极限情况下的结果。极限情况下的loss形式我们将在25.4节讨论。
-[^Kin21]: D. P. Kingma, T. Salimans, B. Poole, and J. Ho. “Variational Diffusion Models”. In: NIPS. July 2021.
+[^Kin21]: [Kin21] D. P. Kingma, T. Salimans, B. Poole, and J. Ho. “Variational Diffusion Models”. In: NIPS. July 2021.
 
 由于信噪比(SNR)函数是可逆的——因为单调性假设，我们可以进行变量替换，并且使一切变量都成为关于 $$v=R(t)$$ 的函数而不是 $t$ 的函数。具体而言，令 $$\boldsymbol{z}_v=\alpha_v \boldsymbol{x}_0+\sigma_v \boldsymbol{\epsilon}$$，以及 $$\tilde{\boldsymbol{x}}_{\boldsymbol{\theta}}(\boldsymbol{z}, v)=\hat{\boldsymbol{x}}_{\boldsymbol{\theta}}\left(\boldsymbol{z}, R^{-1}(v)\right)$$。则公式（25.28）可以重写成
 
@@ -516,7 +516,7 @@ $$
 
 这个score不依赖于权重$\pi$。因此，score matching不能正确地还原真实的分布。此外，朗之万采样在模式（mode）之间转换时也存在困难。（在实践中，即使不同模式的支撑集之间只存在大致的不相交，也会发生上述的情况。）
 
-Song和Ermon [SE19][^SE19]; [SE20b][^SE20b]以及Song等人[Son+21b][Son21b]通过使用不同强度的噪声扰动训练数据来克服这一困难。具体来说，他们使用以下的方法：
+Song和Ermon [SE19][^SE19]; [SE20b][^SE20b]以及Song等人[Son+21b][^Son21b]通过使用不同强度的噪声扰动训练数据来克服这一困难。具体来说，他们使用以下的方法：
 
 
 $$
