@@ -20,7 +20,7 @@ comments: true
 
 本章，我们将讨论**扩散模型**（diffusion model）。这类生成模型最近引起了广泛关注，因为它能够生成多样且高质量的样本，同时由于训练方法相对简单，使得训练一个超大规模的扩散模型成为可能。接下来，我们将会看到，扩散模型与VAE（第21章），归一化流（第23章）以及EBM（第24章）存在着密切关联。
 
-扩散模型背后的基本思想主要是基于如下的观察：将噪声转换成具备结构化特征的正常数据很难，但将正常数据转换成噪声却很容易。具体而言，通过反复执行随机编码器 $$q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}\right)$$，执行 $$T$$ 步后，我们可以逐渐将观察到的正常数据 $$\boldsymbol{x}_0$$ 转换成对应的噪声版本 $$\boldsymbol{x}_T$$，且如果 $$T$$ 足够大， $$\boldsymbol{x}_T\sim\mathcal{N}(\mathbf{0},\mathbf{I})$$，或者其他一些方便分析的参考分布，这个将正常数据转化成噪声的过程被称为 **前向过程**（forwards process）或 **扩散过程**（diffusion process）。接下来，我们可以学习一个**逆向过程**（reverse process）来反转前向过程——即通过执行解码器  $$p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1}\mid\boldsymbol{x}_t\right)$$ ，将噪声转换成正常的数据 $$\boldsymbol{x}_0$$。图25.1展示了上述两个过程。在以下内容中，我们将更详细地讨论扩散模型。我们的讨论基于[KGV22][^KGV22]的优秀教程。更多细节可以参考最近的综述论文[Yan+22][^Yan22]; [Cao+22][^Cao22]以及专业论文[Kar+22][^Kar22]。还有许多其他优秀的在线资源，如https://github.com/heejkoo/Awesome-Diffusion-Models 和https://scorebasedgenerativemodeling.github.io/。
+扩散模型背后的基本思想主要是基于如下的观察：将噪声转换成具备结构化特征的正常数据很难，但将正常数据转换成噪声却很容易。具体而言，通过反复执行随机编码器 $$q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}\right)$$，执行 $$T$$ 步后，我们可以逐渐将观察到的正常数据 $$\boldsymbol{x}_0$$ 转换成对应的噪声版本 $$\boldsymbol{x}_T$$，且如果 $$T$$ 足够大， $$\boldsymbol{x}_T\sim\mathcal{N}(\mathbf{0},\mathbf{I})$$，或者其他一些方便分析的参考分布，这个将正常数据转化成噪声的过程被称为 **前向过程**（forwards process）或 **扩散过程**（diffusion process）。接下来，我们可以学习一个**逆向过程**（reverse process）来反转前向过程——即通过执行解码器  $$p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1}\mid\boldsymbol{x}_t\right)$$ ，将噪声转换成正常的数据 $$\boldsymbol{x}_0$$。图25.1展示了上述两个过程。在以下内容中，我们将更详细地讨论扩散模型。我们的讨论基于[KGV22][^KGV22]的优秀教程。更多细节可以参考最近的综述论文[Yan+22][^Yan22]; [Cao+22][^Cao22]以及专业论文[Kar+22][^Kar22]。还有许多其他优秀的在线资源，如 https://github.com/heejkoo/Awesome-Diffusion-Models 和 https://scorebasedgenerativemodeling.github.io/。
 
 ![ddpm](/assets/img/figures/book2/25.1.png)
 
@@ -28,10 +28,18 @@ comments: true
 图25.1：降噪概率扩散模型。前向过程实现（无可学习参数）推理网络；该过程只是在每一个时间点增加噪声。逆向过程实现解码器；这是一个可学习的高斯模型。图片引用自[KGV22][^KGV22]。经Arash Vahdat允许后使用。
 {:.image-caption}
 
+[^Yan22]:
+[^Cao22]:
+[^ Kar22]:
+[^KGV22]:
+
 ## 25.2 降噪扩散概率模型（DDPMs）
 
 本节，我们将讨论**降噪扩散概率模型**（Denoising diffusion probabilistic models，DDPM），该模型首先在[SD+15b][^SD15b]中被提出，并在[HJA20][^HJA20]; [Kin+21][^Kin21]和许多其他工作中进行了扩展。我们可以将DDPM看作类似于分层变分自编码器（第21.5节）的模型，区别在于，在扩散模型中，所有的隐变量（表示为 $\boldsymbol{x}_t$，$t=1:T$）与输入$\boldsymbol{x}_0$具有相同的维度。（在维度是否一致方面，DDPM又类似于第23章的归一化流，然而，在扩散模型中，隐层的输出是随机的，并且不需要使用可逆变换。）此外，编码器 $q$ 是一个简单的线性高斯模型，而不是通过学习得到的[^1]，解码器 $p$​ 在不同时间节点（timestep）之间共享模型参数。这些限制使得我们可以获得一个非常简单的训练目标，进而使更深层的模型训练变得简单，从而避免了后验坍塌（第21.4节）的风险。特别是在第25.2.3节中，我们将看到，扩散模型的优化最终可以归结为加权版本的非线性最小二乘问题。
 
+[^SD15b]:
+[^HJA20]:
+[^Kin21]:
 [^1]: 稍后我们将讨论一些扩展内容，其中包括编码器的噪音水平也可以学习。尽管如此，编码器的设计仍然很简单。
 
 ### 25.2.1 编码器（前向扩散）
@@ -90,7 +98,8 @@ $$
 
 
 
-<table><tr><td bgcolor=blue>译者注（关于噪声时间表如何定义）</td></tr></table>
+<table><tr><td bgcolor=yellow>译者注（关于噪声时间表如何定义）</td></tr></table>
+
 在 DDPM 中，作者使用了**线性**的变换方式定义$\beta_t$。具体而言，作者令 $T=1000$，$\beta_1=10^{-4}, \beta_T=0.02$。任意时刻的 $\beta_t$ 由如下方式生成：
 
 ```python
@@ -205,6 +214,7 @@ $$
 在生成过程中产生的所有隐变量的联合概率分布为 $$p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{0: T}\right)= p\left(\boldsymbol{x}_T\right) \prod_{t=1}^T p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right)$$​ ，其中我们令 $p\left(\boldsymbol{x}_T\right)=\mathcal{N}(\mathbf{0}, \mathbf{I})$​。根据算法25.2提供的伪代码，我们可以从分布中采样得到新的样本。
 
 [^2]: 我们只需要使用高斯分布的贝叶斯规则。例如，可以参考 https://lilianweng.github.io/posts/2021-07-11-diffusion-models/ 来查看详细的推导过程。
+[^HJA20]:
 
 ### 25.2.3 模型拟合
 
@@ -219,7 +229,7 @@ $$
 \end{align}
 $$
 
-我们现在讨论如何计算ELBO中的各个分项。基于马尔可夫属性，我们有  $$q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}\right)=q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}, \boldsymbol{x}_0\right)$$，
+我们现在讨论如何计算ELBO中的各个分项。基于马尔可夫属性，我们有 $$q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}\right)=q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}, \boldsymbol{x}_0\right)$$，
 
 同时根据贝叶斯定理，我们有
 
@@ -294,7 +304,7 @@ $$
 
 整体训练过程展示在算法25.1中。我们可以使用更先进的加权方案来提高样本的感知质量，这在[Cho+22][^Cho22]中讨论过。相反，如果目标是提高似然分数，我们可以同时优化噪声时间表，如第25.2.4节所讨论的。
 
-[^Cho+22]: J. Choi, J. Lee, C. Shin, S. Kim, H. Kim, and S. Yoon. “Perception Prioritized Training of Diffusion Models”. In: CVPR. Apr. 2022.
+[^Cho22]: J. Choi, J. Lee, C. Shin, S. Kim, H. Kim, and S. Yoon. “Perception Prioritized Training of Diffusion Models”. In: CVPR. Apr. 2022.
 
 模型训练完成后，我们可以使用**始祖抽样**（ancestral sampling）来生成数据，如算法25.2所示。
 
@@ -311,7 +321,8 @@ $$
 
 
 
-<table><tr><td bgcolor=blue>译者注（kimi读文）</td></tr></table>
+<table><tr><td bgcolor=yellow>译者注（kimi读文）</td></tr></table>
+
 文章《Perception Prioritized Training of Diffusion Models》的主要贡献点如下：
 
 1. **新的训练目标权重方案**：文章提出了一种名为感知优先（Perception Prioritized, P2）的权重方案，用于优化扩散模型的训练目标。这种方案通过重新设计损失函数的权重分配，使得模型在训练过程中更加关注于学习感知上重要的特征。
@@ -345,7 +356,7 @@ R(t)=\hat{\alpha}_t^2 / \hat{\sigma}_t^2 \tag{25.26}
 $$
 
 
-上式需要随着 $t$ 的增加而单调递减。这一点可以通过定义 $R(t)=\exp \left(-\gamma_\phi(t)\right)$ 来实现，其中$\gamma_\phi(t)$ 是一个单调神经网络。我们通常令 $\hat{\alpha}_t=\sqrt{1-\sigma_t^2}$，这对应于25.4节讨论的variance preserving SDE。
+上式需要随着 $t$ 的增加而单调递减。这一点可以通过定义 $$R(t)=\exp \left(-\gamma_\phi(t)\right)$$ 来实现，其中$$\gamma_\phi(t)$$ 是一个单调神经网络。我们通常令 $$\hat{\alpha}_t=\sqrt{1-\sigma_t^2}$$，这对应于25.4节讨论的variance preserving SDE。
 
 沿用25.2.3节的推导，负ELBO（变分上确界）可以写成：
 
@@ -362,26 +373,26 @@ $$
 \mathcal{L}_D\left(\boldsymbol{x}_0\right)=\frac{1}{2} \mathbb{E}_{\boldsymbol{\epsilon} \sim \mathcal{N}(\mathbf{0}, \mathbf{I})} \int_0^1 R^{\prime}(t)\left\|\boldsymbol{x}_0-\hat{\boldsymbol{x}}_{\boldsymbol{\theta}}\left(z_t, t\right)\right\|_2^2 d t \tag{25.28}
 $$
 
-
-其中 $R^{\prime}(t)$  是 SNR 函数的导数，$\boldsymbol{z}_t=\alpha_t \boldsymbol{x}_0+\sigma_t \boldsymbol{\epsilon}_t$​。（具体推导参考[Kin+21][^Kin21]）。
+其中 $R^{\prime}(t)$  是 SNR 函数的导数，$$\boldsymbol{z}_t=\alpha_t \boldsymbol{x}_0+\sigma_t \boldsymbol{\epsilon}_t$$​。（具体推导参考[Kin+21][^Kin21]）。
 
 [^3]: 此处的loss采用了简化的形式，即连续时间极限情况下的结果。极限情况下的loss形式我们将在25.4节讨论。
 [^Kin21]: D. P. Kingma, T. Salimans, B. Poole, and J. Ho. “Variational Diffusion Models”. In: NIPS. July 2021.
 
-由于信噪比(SNR)函数是可逆的——因为单调性假设，我们可以进行变量替换，并且使一切变量都成为关于 $v=R(t)$ 的函数而不是 $t$ 的函数。具体而言，令 $$\boldsymbol{z}_v=\alpha_v \boldsymbol{x}_0+\sigma_v \boldsymbol{\epsilon}$$，以及 $$\tilde{\boldsymbol{x}}_{\boldsymbol{\theta}}(\boldsymbol{z}, v)=\hat{\boldsymbol{x}}_{\boldsymbol{\theta}}\left(\boldsymbol{z}, R^{-1}(v)\right)$$。则公式（25.28）可以重写成
+由于信噪比(SNR)函数是可逆的——因为单调性假设，我们可以进行变量替换，并且使一切变量都成为关于 $$v=R(t)$$ 的函数而不是 $t$ 的函数。具体而言，令 $$\boldsymbol{z}_v=\alpha_v \boldsymbol{x}_0+\sigma_v \boldsymbol{\epsilon}$$，以及 $$\tilde{\boldsymbol{x}}_{\boldsymbol{\theta}}(\boldsymbol{z}, v)=\hat{\boldsymbol{x}}_{\boldsymbol{\theta}}\left(\boldsymbol{z}, R^{-1}(v)\right)$$。则公式（25.28）可以重写成
 
 $$
 \mathcal{L}_D\left(\boldsymbol{x}_0\right)=\frac{1}{2} \mathbb{E}_{\boldsymbol{\epsilon} \sim \mathcal{N}(\boldsymbol{0}, \mathbf{I})} \int_{R_{\min }}^{R_{\max }}\left\|\boldsymbol{x}_0-\tilde{\boldsymbol{x}}_{\boldsymbol{\theta}}\left(z_v, v\right)\right\|_2^2 d v \tag{25.29}
 $$
 
 
-其中 $R_{\min }=R(1)$，$R_{\max }=R(0)$。所以我们发现SNR时间表的形状（即中间状态值）对结果没有影响，只有2个端点起作用。
+其中 $$R_{\min }=R(1)$$，$$R_{\max }=R(0)$$。所以我们发现SNR时间表的形状（即中间状态值）对结果没有影响，只有2个端点起作用。
 
-等式（25.29）中的积分可以通过随机均匀采样时间点来估计。当处理 $k$ 个样例的小批量训练数据时，我们可以使用**低偏差采样器**（low-discrepancy sampler，参见，第11.6.5节）来产生一个变分确界的低方差估计。在这种方法中，我们不是独立地对时间点进行抽样，而是抽样一个均匀随机数 $u_0 \sim \operatorname{Unif}(0,1)$，然后将第 $i$ 个样本的时间 $t$ 设置为 $t^i=\bmod \left(u_0+i / k, 1\right)$​。我们也可以对噪声时间表本身进行优化，以减少扩散损失的方差。
+等式（25.29）中的积分可以通过随机均匀采样时间点来估计。当处理 $$k$$ 个样例的小批量训练数据时，我们可以使用**低偏差采样器**（low-discrepancy sampler，参见，第11.6.5节）来产生一个变分确界的低方差估计。在这种方法中，我们不是独立地对时间点进行抽样，而是抽样一个均匀随机数 $$u_0 \sim \operatorname{Unif}(0,1)$$，然后将第 $$i$$ 个样本的时间 $$t$$ 设置为 $$t^i=\bmod \left(u_0+i / k, 1\right)$$​。我们也可以对噪声时间表本身进行优化，以减少扩散损失的方差。
 
 ---
 
-<table><tr><td bgcolor=blue>译者注（kimi读文）</td></tr></table>
+<table><tr><td bgcolor=yellow>译者注（kimi读文）</td></tr></table>
+
 这篇论文介绍了一类基于变分扩散模型（Variational Diffusion Models，简称VDMs，https://arxiv.org/pdf/2107.00630.pdf）的生成模型，并展示了它们在标准图像密度估计基准测试中的优异性能。以下是该论文的主要贡献点：
 
 1. **新的生成模型家族**：作者提出了一种基于扩散的生成模型，这些模型在标准图像数据集（如CIFAR-10和ImageNet）上取得了最先进的对数似然（log-likelihood）结果。这些模型通过结合傅里叶特征（Fourier features）和可学习的扩散过程规范，实现了对图像的高质量生成。
@@ -412,7 +423,7 @@ $$
 
 
 
-扩散模型经常被用来生成图像。图像生成最常用的结构基于U-net模型[RFB15][^RFB15]，如图25.3所示。时间节点 $t$​​ 被编码为一个向量，使用的是正弦位置编码或随机傅里叶特征，随后被输入到残差模块，使用简单的空间加法或通过对组归一化层进行条件化[DN21a][^DN21a]。当然，除了U-net之外，还有其他的架构。例如，最近的研究[PX22][^PX22]; [Li+22][^Li+22]; [Bao+22a][^Bao+22a]提出使用transformer来取代卷积层和反卷积层。
+扩散模型经常被用来生成图像。图像生成最常用的结构基于U-net模型[RFB15][^RFB15]，如图25.3所示。时间节点 $t$​​ 被编码为一个向量，使用的是正弦位置编码或随机傅里叶特征，随后被输入到残差模块，使用简单的空间加法或通过对组归一化层进行条件化[DN21a][^DN21a]。当然，除了U-net之外，还有其他的架构。例如，最近的研究[PX22][^PX22]; [Li+22][^Li22]; [Bao+22a][^Bao22a]提出使用transformer来取代卷积层和反卷积层。
 
 ![25.4](/assets/img/figures/book2/25.4.png)
 
@@ -420,13 +431,18 @@ $$
 图25.4：一些由在 K40 GPU 上训练了大约 30 分钟的小型变分扩散模型生成的样本图像，这些模型是在 EMNIST 数据集上训练的。 (a) 无条件采样。 (b) 基于类别标签的条件采样。 (c) 使用无分类器引导（参见第 25.6.3 节）。由 diffusion_emnist.ipynb 生成。经 Alex Alemi 的友好授权使用。
 {:.image-caption}
 
-
+[^RFB15]:
+[^DN21a]:
+[^PX22]:
+[^Li22]:
+[^Bao22a]:
 
 图25.4展示了在EMNIST图像数据集上训练一个小型U-net VDM的结果。通过在大量数据（数百万图像）上长时间（数天）训练大规模参数（数十亿），扩散模型可以生成非常高质量的图像（见图20.2）。通过使用条件扩散模型，可以进一步提高结果，其中的条件信息提供了关于生成哪些类型图像的指导（见第25.6节）。
 
 ---
 
-<table><tr><td bgcolor=blue>译者注（位置编码如何计算）</td></tr></table>
+<table><tr><td bgcolor=yellow>译者注（位置编码如何计算）</td></tr></table>
+
 在 transformer 的原文中，位置编码的计算方式为：
 
 对于序列中的第 $k$ 个 token, 其位置编码的目标维度为 $d_{model}$, 每个维度 $i$ 的数值计算方式为:
@@ -466,13 +482,18 @@ pe[:, 1::2] = torch.cos(k * div_term)
 
 ## 25.3 Score-based 生成模型（SGMs）
 
-在第24.3节中，我们讨论了如何使用score matching来拟合能量模型（EBMs）。该方法通过调整EBM的参数，使得模型的**评分函数**（score function）$\nabla_{\boldsymbol{x}} \log p_{\boldsymbol{\theta}}(\boldsymbol{x})$，匹配真实数据的评分函数 $\nabla_{\boldsymbol{x}} \log p_{\mathcal{D}}(\boldsymbol{x})$。一个替代*先估计标量能量函数再计算其评分* 的方法是直接学习一个**评分函数**，该方法被称为 **score-based generative model**（SGM）[SE19][^SE19]; [SE20b][^SE20b]; [Son+21b][^Son+21b]。我们可以使用basic score matching（第24.3.1节）、sliced score matching（第24.3.3节）或 denoising score matching（第24.3.2节）来优化评分函数 $s_{\boldsymbol{\theta}}(\boldsymbol{x})$​​。我们将在下文中更详细地讨论这类模型。（关于与EBMs的比较，参见[SH21][^SH21]。）
+在第24.3节中，我们讨论了如何使用score matching来拟合能量模型（EBMs）。该方法通过调整EBM的参数，使得模型的**评分函数**（score function）$$\nabla_{\boldsymbol{x}} \log p_{\boldsymbol{\theta}}(\boldsymbol{x})$$，匹配真实数据的评分函数 $$\nabla_{\boldsymbol{x}} \log p_{\mathcal{D}}(\boldsymbol{x})$$。一个替代*先估计标量能量函数再计算其评分* 的方法是直接学习一个**评分函数**，该方法被称为 **score-based generative model**（SGM）[SE19][^SE19]; [SE20b][^SE20b]; [Son+21b][^Son21b]。我们可以使用basic score matching（第24.3.1节）、sliced score matching（第24.3.3节）或 denoising score matching（第24.3.2节）来优化评分函数 $$s_{\boldsymbol{\theta}}(\boldsymbol{x})$$​​。我们将在下文中更详细地讨论这类模型。（关于与EBMs的比较，参见[SH21][^SH21]。）
 
-
+[^SE19]:
+[^SE20b]:
+[^Son21b]:
+[^SH21]:
 
 ![25.5](/assets/img/figures/book2/25.5.png)
 
-{: style="width: 100%;" class="center"}图25.5: 将SGM拟合到2D瑞士卷数据集。(a) 训练集。 (b) 使用score matching学习得分函数。(c) score function输出和经验密度的叠加。 (d) 应用于所学模型的朗之万采样。 我们展示了3条不同的轨迹，每条轨迹长度为25。由score_matching_swiss_roll.ipynb生成。
+{: style="width: 100%;" class="center"}
+
+图25.5: 将SGM拟合到2D瑞士卷数据集。(a) 训练集。 (b) 使用score matching学习得分函数。(c) score function输出和经验密度的叠加。 (d) 应用于所学模型的朗之万采样。 我们展示了3条不同的轨迹，每条轨迹长度为25。由score_matching_swiss_roll.ipynb生成。
 
 {:.image-caption}
 
@@ -484,7 +505,7 @@ pe[:, 1::2] = torch.cos(k * div_term)
 
 ### 25.3.2 分层加噪
 
-通常，当存在低密度数据区域时，score matching 可能会遇到困难。为了了解这一点，假设 $p_{\mathcal{D}}(\mathbf{x})=\pi p_0(\mathbf{x})+(1-\pi) p_1(\mathbf{x})$。令$$\mathcal{S}_0:=\left\{\mathbf{x} \mid p_0(\mathbf{x})>0\right\}$$ 和 
+通常，当存在低密度数据区域时，score matching 可能会遇到困难。为了了解这一点，假设 $p_{\mathcal{D}}(\mathbf{x})=\pi p_0(\mathbf{x})+(1-\pi) p_1(\mathbf{x})$。令$$\mathcal{S}_0:=\left\{\mathbf{x} \mid p_0(\mathbf{x})>0\right\}$$ 和
 
 $$\mathcal{S}_1:=\left\{\mathbf{x} \mid p_1(\mathbf{x})>0\right\}$$ 分别对应 $$p_0(\mathbf{x})$$ 和 $$p_1(\mathbf{x})$$ 的支撑集。当两个支撑集不相交时，$p_{\mathcal{D}}(\mathbf{x})$ 的score为：
 
@@ -505,10 +526,15 @@ q_\sigma(\tilde{\boldsymbol{x}}) & =\int p_{\mathcal{D}}(\boldsymbol{x}) q_\sigm
 \end{align}
 $$
 
+对于较强的噪声扰动，由于添加了噪声，不同模式的支撑集之间产生了连通，此时估算的权重是准确的。对于强度较小的噪声扰动，不同模式的支撑集不连通，但噪声扰动后的分布更接近原始未扰动的数据分布。使用诸如退火朗之万动力学[SE19][^SE19]; [SE20b][^SE20b]; [Son+21b][^Son21b]或扩散采样[SD+15a][^SD15a]; [HJA20][^HJA20]; [Son+21b][^Son21b]等采样方法，我们可以首先从被最大噪声强度扰动后的分布中采样，然后平滑地减小噪声的强度，直到抵达最小噪声强度。这个过程有助于利用来自所有噪声强度层的信息，并在从弱噪声扰动分布中采样时保持强噪声扰动分布下获得的正确的权重估计。
 
-对于较强的噪声扰动，由于添加了噪声，不同模式的支撑集之间产生了连通，此时估算的权重是准确的。对于强度较小的噪声扰动，不同模式的支撑集不连通，但噪声扰动后的分布更接近原始未扰动的数据分布。使用诸如退火朗之万动力学[SE19][^SE19]; [SE20b][^SE20b]; [Son+21b][^Son21b]或扩散采样[SD+15a][^SD+15a]; [HJA20][^HJA20]; [Son+21b][^Son21b]等采样方法，我们可以首先从被最大噪声强度扰动后的分布中采样，然后平滑地减小噪声的强度，直到抵达最小噪声强度。这个过程有助于利用来自所有噪声强度层的信息，并在从弱噪声扰动分布中采样时保持强噪声扰动分布下获得的正确的权重估计。
+[^SE19]:
+[^SE20b]:
+[^Son21b]:
+[^SD15a]:
+[^HJA20]:
 
-在具体实现中，所有评分模型共享权重，并且用一个以噪声强度为条件的神经网络实现；这被称为**噪声条件评分网络**（noise conditional score network），形式为 $\boldsymbol{s}_{\boldsymbol{\theta}}(\boldsymbol{x}, \sigma)$ 。通过训练所有噪声强度下的score matching目标——每个噪声强度对应一个匹配目标——来估计不同强度下的评分函数。如果我们使用等式(24.33)中的denoising score matching目标，将得到：
+在具体实现中，所有评分模型共享权重，并且用一个以噪声强度为条件的神经网络实现；这被称为**噪声条件评分网络**（noise conditional score network），形式为 $$\boldsymbol{s}_{\boldsymbol{\theta}}(\boldsymbol{x}, \sigma)$$ 。通过训练所有噪声强度下的score matching目标——每个噪声强度对应一个匹配目标——来估计不同强度下的评分函数。如果我们使用等式(24.33)中的denoising score matching目标，将得到：
 
 
 $$
@@ -535,11 +561,11 @@ $$
 $$
 
 
-其中我们选择 $\sigma_1>\sigma_2>\cdots>\sigma_T$ ，并且权重项满足 $\lambda_t>0$​。
+其中我们选择 $$\sigma_1>\sigma_2>\cdots>\sigma_T$$ ，并且权重项满足 $ \lambda_t>0 $​​。
 
 ### 25.3.3 与 DDPM 的等价性
 
-我们现在展示 score-based generative model 的训练目标与DDPM损失函数是等价的。为了验证这一点，首先使用$$q_0\left(\boldsymbol{x}_0\right)$$ 替换 $$p_{\mathcal{D}}(\boldsymbol{x})$$，用 $$\boldsymbol{x}_t$$ 替换 $$\tilde{\boldsymbol{x}}$$ ，并用 $$\boldsymbol{s}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right)$$ 替换 $$\boldsymbol{s}_{\boldsymbol{\theta}}(\tilde{\boldsymbol{x}},\sigma)$$。我们还将使用随机地均匀采样一个时间点来计算等式(25.36)。那么等式(25.36)变成了以下形式：
+我们现在展示 score-based generative model 的训练目标与DDPM损失函数是等价的。为了验证这一点，首先使用 $$q_0\left(\boldsymbol{x}_0\right)$$ 替换 $$p_{\mathcal{D}}(\boldsymbol{x})$$，用 $$\boldsymbol{x}_t$$ 替换 $$\tilde{\boldsymbol{x}}$$ ，并用 $$\boldsymbol{s}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right)$$ 替换 $$\boldsymbol{s}_{\boldsymbol{\theta}}(\tilde{\boldsymbol{x}},\sigma)$$。我们还将使用随机地均匀采样一个时间点来计算等式(25.36)。那么等式(25.36)变成了以下形式：
 
 $$
 \mathcal{L}=\mathbb{E}_{\boldsymbol{x}_0 \sim q_0\left(\boldsymbol{x}_0\right), \boldsymbol{x}_t \sim q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_0\right), t \sim \operatorname{Unif}(1, T)}\left[\lambda_t\left\|\boldsymbol{s}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right)+\frac{\left(\boldsymbol{x}_t-\boldsymbol{x}_0\right)}{\sigma_t^2}\right\|_2^2\right] \tag{25.37}
@@ -554,11 +580,11 @@ $$
 $$
 
 
-如果我们令 $\lambda_t=\sigma_t^2$，我们就可以得到等式(25.24)中的损失$L_{\text{simple}}$​。
+如果我们令 $\lambda_t=\sigma_t^2$，我们就可以得到等式(25.24)中的损失 $L_{\text{simple}}$​。
 
 ## 25.4 使用微分方程建模连续时间模型
 
-在这一部分，我们考虑某种极限情况下的DDPM模型——即$T$趋向于无穷大，或者等效地，考虑无限多层噪声强度下的SGM模型。为了实现这一点，我们需要从离散的时间状态转换到连续的时间状态，这个过程使得相关的数学表达变得更加复杂。而因此带来的优势在于，我们可以利用已有的大量关于常微分方程以及随机微分方程（stochastic differential equations，SDE）求解器的知识，如我们所见，这可以实现生成速度的加快。
+在这一部分，我们考虑某种极限情况下的DDPM模型——即 $T$ 趋向于无穷大，或者等效地，考虑无限多层噪声强度下的SGM模型。为了实现这一点，我们需要从离散的时间状态转换到连续的时间状态，这个过程使得相关的数学表达变得更加复杂。而因此带来的优势在于，我们可以利用已有的大量关于常微分方程以及随机微分方程（stochastic differential equations，SDE）求解器的知识，如我们所见，这可以实现生成速度的加快。
 
 ### 25.4.1 前向扩散随机微分方程
 
@@ -604,7 +630,7 @@ $$
 
 上述SDE中的第一项被称为**漂移系数**（drift coefficient），第二项被称为**扩散系数**（diffusion coefficient）。
 
-
+[^SS19]:
 
 ![25.6](/assets/img/figures/book2/25.6.png)
 
