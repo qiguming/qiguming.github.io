@@ -28,18 +28,18 @@ comments: true
 图25.1：降噪概率扩散模型。前向过程实现（无可学习参数）推理网络；该过程只是在每一个时间点增加噪声。逆向过程实现解码器；这是一个可学习的高斯模型。图片引用自[KGV22][^KGV22]。经Arash Vahdat允许后使用。
 {:.image-caption}
 
-[^Yan22]:
-[^Cao22]:
-[^ Kar22]:
-[^KGV22]:
+[^Yan22]:[Yan+22]
+[^Cao22]:[Cao+22]
+[^ Kar22]:[Kar+22]
+[^KGV22]:[KGV22]
 
 ## 25.2 降噪扩散概率模型（DDPMs）
 
 本节，我们将讨论**降噪扩散概率模型**（Denoising diffusion probabilistic models，DDPM），该模型首先在[SD+15b][^SD15b]中被提出，并在[HJA20][^HJA20]; [Kin+21][^Kin21]和许多其他工作中进行了扩展。我们可以将DDPM看作类似于分层变分自编码器（第21.5节）的模型，区别在于，在扩散模型中，所有的隐变量（表示为 $\boldsymbol{x}_t$，$t=1:T$）与输入$\boldsymbol{x}_0$具有相同的维度。（在维度是否一致方面，DDPM又类似于第23章的归一化流，然而，在扩散模型中，隐层的输出是随机的，并且不需要使用可逆变换。）此外，编码器 $q$ 是一个简单的线性高斯模型，而不是通过学习得到的[^1]，解码器 $p$​ 在不同时间节点（timestep）之间共享模型参数。这些限制使得我们可以获得一个非常简单的训练目标，进而使更深层的模型训练变得简单，从而避免了后验坍塌（第21.4节）的风险。特别是在第25.2.3节中，我们将看到，扩散模型的优化最终可以归结为加权版本的非线性最小二乘问题。
 
-[^SD15b]:
-[^HJA20]:
-[^Kin21]:
+[^SD15b]:[SD+15b]
+[^HJA20]:[HJA20]
+[^Kin21]:[Kin+21]
 [^1]: 稍后我们将讨论一些扩展内容，其中包括编码器的噪音水平也可以学习。尽管如此，编码器的设计仍然很简单。
 
 ### 25.2.1 编码器（前向扩散）
@@ -911,37 +911,61 @@ $$
 ### 25.6.2 Classifier guidance
 
 条件扩散模型的一个问题是，我们需要对每种想要使用的条件进行重新训练。一种替代方法，被称为**分类器引导**（classifier guidance），该方法在[DN21b][^DN21b]中提出，它允许我们利用一个预训练的判别式分类器 $p(c|\boldsymbol{x})$ 来控制样本生成的过程。其思想如下。首先我们使用贝叶斯定理得到：
+
+
 $$
 \log p(\boldsymbol{x} \mid \boldsymbol{c})=\log p(\boldsymbol{c} \mid \boldsymbol{x})+\log p(\boldsymbol{x})-\log p(\boldsymbol{c}) \tag{25.60}
 $$
+
+
 此时的评分函数变成
+
+
 $$
 \nabla_{\boldsymbol{x}} \log p(\boldsymbol{x} \mid \boldsymbol{c})=\nabla_{\boldsymbol{x}} \log p(\boldsymbol{x})+\nabla_{\boldsymbol{x}} \log p(\boldsymbol{c} \mid \boldsymbol{x}) \tag{25.61}
 $$
+
+
 我们现在可以使用这个条件得分来生成样本，而不是无条件得分。我们可以进一步通过将其乘以一个大于1的因子$w$来增强条件信息的影响：
+
+
 $$
 \nabla_{\boldsymbol{x}} \log p_w(\boldsymbol{x} \mid \boldsymbol{c})=\nabla_{\boldsymbol{x}} \log p(\boldsymbol{x})+w \nabla_{\boldsymbol{x}} \log p(\boldsymbol{c} \mid \boldsymbol{x}) \tag{25.62}
 $$
+
+
 在实践中，可以通过从以下内容生成样本来实现这一点：
+
+
 $$
 \boldsymbol{x}_{t-1} \sim \mathcal{N}(\boldsymbol{\mu}+w \boldsymbol{\Sigma} \boldsymbol{g}, \boldsymbol{\Sigma}), \boldsymbol{\mu}=\boldsymbol{\mu}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right), \boldsymbol{\Sigma}=\boldsymbol{\Sigma}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right), \boldsymbol{g}=\nabla_{\boldsymbol{x}_t} \log p_{\boldsymbol{\phi}}\left(\boldsymbol{c} \mid \boldsymbol{x}_t\right) \tag{25.63}
 $$
 
+
+
 ### 25.6.3 Classifier-free guidance
 
-不幸的是，$p\left(\boldsymbol{c} \mid \boldsymbol{x}_t\right)$ 是一个判别模型，该模型可能会忽视输入 $\boldsymbol{x}_t$ 中的许多细节。因此，沿着由 $\nabla_{\boldsymbol{x}_t} \log p\left(\boldsymbol{c} \mid \boldsymbol{x}_t\right)$​ 指定的方向更新样本可能会得到较差的结果，这类似于我们创建对抗性图像时发生的情况。此外，由于$\boldsymbol{x}_t$在其模糊度上会有所不同，我们需要为每个时间步骤训练一个分类器。
+不幸的是，$$p\left(\boldsymbol{c} \mid \boldsymbol{x}_t\right)$$ 是一个判别模型，该模型可能会忽视输入 $\boldsymbol{x}_t$ 中的许多细节。因此，沿着由 $$\nabla_{\boldsymbol{x}_t} \log p\left(\boldsymbol{c} \mid \boldsymbol{x}_t\right)$$​ 指定的方向更新样本可能会得到较差的结果，这类似于我们创建对抗性图像时发生的情况。此外，由于 $\boldsymbol{x}_t$ 在其模糊度上会有所不同，我们需要为每个时间步骤训练一个分类器。
 
 在[HS21][^HS21]中，他们提出了一种称为**无分类器引导**（classifier-free guidance）的技术，该技术从生成模型中推导出分类器，使用 $p(\boldsymbol{c} \mid \boldsymbol{x})=\frac{p(\boldsymbol{x} \mid \boldsymbol{c}) p(\boldsymbol{c})}{p(\boldsymbol{x})}$ ，我们可以得到
+
+
 $$
 \log p(\boldsymbol{c} \mid \boldsymbol{x})=\log p(\boldsymbol{x} \mid \boldsymbol{c})+\log p(\boldsymbol{c})-\log p(\boldsymbol{x}) \tag{25.64}
 $$
+
+
 这要求学习两个生成模型，即 $p(\boldsymbol{x} \mid \boldsymbol{c})$ 和 $p(\boldsymbol{x})$。然而，在实践中我们可以使用同一个模型，并简单地令 $c=\emptyset$​ 来表示无条件的情况。然后我们使用这个隐式分类器来得到以下修改后的评分函数：
+
+
 $$
 \begin{align}
 \nabla_{\boldsymbol{x}}[\log p(\boldsymbol{x} \mid \boldsymbol{c})+w \log p(\boldsymbol{c} \mid \boldsymbol{x})] & =\nabla_{\boldsymbol{x}}[\log p(\boldsymbol{x} \mid \boldsymbol{c})+w(\log p(\boldsymbol{x} \mid \boldsymbol{c})-\log p(\boldsymbol{x}))] \tag{25.65}\\
 & =\nabla_{\boldsymbol{x}}[(1+w) \log p(\boldsymbol{x} \mid \boldsymbol{c})-w \log p(\boldsymbol{x})] \tag{25.66}
 \end{align}
 $$
+
+
 更大的权重 $w$​ 通常会导致更好的单个样本质量，但多样性会变低。
 
 ![25.14](/assets/img/figures/book2/25.14.png)
@@ -976,26 +1000,42 @@ $$
 
 如图25.15所示，我们在语义分割的设定下进行讨论，在当前设定中，类别标签与图像中的每个像素相关联。在图25.15的右侧，我们展示了一些示例图像，以及它们在单个像素上诱导的相应类别分布。我们使用下面描述的随机采样过程，逐渐将这些像素级别的类别分布转化为均匀分布。然后我们学习一个神经网络来反转这个过程，所以它可以从噪声生成离散数据，在图25.15中，这相当于从左向右移动的过程。
 
-为了确保训练效率，我们要求可以有效地从分布 $q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_0\right)$ 中采样任意时间 $t$ 对应的含噪样本，这样我们可以在优化变分确界（方程25.27）时随机采样时间步骤 $t$。此外，我们要求 $q\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t, \boldsymbol{x}_0\right)$ 具有易于处理的形式，使得我们可以高效地计算KL项：
+为了确保训练效率，我们要求可以有效地从分布 $$q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_0\right)$$ 中采样任意时间 $t$ 对应的含噪样本，这样我们可以在优化变分确界（方程25.27）时随机采样时间步骤 $t$。此外，我们要求 $$q\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t, \boldsymbol{x}_0\right)$$ 具有易于处理的形式，使得我们可以高效地计算KL项：
+
+
 $$
 L_{t-1}\left(\boldsymbol{x}_0\right)=\mathbb{E}_{q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_0\right)} D_{\mathbb{K} \mathbb{L}}\left(q\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t, \boldsymbol{x}_0\right) \| p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right)\right) \tag{25.67}
 $$
-最后，如果前向过程收敛于一个已知的稳态分布 $\pi\left(\boldsymbol{x}_T\right)$，这将有助于我们用于选择先验分布 $p\left(\boldsymbol{x}_T\right)$从而确保 $D_{\mathbb{K} \mathbb{L}}\left(q\left(\boldsymbol{x}_T \mid \boldsymbol{x}_0\right) \| p\left(\boldsymbol{x}_T\right)\right)=0$。
+
+
+最后，如果前向过程收敛于一个已知的稳态分布 $\pi\left(\boldsymbol{x}_T\right)$，这将有助于我们用于选择先验分布 $p\left(\boldsymbol{x}_T\right)$从而确保 $$D_{\mathbb{K} \mathbb{L}}\left(q\left(\boldsymbol{x}_T \mid \boldsymbol{x}_0\right) \| p\left(\boldsymbol{x}_T\right)\right)=0$$。
 
 为了满足上述要求，我们假设每个时间点下的状态由 $D$ 个独立的分区组成，每个分区表示一个类别变量 $x_t \in\{1, \ldots, K\}$，我们用 one-hot 行向量 $\boldsymbol{x}_0$ 表示每个变量。一般来说，这将代表一个概率向量（译者注：概率向量是指向量的每个分量对应某个事件发生的概率）。然后我们定义前向扩散核如下：
+
+
 $$
 q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}\right)=\operatorname{Cat}\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1} \mathbf{Q}_t\right) \tag{25.68}
 $$
-其中 $\left[\mathbf{Q}_t\right]_{i j}=q\left(x_t=j \mid x_{t-1}=k\right)$ 是一个行随机转移矩阵。（我们在25.7.2节讨论如何定义 $\textbf{Q}_t$。）
+
+
+其中 $$\left[\mathbf{Q}_t\right]_{i j}=q\left(x_t=j \mid x_{t-1}=k\right)$$ 是一个行随机转移矩阵。（我们在25.7.2节讨论如何定义 $\textbf{Q}_t$。）
 
 我们可以通过以下步骤推导出前向过程中第 $t$ 步的边际分布：
+
+
 $$
 q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_0\right)=\operatorname{Cat}\left(\boldsymbol{x}_t \mid \boldsymbol{x}_0 \overline{\mathbf{Q}}_t\right), \overline{\mathbf{Q}}_t=\mathbf{Q}_1 \mathbf{Q}_2 \cdots \mathbf{Q}_t \tag{25.69}
 $$
+
+
 同样，我们可以通过以下步骤逆转前向过程：
+
+
 $$
 q\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t, \boldsymbol{x}_0\right)=\frac{q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}, \boldsymbol{x}_0\right) q\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_0\right)}{q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_0\right)}=\operatorname{Cat}\left(\boldsymbol{x}_{t-1} \left\lvert\, \frac{\boldsymbol{x}_t \mathbf{Q}_t^{\top} \odot \boldsymbol{x}_0 \overline{\mathbf{Q}}_{t-1}}{\boldsymbol{x}_0 \overline{\mathbf{Q}}_t \boldsymbol{x}_t^{\top}}\right.\right) \tag{25.70}
 $$
+
+
 我们将在第25.7.3节讨论如何定义生成过程 $p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right)$​。由于两个分布都可以进行因式分解，我们可以通过对每个维度的KL求和，轻松计算方程(25.67)中的KL分布。
 
 ![25.16](/assets/img/figures/book2/25.16.png)
@@ -1011,26 +1051,42 @@ $$
 在这一节中，我们将给出一些转移矩阵 $\mathbf{Q}_t$​ 的例子。
 
 一种简单的方法是使用 $\mathbf{Q}_t=\left(1-\beta_t\right) \mathbf{I}+\beta_t / K$​，我们可以将其以标量形式写成：
+
+
 $$
 \left[\mathbf{Q}_t\right]_{i j}= \begin{cases}1-\frac{K-1}{K} \beta_t & \text { if } i=j \\ \frac{1}{K} \beta_t & \text { if } i \neq j\end{cases} \tag{25.71}
 $$
+
+
 直观上来说，上述的转移矩阵在 $K$ 个类别上增加了少量的均匀噪声，并且以很大的概率$1-\beta_t$，我们会从 $\boldsymbol{x}_{t-1}$​ 中采样。我们称这个为均匀核。由于这是一个具有严格正值的双随机矩阵，所以最终的稳态分布实际上是一个均匀分布。参见图25.16的示意图。
 
 在均匀核的情况下，[Hoo+21][^Hoo21]证明边际分布由下式给出：
+
+
 $$
 q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_0\right)=\operatorname{Cat}\left(\boldsymbol{x}_t \mid \bar{\alpha}_t \boldsymbol{x}_0+\left(1-\bar{\alpha}_t\right) / K\right) \tag{25.72}
 $$
+
+
 其中 $\alpha_t=1-\beta_t$ 且 $\bar{\alpha}_t=\prod_{\tau=1}^t \alpha_\tau$​。这与第25.2节讨论的高斯情况类似。 此外，我们可以推导出后验分布如下：
+
+
 $$
 \begin{align}
 q\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t, \boldsymbol{x}_0\right) & =\operatorname{Cat}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{\theta}_{\text {post }}\left(\boldsymbol{x}_t, \boldsymbol{\theta}_0\right)\right), \boldsymbol{\theta}_{\text {post }}\left(\boldsymbol{x}_t, \boldsymbol{\theta}_0\right)=\tilde{\boldsymbol{\theta}} / \sum_{k=1}^K \tilde{\theta}_k \tag{25.73} \\
 \tilde{\boldsymbol{\theta}} & =\left[\alpha_t \boldsymbol{x}_t+\left(1-\alpha_t\right) / K\right] \odot\left[\bar{\alpha}_{t-1} \boldsymbol{x}_0+\left(1-\bar{\alpha}_{t-1}\right) / K\right] \tag{25.74}
 \end{align}
 $$
+
+
 另一个选择是定义一个特殊的**吸收状态**（absorbing state） $m$，代表一个掩码令牌，我们以概率 $\beta_t$ 转换为该状态。具体来说，我们有 $\mathbf{Q}_t=\left(1-\beta_t\right) \mathbf{I}+\beta_t \mathbf{1} \boldsymbol{e}_m^{\top}$，或者，用标量形式来表达
+
+
 $$
 \left[\mathbf{Q}_t\right]_{i j}= \begin{cases}1 & \text { if } i=j=m \\ 1-\beta_t & \text { if } i=j \neq m \\ \beta_t & \text { if } j=m, i \neq m\end{cases} \tag{25.75}
 $$
+
+
 这会收敛到状态 $m$ 上的一个点质量分布。参见图 25.16 的示意图。 
 
 另一种适合量化序数值的选择是使用离散化的高斯分布，它会转换到其他相近的状态，转换的概率取决于状态在数值上的相似性。如果我们确保转移矩阵是双随机的，那么得到的稳态分布将再次是均匀的。参见图 25.16 的示意图。
@@ -1038,13 +1094,21 @@ $$
 ### 25.7.3 逆向过程的参数化
 
 虽然可以使用神经网络$f_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t\right)$ 直接预测 $p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right)$ 的对数似然，但更可取的做法是直接预测输出的对数似然，使用 $\tilde{p}_{\boldsymbol{\theta}}\left(\tilde{\boldsymbol{x}}_0 \mid \boldsymbol{x}_t\right)$；然后我们可以将这个与 $q\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t, \boldsymbol{x}_0\right)$​ 的解析表达式结合起来得到
+
+
 $$
 p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right) \propto \sum_{\tilde{\boldsymbol{x}}_0} q\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t, \tilde{\boldsymbol{x}}_0\right) \tilde{p}_{\boldsymbol{\theta}}\left(\tilde{\boldsymbol{x}}_0 \mid \boldsymbol{x}_t\right) \tag{25.76}
 $$
+
+
 （如果有$D$个维度，每个维度有$K$个值，那么对 $\tilde{\boldsymbol{x}}_0$ 的求和需要 $O(D K)$ 时间。）与直接学习 $p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right)$ 相比，这种方法的一个优势是模型将自动满足 $\mathbf{Q}_t$ 中的任何稀疏性约束。此外，我们可以一次执行 $k$​ 步推理，通过预测
+
+
 $$
 p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-k} \mid \boldsymbol{x}_t\right) \propto \sum_{\tilde{\boldsymbol{x}}_0} q\left(\boldsymbol{x}_{t-k} \mid \boldsymbol{x}_t, \tilde{\boldsymbol{x}}_0\right) \tilde{p}_{\boldsymbol{\theta}}\left(\tilde{\boldsymbol{x}}_0 \mid \boldsymbol{x}_t\right) \tag{25.77}
 $$
+
+
 请注意，在多步高斯情况下，我们需要更复杂的模型来处理多模态性（见第25.5.2节）。相比之下，离散分布已经内置了这种灵活性。
 
 ### 25.7.4 噪声计划表
@@ -1062,12 +1126,16 @@ $$
 ### 25.7.5 Connections to other probabilistic models for discrete sequences
 
 D3PM（基于扩散的离散概率模型）与其他概率文本模型之间有着有趣的联系。例如，假设我们将转移矩阵定义为均匀转移矩阵和一个吸收MASK状态的组合，即 $\mathbf{Q}=\alpha \mathbf{1} \boldsymbol{e}_m^{\top}+\beta \mathbf{1} \mathbf{1}^{\top} / K+(1-\alpha-\beta) \mathbf{I}$。对于一个一步扩散过程，其中$q\left(\boldsymbol{x}_1 \mid \boldsymbol{x}_0\right)$​ 用MASK替换了10%的令牌，并且以5%的概率随机替换，我们恢复了用来训练BERT语言模型的相同目标，即
+
+
 $$
 L_0\left(\boldsymbol{x}_0\right)=-\mathbb{E}_{q\left(\boldsymbol{x}_1 \mid \boldsymbol{x}_0\right)} \log p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_0 \mid \boldsymbol{x}_1\right) \tag{25.78}
 $$
+
+
 （这是因为 $L_T=0$​，并且在方程（25.27）中的变分界限中没有使用其他时间步骤。）
 
-现在考虑一个确定性地逐个掩码令牌的扩散过程。对于长度为 $N = T$ 的序列，我们有 $q\left(\left[\boldsymbol{x}_t\right]_i \mid \boldsymbol{x}_0\right)=\left[\boldsymbol{x}_0\right]_i$ 如果 $i < N - t$（通过），否则 $\left[\boldsymbol{x}_t\right]_i$ 被设置为 MASK。因为这是一个确定性过程，后验 $q\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t, \boldsymbol{x}_0\right)$ 是在 $\boldsymbol{x}_t$ 上有一个少的掩码令牌的 delta 函数。然后可以显示 KL 项变成 $D_{\mathbb{K L}}\left(q\left(\left[\boldsymbol{x}_t\right]_i \mid \boldsymbol{x}_t, \boldsymbol{x}_0\right) \| p_{\boldsymbol{\theta}}\left(\left[\boldsymbol{x}_{t-1}\right]_i \mid \boldsymbol{x}_t\right)\right)=-\log p_{\boldsymbol{\theta}}\left(\left[\boldsymbol{x}_0\right]_i \mid \boldsymbol{x}_t\right)$​，这是自回归模型的标准交叉熵损失。
+现在考虑一个确定性地逐个掩码令牌的扩散过程。对于长度为 $N = T$ 的序列，我们有 $q\left(\left[\boldsymbol{x}_t\right]_i \mid \boldsymbol{x}_0\right)=\left[\boldsymbol{x}_0\right]_i$ 如果 $i < N - t$（通过），否则 $\left[\boldsymbol{x}_t\right]_i$ 被设置为 MASK。因为这是一个确定性过程，后验 $q\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t, \boldsymbol{x}_0\right)$ 是在 $\boldsymbol{x}_t$ 上有一个少的掩码令牌的 delta 函数。然后可以显示 KL 项变成 $$D_{\mathbb{K L}}\left(q\left(\left[\boldsymbol{x}_t\right]_i \mid \boldsymbol{x}_t, \boldsymbol{x}_0\right) \| p_{\boldsymbol{\theta}}\left(\left[\boldsymbol{x}_{t-1}\right]_i \mid \boldsymbol{x}_t\right)\right)=-\log p_{\boldsymbol{\theta}}\left(\left[\boldsymbol{x}_0\right]_i \mid \boldsymbol{x}_t\right)$$​，这是自回归模型的标准交叉熵损失。
 
 最后，可以证明生成掩码的语言模型，如 [WC19; Gha+19]，也对应于离散扩散过程：序列以所有位置都被掩码的方式开始，每一步，一组令牌在给定前一个序列的情况下被生成。[Cha+22] 的 MaskGIT 方法在图像领域中使用了类似的过程，这是在对图像块应用矢量量化之后。这些并行的、迭代的解码器要比顺序的自回归解码器快得多。参见图 25.17 的示意图。
 
