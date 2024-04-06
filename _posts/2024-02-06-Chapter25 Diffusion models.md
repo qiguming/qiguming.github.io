@@ -2,7 +2,7 @@
 title: 25 扩散模型
 author: fengliang qi
 date: 2023-02-06 11:33:00 +0800
-categories: [MLAPP-CN, PART-IV]
+categories: [MLAPP-CN, BOOK-2, PART-IV]
 tags: [diffusion model, generative model]
 math: true
 mermaid: true
@@ -20,18 +20,19 @@ comments: true
 
 本章，我们将讨论**扩散模型**（diffusion model）。这类生成模型最近引起了广泛关注，因为它能够生成多样且高质量的样本，同时由于训练方法相对简单，使得训练一个超大规模的扩散模型成为可能。接下来，我们将会看到，扩散模型与VAE（第21章），归一化流（第23章）以及EBM（第24章）存在着密切关联。
 
-扩散模型背后的基本思想主要是基于如下的观察：将噪声转换成具备结构化特征的正常数据很难，但将正常数据转换成噪声却很容易。具体而言，通过反复执行随机编码器 $$q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}\right)$$，执行 $$T$$ 步后，我们可以逐渐将观察到的正常数据 $$\boldsymbol{x}_0$$ 转换成对应的噪声版本 $$\boldsymbol{x}_T$$，且如果 $$T$$ 足够大， $$\boldsymbol{x}_T\sim\mathcal{N}(\mathbf{0},\mathbf{I})$$，或者其他一些方便分析的参考分布，这个将正常数据转化成噪声的过程被称为 **前向过程**（forwards process）或 **扩散过程**（diffusion process）。接下来，我们可以学习一个**逆向过程**（reverse process）来反转前向过程——即通过执行解码器  $$p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1}\mid\boldsymbol{x}_t\right)$$ $T$ 步，将噪声转换成正常的数据 $$\boldsymbol{x}_0$$。图25.1展示了上述两个过程。在以下内容中，我们将更详细地讨论扩散模型。我们的讨论基于[KGV22][^KGV22]的优秀教程。更多细节可以参考最近的综述论文[Yan+22][^Yan22]; [Cao+22][^Cao22]以及专业论文[Kar+22][^Kar22]。还有许多其他优秀的在线资源，如 [https://github.com/heejkoo/Awesome-Diffusion-Models](https://github.com/heejkoo/Awesome-Diffusion-Models) 和  [https://scorebasedgenerativemodeling.github.io/](https://scorebasedgenerativemodeling.github.io/)。
+扩散模型背后的基本思想主要是基于如下的观察：将噪声转换成具备结构化特征的正常数据很难，但将正常数据转换成噪声却很容易。具体而言，通过反复执行随机编码器 $$q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}\right)$$，执行 $$T$$ 步后，我们可以逐渐将观察到的正常数据 $$\boldsymbol{x}_0$$ 转换成对应的噪声版本 $$\boldsymbol{x}_T$$，且如果 $$T$$ 足够大， $$\boldsymbol{x}_T\sim\mathcal{N}(\mathbf{0},\mathbf{I})$$，或者其他一些方便分析的参考分布，这个将正常数据转化成噪声的过程被称为 **前向过程**（forwards process）或 **扩散过程**（diffusion process）。接下来，我们可以学习一个**逆向过程**（reverse process）来反转前向过程——即通过执行解码器  $$p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1}\mid\boldsymbol{x}_t\right)$$ $T$ 步，将噪声转换成正常的数据 $$\boldsymbol{x}_0$$。图25.1展示了上述两个过程。在以下内容中，我们将更详细地讨论扩散模型。我们的讨论基于[KGV22][^KGV22]的优秀教程。更多细节可以参考最近的综述论文[Yan+22][^Yan22]; [Cao+22][^Cao22]以及专业论文[Kar+22][^Kar22]。还有许多其他优秀的在线资源，如 [https://github.com/heejkoo/Awesome-Diffusion-Models](https://github.com/heejkoo/Awesome-Diffusion-Models) 和  [https://scorebasedgenerativemodeling.github.io/](https://scorebasedgenerativemodeling.github.io/)。更多的数学内容，可以参考[McA23][^McA23]。
 
 ![ddpm](/assets/img/figures/book2/25.1.png)
 
 {: style="width: 100%;" class="center"}
-图25.1：降噪概率扩散模型。前向过程实现（无可学习参数）推理网络；该过程只是在每一个时间点增加噪声。逆向过程实现解码器；这是一个可学习的高斯模型。图片引用自[KGV22][^KGV22]。经Arash Vahdat允许后使用。
+图25.1：降噪概率扩散模型。前向过程使用（无可学习参数）推理网络；该过程只是在每一个时间节点增加噪声。逆向过程使用解码器，这是一个可学习的高斯模型。图片引用自[KGV22][^KGV22]。经Arash Vahdat允许后使用。
 {:.image-caption}
 
 [^Yan22]:【Yan+22】
 [^Cao22]:【Cao+22】
 [^ Kar22]:【Kar+22】
 [^KGV22]:【KGV22】
+[^McA23]:【McA23】
 
 ## 25.2 降噪扩散概率模型（DDPMs）
 
@@ -52,7 +53,7 @@ q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}\right)=\mathcal{N}\left(\bolds
 $$
 
 
-其中， $\beta_t \in (0,1)$ 取决于**噪声时间表**（noise schedule，25.2.4节进行讨论）。以输入$\boldsymbol{x}_0$为条件，所有中间过程产生的隐变量的联合概率分布定义为：
+其中， $\beta_t \in (0,1)$ 取决于**噪声时间表**（noise schedule，25.2.4节进行讨论）。以输入$\boldsymbol{x}_0$为条件，所有中间过程产生的隐变量的服从的联合概率分布定义为：
 
 
 $$
@@ -78,7 +79,7 @@ $$
 
 我们可以选择一种噪声时间表使得 $\bar{\alpha}_T \approx 0$，这样 $q\left(\boldsymbol{x}_T \mid \boldsymbol{x}_0\right) \approx \mathcal{N}(\textbf{0}, \textbf{I})$。
 
-分布 $q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_0\right)$ 又被称为**扩散核**（diffusion kernel）。将其应用于输入的数据分布并计算无条件边际分布，这个过程等同于高斯卷积：
+实际上，分布 $q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_0\right)$ 又被称为**扩散核**（diffusion kernel）。将其应用于输入的数据分布并计算无条件边际分布，这个过程等同于高斯卷积：
 
 
 $$
@@ -210,7 +211,7 @@ $$
 
 通常我们令 $\boldsymbol{\Sigma}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right)=\sigma_t^2 \mathbf{I}$（译者注：即各向同性的对角协方差矩阵）。我们将在 25.2.4 节讨论如何学习 $\sigma_t^2$，但两种容易想到的选择是令 $\sigma_t^2=\beta_t$ 和 $\sigma_t^2=\tilde{\beta}_t$，两种选择分别对应于在[HJA20][^HJA20]中介绍的反向过程熵的上限和下限。
 
-在生成过程中产生的所有隐变量的联合概率分布为 $$p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{0: T}\right)= p\left(\boldsymbol{x}_T\right) \prod_{t=1}^T p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right)$$​ ，其中我们令 $p\left(\boldsymbol{x}_T\right)=\mathcal{N}(\mathbf{0}, \mathbf{I})$​。根据算法25.2提供的伪代码，我们可以从分布中采样得到新的样本。
+在生成过程中产生的所有隐变量服从的联合概率分布为 $$p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{0: T}\right)= p\left(\boldsymbol{x}_T\right) \prod_{t=1}^T p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right)$$​ ，其中我们令 $p\left(\boldsymbol{x}_T\right)=\mathcal{N}(\mathbf{0}, \mathbf{I})$​。根据算法25.2提供的伪代码，我们可以从分布中采样得到新的样本。
 
 [^2]: 我们只需要使用高斯分布的贝叶斯规则。例如，可以参考 [https://lilianweng.github.io/posts/2021-07-11-diffusion-models/](https://lilianweng.github.io/posts/2021-07-11-diffusion-models/) 来查看详细的推导过程。
 [^HJA20]:【HJA20】
@@ -269,7 +270,7 @@ $$
 $$
 
 
-这些 KL 项中每一项都存在解析解，因为所有的分布都是高斯分布。接下来我们将聚焦在 $L_{t-1}$ 项。考虑到 $\boldsymbol{x}_t=\sqrt{\overline{\alpha_t}} \boldsymbol{x}_0+\sqrt{\left(1-\bar{\alpha}_t\right)} \boldsymbol{\epsilon}$，式（25.7）可以写成：
+这些 $\textrm{KL}$ 项中每一项都存在解析解，因为所有的分布都是高斯分布。接下来我们将聚焦在 $L_{t-1}$ 项。考虑到 $\boldsymbol{x}_t=\sqrt{\overline{\alpha_t}} \boldsymbol{x}_0+\sqrt{\left(1-\bar{\alpha}_t\right)} \boldsymbol{\epsilon}$，式（25.7）可以写成：
 
 
 $$
@@ -293,7 +294,7 @@ L_{t-1}=\mathbb{E}_{\boldsymbol{x}_0 \sim q_0\left(\boldsymbol{x}_0\right), \bol
 $$
 
 
-与时间相关的权重 $\lambda_t$ 确保训练目标对应于最大似然估计（假设变分确界是紧凑的）。然而，经验表明，如果我们设置$\lambda_t=1$，模型输出的样本看起来更好。由此产生的简化版本的损失（在整个优化目标中同时需要考虑时间点 $t$ ）由以下公式给出：
+与时间相关的权重 $\lambda_t$ 确保训练目标对应于最大似然估计（假设变分确界是紧凑的）。然而，经验表明，如果我们设置 $\lambda_t=1$，模型输出的样本看起来更好。由此产生的简化版本的损失（在整个优化目标中同时需要考虑时间点 $t$ ）由以下公式给出：
 
 
 $$
@@ -320,16 +321,16 @@ $$
 
 <table><tr><td bgcolor=yellow> 译者注（Kimi读文）</td></tr></table>
 
-文章《Perception Prioritized Training of Diffusion Models》的主要贡献点如下：
-
-1. **新的训练目标权重方案**：文章提出了一种名为感知优先（Perception Prioritized, P2）的权重方案，用于优化扩散模型的训练目标。这种方案通过重新设计损失函数的权重分配，使得模型在训练过程中更加关注于学习感知上重要的特征。
-2. **深入分析模型学习过程**：作者首先对扩散模型在不同噪声级别下的学习内容进行了深入的分析。他们发现，模型在噪声较小的级别上学习到的是不易察觉的细节，而在噪声较大的级别上学习到的是感知上显著的内容。基于这些观察，文章提出了P2权重方案，旨在优先训练模型学习感知上丰富的内容。
-3. **跨数据集、架构和采样策略的一致性能提升**：通过在多个数据集上进行实验，文章展示了使用P2权重方案训练的扩散模型在性能上的显著提升。这些数据集包括CelebAHQ、Oxford-flowers和FFHQ等，证明了该方法的泛化能力和有效性。
-4. **与现有技术的比较**：文章将使用P2权重方案的扩散模型与其他类型的生成模型进行了比较，包括生成对抗网络（GANs）和其他扩散模型。结果显示，P2权重方案在多个数据集上都取得了最先进的性能。
-5. **模型配置和采样步骤的鲁棒性分析**：作者还探讨了P2权重方案在不同模型配置和采样步骤下的有效性。实验结果表明，无论模型配置如何变化，P2权重方案都能一致地提高模型的性能。
-6. **实现细节的提供**：文章提供了关于所提出方法的实现细节，包括模型架构、超参数设置和训练过程的具体信息，这有助于其他研究者复现和进一步研究该方法。
-
-总体而言，这篇文章通过提出一种新的训练目标权重方案，不仅提高了扩散模型的性能，还为理解和改进这类模型的学习过程提供了新的视角。
+> 文章《Perception Prioritized Training of Diffusion Models》的主要贡献点如下：
+>
+> 1. **新的训练目标权重方案**：文章提出了一种名为感知优先（Perception Prioritized, P2）的权重方案，用于优化扩散模型的训练目标。这种方案通过重新设计损失函数的权重分配，使得模型在训练过程中更加关注于学习感知上重要的特征。
+> 2. **深入分析模型学习过程**：作者首先对扩散模型在不同噪声级别下的学习内容进行了深入的分析。他们发现，模型在噪声较小的级别上学习到的是不易察觉的细节，而在噪声较大的级别上学习到的是感知上显著的内容。基于这些观察，文章提出了P2权重方案，旨在优先训练模型学习感知上丰富的内容。
+> 3. **跨数据集、架构和采样策略的一致性能提升**：通过在多个数据集上进行实验，文章展示了使用P2权重方案训练的扩散模型在性能上的显著提升。这些数据集包括CelebAHQ、Oxford-flowers和FFHQ等，证明了该方法的泛化能力和有效性。
+> 4. **与现有技术的比较**：文章将使用P2权重方案的扩散模型与其他类型的生成模型进行了比较，包括生成对抗网络（GANs）和其他扩散模型。结果显示，P2权重方案在多个数据集上都取得了最先进的性能。
+> 5. **模型配置和采样步骤的鲁棒性分析**：作者还探讨了P2权重方案在不同模型配置和采样步骤下的有效性。实验结果表明，无论模型配置如何变化，P2权重方案都能一致地提高模型的性能。
+> 6. **实现细节的提供**：文章提供了关于所提出方法的实现细节，包括模型架构、超参数设置和训练过程的具体信息，这有助于其他研究者复现和进一步研究该方法。
+>
+> 总体而言，这篇文章通过提出一种新的训练目标权重方案，不仅提高了扩散模型的性能，还为理解和改进这类模型的学习过程提供了新的视角。
 
 ---
 
@@ -390,35 +391,31 @@ $$
 
 <table><tr><td bgcolor=yellow> 译者注（Kimi读文）</td></tr></table>
 
-这篇论文介绍了一类基于变分扩散模型（Variational Diffusion Models，简称VDMs，https://arxiv.org/pdf/2107.00630.pdf）的生成模型，并展示了它们在标准图像密度估计基准测试中的优异性能。以下是该论文的主要贡献点：
-
-1. **新的生成模型家族**：作者提出了一种基于扩散的生成模型，这些模型在标准图像数据集（如CIFAR-10和ImageNet）上取得了最先进的对数似然（log-likelihood）结果。这些模型通过结合傅里叶特征（Fourier features）和可学习的扩散过程规范，实现了对图像的高质量生成。
-
-2. **理论理解的提高**：通过对变分下界（Variational Lower Bound，简称VLB）的分析，作者提高了我们对使用扩散模型进行密度建模的理论理解。他们发现VLB可以简化为一个关于扩散数据信噪比的简短表达式，并通过这一发现证明了文献中提出的几个模型之间的等价性。
-
-3. **连续时间VLB的不变性**：作者证明了在连续时间设置下，VLB对于噪声计划是不变的，除了信噪比在其端点的值。这使得他们能够学习一个最小化VLB估计器方差的噪声计划，从而加快了优化过程。
-
-4. **架构改进**：结合上述理论进展和架构改进，VDMs在图像密度估计基准测试中取得了最先进的似然结果，超越了长期以来在这些基准测试中占主导地位的自回归模型，并且通常具有更快的优化速度。
-
-5. **无损压缩应用**：作者展示了如何将模型作为无损压缩方案的一部分，并展示了接近理论最优的无损压缩率。
-
-6. **代码可用性**：为了促进研究和应用，作者提供了模型的代码实现，可以在GitHub上找到。
-
-这篇论文的贡献在于它不仅提出了一种新的生成模型，而且还通过理论分析和实验验证，展示了这种模型在图像生成和无损压缩等任务中的有效性和优越性。
+> 这篇论文介绍了一类基于变分扩散模型（Variational Diffusion Models，简称VDMs，https://arxiv.org/pdf/2107.00630.pdf）的生成模型，并展示了它们在标准图像密度估计基准测试中的优异性能。以下是该论文的主要贡献点：
+>
+> 1. **新的生成模型家族**：作者提出了一种基于扩散的生成模型，这些模型在标准图像数据集（如CIFAR-10和ImageNet）上取得了最先进的对数似然（log-likelihood）结果。这些模型通过结合傅里叶特征（Fourier features）和可学习的扩散过程规范，实现了对图像的高质量生成。
+>
+> 2. **理论理解的提高**：通过对变分下界（Variational Lower Bound，简称VLB）的分析，作者提高了我们对使用扩散模型进行密度建模的理论理解。他们发现VLB可以简化为一个关于扩散数据信噪比的简短表达式，并通过这一发现证明了文献中提出的几个模型之间的等价性。
+>
+> 3. **连续时间VLB的不变性**：作者证明了在连续时间设置下，VLB对于噪声计划是不变的，除了信噪比在其端点的值。这使得他们能够学习一个最小化VLB估计器方差的噪声计划，从而加快了优化过程。
+>
+> 4. **架构改进**：结合上述理论进展和架构改进，VDMs在图像密度估计基准测试中取得了最先进的似然结果，超越了长期以来在这些基准测试中占主导地位的自回归模型，并且通常具有更快的优化速度。
+>
+> 5. **无损压缩应用**：作者展示了如何将模型作为无损压缩方案的一部分，并展示了接近理论最优的无损压缩率。
+>
+> 6. **代码可用性**：为了促进研究和应用，作者提供了模型的代码实现，可以在GitHub上找到。
+>
+> 这篇论文的贡献在于它不仅提出了一种新的生成模型，而且还通过理论分析和实验验证，展示了这种模型在图像生成和无损压缩等任务中的有效性和优越性。
 
 ---
 
 ### 25.2.5 案例：图像生成
-
-
 
 ![25.3](/assets/img/figures/book2/25.3.png)
 
 {: style="width: 100%;" class="center"}
 图25.3：降噪过程中U-net的结构示意图。图片引用自 [KGV22][^KGV22] 的第26页。经Arash Vahdat允许后使用。
 {:.image-caption}
-
-
 
 扩散模型经常被用来生成图像。图像生成最常用的结构基于U-net模型[RFB15][^RFB15]，如图25.3所示。时间节点 $t$​​ 被编码为一个向量，使用的是正弦位置编码或随机傅里叶特征，随后被输入到残差模块，使用简单的空间加法或通过对组归一化层进行条件化[DN21a][^DN21a]。当然，除了U-net之外，还有其他的架构。例如，最近的研究[PX22][^PX22]; [Li+22][^Li22]; [Bao+22a][^Bao22a]提出使用transformer来取代卷积层和反卷积层。
 
