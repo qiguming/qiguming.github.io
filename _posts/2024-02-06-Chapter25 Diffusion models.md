@@ -99,7 +99,6 @@ $$
 
 
 <table><tr><td bgcolor=yellow>译者注（关于噪声时间表如何定义）</td></tr></table>
-
 在 DDPM 中，作者使用了**线性**的变换方式定义$\beta_t$。具体而言，作者令 $T=1000$，$\beta_1=10^{-4}, \beta_T=0.02$。任意时刻的 $\beta_t$ 由如下方式生成：
 
 ```python
@@ -319,9 +318,7 @@ $$
 
 ----
 
-
-
-<table><tr><td bgcolor=yellow>译者注（kimi读文）</td></tr></table>
+>  :fire: 译者注（Kimi读文）
 
 文章《Perception Prioritized Training of Diffusion Models》的主要贡献点如下：
 
@@ -391,7 +388,7 @@ $$
 
 ---
 
-<table><tr><td bgcolor=yellow>译者注（kimi读文）</td></tr></table>
+> :fire: 译者注（Kimi读文）
 
 这篇论文介绍了一类基于变分扩散模型（Variational Diffusion Models，简称VDMs，https://arxiv.org/pdf/2107.00630.pdf）的生成模型，并展示了它们在标准图像密度估计基准测试中的优异性能。以下是该论文的主要贡献点：
 
@@ -441,7 +438,7 @@ $$
 
 ---
 
-<table><tr><td bgcolor=yellow>译者注（位置编码如何计算）</td></tr></table>
+> :fire: 译者注（位置编码如何计算）
 
 在 transformer 的原文中，位置编码的计算方式为：
 
