@@ -278,7 +278,7 @@ $$
 $$
 
 
-因此，除了训练模型直接根据含噪输入 $\boldsymbol{x}_t$ 预测去噪后的 $\boldsymbol{x}_{t-1}$ 的均值，我们也可以训练模型来直接预测噪声，然后再根据下式计算均值：
+因此，除了训练模型直接根据含噪输入 $$\boldsymbol{x}_t$$ 预测去噪后的 $\boldsymbol{x}_{t-1}$ 的均值，我们也可以训练模型来直接预测噪声，然后再根据下式计算均值：
 
 
 $$
@@ -457,20 +457,20 @@ $\frac{1}{n^{\frac{2 i}{d_{\text {model }}}}}=n^{-\frac{2 i}{d_{\text {model }}}
 
 所以被除项可以批量计算，注意被除项的数量为 $d_{model}/2$：
 
-```
+```python
 div_term = torch.exp(torch.arange(0, d_model, 2) * -(math.log(n) / d_model))
 ```
 
 所以对于一个最大长度为 $\text{max\_length}$ 的序列，所有位置的被除项可以定义为：
 
-```
+```python
 k = torch.arange(0, max_length).unsqueeze(1)
 div_term = k*div_term
 ```
 
 接下来我们初始化位置编码：
 
-```
+```python
 pe = torch.zeros(max_length, d_model)
 # set the odd values (偶数列)
 pe[:, 0::2] = torch.sin(k * div_term)
@@ -844,7 +844,7 @@ p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right)=\
 $$
 
 
-其中 $\hat{\boldsymbol{x}}_0=\hat{\boldsymbol{x}}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right)$ 是模型预测的输出。通过令 $\tilde{\sigma}_t^2=0$，反向过程在给定初始先验样本（其方差由 $\tilde{\sigma}_T^2$ 控制）的情况下变得完全确定。与第25.4.4节中讨论的方法相比，由此产生的概率流ODE在使用少量步骤时可以得到更好的结果。
+其中 $$\hat{\boldsymbol{x}}_0=\hat{\boldsymbol{x}}_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t, t\right)$$ 是模型预测的输出。通过令 $$\tilde{\sigma}_t^2=0$$，反向过程在给定初始先验样本（其方差由 $$\tilde{\sigma}_T^2$$ 控制）的情况下变得完全确定。与第25.4.4节中讨论的方法相比，由此产生的概率流ODE在使用少量步骤时可以得到更好的结果。
 
 请注意，该模型的加权负变分下确界（VLB）与第25.2节中的 $L_{\text{simple}}$​​ 相同，因此 DDIM 采样器可以应用于训练过的 DDPM 模型。
 
@@ -872,9 +872,14 @@ $$
 
 {: style="width: 100%;" class="center"}
 
+
+
 ### 25.5.2 非高斯解码器网络
 
-如图25.11所示，如果反向过程采用更大的采样步长，则在给定含噪输入的情况下，清晰输出的诱导分布（induced distribution）将变得多峰值。这需要对分布 $p_\boldsymbol{\theta}(\boldsymbol{x}_{t-1}|\boldsymbol{x}_t)$ 使用更复杂的建模形式。在 [Gao+21][^Gao21] 中，他们使用EBM来拟合这个分布。然而，这仍然需要使用MCMC（马尔科夫链蒙特卡罗）来抽取样本。在 [XKV22][^XKV22] 中，他们使用GAN（生成对抗网络，第26章）来拟合这个分布。这使我们能够通过将高斯噪声传递给生成器来轻松地抽取样本。相比于单阶段生成对抗网络（GAN），其优势在于生成器和判别器都在解决一个更为简单的问题，这导致了更高的模态覆盖率和更好的训练稳定性。与标准扩散模型相比，我们可以用更少的步骤中生成高质量的样本。
+如图25.11所示，如果反向过程采用更大的采样步长，则在给定含噪输入的情况下，清晰输出的诱导分布（induced distribution）将变得多峰值。这需要对分布 $$p_\boldsymbol{\theta}(\boldsymbol{x}_{t-1}|\boldsymbol{x}_t)$$ 使用更复杂的建模形式。在 [Gao+21][^Gao21] 中，他们使用EBM来拟合这个分布。然而，这仍然需要使用MCMC（马尔科夫链蒙特卡罗）来抽取样本。在 [XKV22][^XKV22] 中，他们使用GAN（生成对抗网络，第26章）来拟合这个分布。这使我们能够通过将高斯噪声传递给生成器来轻松地抽取样本。相比于单阶段生成对抗网络（GAN），其优势在于生成器和判别器都在解决一个更为简单的问题，这导致了更高的模态覆盖率和更好的训练稳定性。与标准扩散模型相比，我们可以用更少的步骤中生成高质量的样本。
+
+[^Gao21]: 【Gao+21】
+[^XKV22]: 【XKV22】
 
 ### 25.5.3 蒸馏
 
@@ -888,7 +893,7 @@ $$
 
 {:.image-caption}
 
-
+[^SH22]: 【SH22】
 
 ### 25.5.4 隐空间扩散
 
@@ -907,6 +912,8 @@ $$
 ### 25.6.1 条件扩散模型
 
 控制生成模型样本生成的最简单方式是在 $(\boldsymbol{c}, \boldsymbol{x})$ 对上训练它，以最大化条件似然 $p(\boldsymbol{x} \mid \boldsymbol{c})$ 。如果条件信号 $c$ 是一个标量（例如，一个类别标签），它可以被映射到一个嵌入向量，然后通过spatial addition 或使用它来调节group normalization层来整合到网络中。如果输入 $\boldsymbol{c}$ 是一张图片，我们可以简单地将其作为额外的通道与$\boldsymbol{x}_t$连接起来。如果输入$c$是文本提示，我们可以得到它的 embedding，然后使用 spatial addition 或交叉注意力（见图25.13作为示例）。
+
+
 
 ### 25.6.2 Classifier guidance
 
@@ -1068,7 +1075,7 @@ q\left(\boldsymbol{x}_t \mid \boldsymbol{x}_0\right)=\operatorname{Cat}\left(\bo
 $$
 
 
-其中 $\alpha_t=1-\beta_t$ 且 $\bar{\alpha}_t=\prod_{\tau=1}^t \alpha_\tau$​。这与第25.2节讨论的高斯情况类似。 此外，我们可以推导出后验分布如下：
+其中 $\alpha_t=1-\beta_t$ 且 $$\bar{\alpha}_t=\prod_{\tau=1}^t \alpha_\tau$$​。这与第25.2节讨论的高斯情况类似。 此外，我们可以推导出后验分布如下：
 
 
 $$
@@ -1093,7 +1100,7 @@ $$
 
 ### 25.7.3 逆向过程的参数化
 
-虽然可以使用神经网络$f_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t\right)$ 直接预测 $p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right)$ 的对数似然，但更可取的做法是直接预测输出的对数似然，使用 $\tilde{p}_{\boldsymbol{\theta}}\left(\tilde{\boldsymbol{x}}_0 \mid \boldsymbol{x}_t\right)$；然后我们可以将这个与 $q\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t, \boldsymbol{x}_0\right)$​ 的解析表达式结合起来得到
+虽然可以使用神经网络 $$f_{\boldsymbol{\theta}}\left(\boldsymbol{x}_t\right)$$  直接预测 $$p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right)$$ 的对数似然，但更可取的做法是直接预测输出的对数似然，使用 $$\tilde{p}_{\boldsymbol{\theta}}\left(\tilde{\boldsymbol{x}}_0 \mid \boldsymbol{x}_t\right)$$；然后我们可以将这个与 $$q\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t, \boldsymbol{x}_0\right)$$​ 的解析表达式结合起来得到
 
 
 $$
@@ -1101,7 +1108,7 @@ p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right) \
 $$
 
 
-（如果有$D$个维度，每个维度有$K$个值，那么对 $\tilde{\boldsymbol{x}}_0$ 的求和需要 $O(D K)$ 时间。）与直接学习 $p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right)$ 相比，这种方法的一个优势是模型将自动满足 $\mathbf{Q}_t$ 中的任何稀疏性约束。此外，我们可以一次执行 $k$​ 步推理，通过预测
+（如果有$D$个维度，每个维度有$K$个值，那么对 $$\tilde{\boldsymbol{x}}_0$$ 的求和需要 $$O(D K)$$ 时间。）与直接学习 $$p_{\boldsymbol{\theta}}\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t\right)$$ 相比，这种方法的一个优势是模型将自动满足 $$\mathbf{Q}_t$$ 中的任何稀疏性约束。此外，我们可以一次执行 $k$​ 步推理，通过预测
 
 
 $$
@@ -1135,7 +1142,7 @@ $$
 
 （这是因为 $L_T=0$​，并且在方程（25.27）中的变分界限中没有使用其他时间步骤。）
 
-现在考虑一个确定性地逐个掩码令牌的扩散过程。对于长度为 $N = T$ 的序列，我们有 $q\left(\left[\boldsymbol{x}_t\right]_i \mid \boldsymbol{x}_0\right)=\left[\boldsymbol{x}_0\right]_i$ 如果 $i < N - t$（通过），否则 $\left[\boldsymbol{x}_t\right]_i$ 被设置为 MASK。因为这是一个确定性过程，后验 $q\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t, \boldsymbol{x}_0\right)$ 是在 $\boldsymbol{x}_t$ 上有一个少的掩码令牌的 delta 函数。然后可以显示 KL 项变成 $$D_{\mathbb{K L}}\left(q\left(\left[\boldsymbol{x}_t\right]_i \mid \boldsymbol{x}_t, \boldsymbol{x}_0\right) \| p_{\boldsymbol{\theta}}\left(\left[\boldsymbol{x}_{t-1}\right]_i \mid \boldsymbol{x}_t\right)\right)=-\log p_{\boldsymbol{\theta}}\left(\left[\boldsymbol{x}_0\right]_i \mid \boldsymbol{x}_t\right)$$​，这是自回归模型的标准交叉熵损失。
+现在考虑一个确定性地逐个掩码令牌的扩散过程。对于长度为 $N = T$ 的序列，我们有 $$q\left(\left[\boldsymbol{x}_t\right]_i \mid \boldsymbol{x}_0\right)=\left[\boldsymbol{x}_0\right]_i$$ 如果 $i < N - t$（通过），否则 $$\left[\boldsymbol{x}_t\right]_i$$ 被设置为 MASK。因为这是一个确定性过程，后验 $$q\left(\boldsymbol{x}_{t-1} \mid \boldsymbol{x}_t, \boldsymbol{x}_0\right)$$ 是在 $\boldsymbol{x}_t$ 上有一个少的掩码令牌的 delta 函数。然后可以显示 KL 项变成 $$D_{\mathbb{K L}}\left(q\left(\left[\boldsymbol{x}_t\right]_i \mid \boldsymbol{x}_t, \boldsymbol{x}_0\right) \| p_{\boldsymbol{\theta}}\left(\left[\boldsymbol{x}_{t-1}\right]_i \mid \boldsymbol{x}_t\right)\right)=-\log p_{\boldsymbol{\theta}}\left(\left[\boldsymbol{x}_0\right]_i \mid \boldsymbol{x}_t\right)$$​，这是自回归模型的标准交叉熵损失。
 
 最后，可以证明生成掩码的语言模型，如 [WC19; Gha+19]，也对应于离散扩散过程：序列以所有位置都被掩码的方式开始，每一步，一组令牌在给定前一个序列的情况下被生成。[Cha+22] 的 MaskGIT 方法在图像领域中使用了类似的过程，这是在对图像块应用矢量量化之后。这些并行的、迭代的解码器要比顺序的自回归解码器快得多。参见图 25.17 的示意图。
 
