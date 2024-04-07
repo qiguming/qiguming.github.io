@@ -222,13 +222,9 @@ $$
 因此，最大化 ELBO 需要最小化两个 KL 项。第一个 KL 项通过 MLE 实现最小化，第二个 KL 项通过拟合真实后验分布实现最小化。因此，如果近似后验分布的解空间有限，这些优化目标之间可能存在冲突。
 
 最后，我们注意到 ELBO 可以写成
-
-
 $$
 \mathfrak{Ł}_{\boldsymbol{\theta}, \boldsymbol{\phi}} \stackrel{c}{=}-D_{\mathrm{KL}}\left(q_{\mathcal{D}, \boldsymbol{\phi}}(\boldsymbol{z}) \| p_{\boldsymbol{\theta}}(\boldsymbol{z})\right)-\mathbb{E}_{q_{\mathcal{D}, \boldsymbol{\phi}}(\boldsymbol{z})}\left[D_{\mathbb{K L}}\left(q_{\boldsymbol{\phi}}(\boldsymbol{x} \mid \boldsymbol{z}) \| p_{\boldsymbol{\theta}}(\boldsymbol{x} \mid \boldsymbol{z})\right)\right] \tag{21.22}
 $$
-
-
 从方程（21.59）可以看出，VAE 试图最小化推理边际和生成先验之间的差异 $D_{\mathbb{K L}}\left(q_{\boldsymbol{\phi}}(\boldsymbol{z}) \| p_{\boldsymbol{\theta}}(\boldsymbol{z})\right)$，同时最小化重构误差 $D_{\mathbb{K} \mathbb{L}}\left(q_\phi(\boldsymbol{x}|z|) \| p_{\boldsymbol{\theta}}(\boldsymbol{x} \mid \boldsymbol{z})\right)$。由于 $\boldsymbol{x}$ 的维度通常比 $\boldsymbol{z}$ 高得多，后者通常占主导地位。因此，如果这两个目标之间存在冲突 （例如，由于拟合能力有限），VAE 将优先考虑最小化重构误差而不是后验推断的准确性。因此，学习到的后验分布可能不是真实后验的很好逼近（更多讨论请参见[ZSE19][^ZSE19]）
 
 ![21.4](/assets/img/figures/book2/21.4.png)
@@ -354,7 +350,7 @@ $$
 
 只要我们使用严格的散度，即 $D(q, p)=0$ 当且仅当 $q=p$，那么可以证明这不会影响程序的最优性。特别是，[ZSE19][^ZSE19] 的命题2告诉我们以下内容：
 
-定理1。假设  $\mathcal{X}$ 和 $\mathcal{Z}$ 是连续的空间，且 $\alpha<1$（用于限制互信息的上界），并且  $\lambda>0$。对于任何固定的 $\mathbb{I}_q(x ; z)$ 值，采用任何严格散度 $D\left(q_{\boldsymbol{\phi}}(\boldsymbol{z}), p_{\boldsymbol{\theta}}(\boldsymbol{z})\right)$ 的近似 InfoVAE 损失，在 $p_{\boldsymbol{\theta}}(\boldsymbol{x})=p_{\mathcal{D}}(\boldsymbol{x})$ 且 $q_{\boldsymbol{\phi}}(\boldsymbol{z} \mid \boldsymbol{x})=p_{\boldsymbol{\theta}}(\boldsymbol{z} \mid \boldsymbol{x})$ 的情况下进行全局优化。
+定理1。假设  $\mathcal{X}$ 和 $\mathcal{Z}$ 是连续的空间，且 $\alpha<1$（用于限制互信息的上界），并且  $\lambda>0$。对于任何固定的 $\mathbb{I}_q(x ; z)$ 值，采用任何严格散度 $$D\left(q_{\boldsymbol{\phi}}(\boldsymbol{z}), p_{\boldsymbol{\theta}}(\boldsymbol{z})\right)$$ 的近似 InfoVAE 损失，在 $$p_{\boldsymbol{\theta}}(\boldsymbol{x})=p_{\mathcal{D}}(\boldsymbol{x})$$ 且 $$q_{\boldsymbol{\phi}}(\boldsymbol{z} \mid \boldsymbol{x})=p_{\boldsymbol{\theta}}(\boldsymbol{z} \mid \boldsymbol{x})$$ 的情况下进行全局优化。
 
 #### 21.3.2.1 与 MMD VAE 的联系
 
@@ -384,7 +380,7 @@ $$
 
 其中，$\mathcal{K}()$ 是某个核函数，如 RBF 核函数，$\mathcal{K}\left(z, z^{\prime}\right)=\exp \left(-\frac{1}{2 \sigma^2}\left\|z-z^{\prime}\right\|_2^2\right)$。直观地说，MMD 衡量了来自先验分布和聚合后验分布的样本（在潜在空间中）的相似性。
 
-在实践中，我们可以通过使用当前小批量中所有 $B$ 个样本的后验预测均值 $\boldsymbol{z}_n=e_\boldsymbol{\phi}(\boldsymbol{x}_n)$，并将其与来自 $\mathcal{N}(\mathbf{0}, \mathbf{I})$ 先验的 $B$ 个随机样本进行比较，来实现 MMD 目标。
+在实践中，我们可以通过使用当前小批量中所有 $B$ 个样本的后验预测均值 $$\boldsymbol{z}_n=e_\boldsymbol{\phi}(\boldsymbol{x}_n)$$，并将其与来自 $\mathcal{N}(\mathbf{0}, \mathbf{I})$ 先验的 $B$ 个随机样本进行比较，来实现 MMD 目标。
 
 如果我们使用一个固定方差的高斯解码器，则负对数似然仅为一个平方误差项：
 
@@ -448,7 +444,7 @@ $$
 $$
 
 
-关键问题是如何计算在给定不同特征子集时的后验概率 $q_\phi(z \mid \mathbf{X})$。一般来说，这可能很困难，因为推理网络是一个判别模型，它假设所有输入都是可用的。例如，如果它是在（图像，文本）配对上训练的，则如何仅针对图像计算后验概率 $q_\phi\left(\boldsymbol{z} \mid \boldsymbol{x}_1\right)$，或仅针对文本计算后验概率 $q_\phi\left(z \mid x_2\right)$（在VAE存在缺失输入时，这个问题通常会出现；我们将在第21.3.4节中讨论一般情况。）
+关键问题是如何计算在给定不同特征子集时的后验概率 $q_\phi(z \mid \mathbf{X})$。一般来说，这可能很困难，因为推理网络是一个判别模型，它假设所有输入都是可用的。例如，如果它是在（图像，文本）配对上训练的，则如何仅针对图像计算后验概率 $$q_\phi\left(\boldsymbol{z} \mid \boldsymbol{x}_1\right)$$，或仅针对文本计算后验概率 $q_\phi\left(z \mid x_2\right)$（在VAE存在缺失输入时，这个问题通常会出现；我们将在第21.3.4节中讨论一般情况。）
 
 幸运的是，在我们对模态之间的条件独立性假设的基础上，我们可以通过计算模型下的精确后验来计算给定一组输入的 $q_\phi(\boldsymbol{z} \mid \mathbf{X})$ 的最优形式，即：
 
@@ -565,7 +561,7 @@ $$
 
 #### 21.3.5.1 模型
 
-如果我们在VAE的编码器和解码器中使用RNN，我们得到的模型被称为VAE-RNN，正如[Bow+16a][^Bow+16a]中提出的那样。更详细地说，生成模型是 $p\left(\boldsymbol{z}, \boldsymbol{x}_{1: T}\right)=p(\boldsymbol{z}) \operatorname{RNN}\left(\boldsymbol{x}_{1: T} \mid \boldsymbol{z}\right)$，其中 $\boldsymbol{z}$ 可以作为RNN的初始状态注入，或作为每个时间步的输入。推断模型是 $q\left(\boldsymbol{z} \mid \boldsymbol{x}_{1: T}\right)=\mathcal{N}(\boldsymbol{z} \mid \boldsymbol{\mu}(\boldsymbol{h}), \boldsymbol{\Sigma}(\boldsymbol{h}))$，其中 $\boldsymbol{h}=\left[\boldsymbol{h}_T^{\vec{T}}, \boldsymbol{h}_1^{\leftarrow}\right]$ 是应用于 $x_{1: T}$ 的双向RNN的输出。请参见图21.6进行说明。
+如果我们在VAE的编码器和解码器中使用RNN，我们得到的模型被称为VAE-RNN，正如[Bow+16a][^Bow+16a]中提出的那样。更详细地说，生成模型是 $$p\left(\boldsymbol{z}, \boldsymbol{x}_{1: T}\right)=p(\boldsymbol{z}) \operatorname{RNN}\left(\boldsymbol{x}_{1: T} \mid \boldsymbol{z}\right)$$，其中 $\boldsymbol{z}$ 可以作为RNN的初始状态注入，或作为每个时间步的输入。推断模型是 $$q\left(\boldsymbol{z} \mid \boldsymbol{x}_{1: T}\right)=\mathcal{N}(\boldsymbol{z} \mid \boldsymbol{\mu}(\boldsymbol{h}), \boldsymbol{\Sigma}(\boldsymbol{h}))$$，其中 $$\boldsymbol{h}=\left[\boldsymbol{h}_T^{\vec{T}}, \boldsymbol{h}_1^{\leftarrow}\right]$$ 是应用于 $x_{1: T}$ 的双向RNN的输出。请参见图21.6进行说明。
 
 最近，人们尝试将Transformer与VAE结合起来。例如，在[Li+20][^Li+20]的Optimus模型中，他们使用BERT模型作为编码器。更详细地说，编码器 $q(z \mid x)$ 是从与输入序列 $\boldsymbol{x}$ 对应的“类别标签”所附加的虚拟令牌的嵌入向量中派生的。解码器是一个标准的自回归模型（类似于GPT），但有一个额外的输入，即隐变量 $\boldsymbol{z}$。他们考虑了两种注入潜变量的方法。最简单的方法是在解码步骤中将 $\boldsymbol{z}$ 添加到每个令牌的嵌入层中，通过定义 $\boldsymbol{h}_i^{\prime}=\boldsymbol{h}_i+\mathbf{W} \boldsymbol{z}$ 来实现，其中 $\boldsymbol{h}_i \in \mathbb{R}^H$ 是第 $i$ 个令牌的原始嵌入，$\mathbf{W} \in \mathbb{R}^{H \times K}$ 是一个解码矩阵，其中 $K$ 是隐变量的大小。然而，通过让解码器的所有层都关注潜变量代码 $\boldsymbol{z}$，他们在实验中取得了更好的结果。一个简单的方法是定义记忆向量 $h_m=\mathbf{W} \boldsymbol{z}$，其中 $\mathbf{W} \in \mathbb{R}^{L H \times K}$，$L$ 是解码器中的层数，然后将 $\boldsymbol{h}_m \in \mathbb{R}^{L \times H}$ 附加到每一层的所有其他嵌入中。
 
@@ -609,7 +605,7 @@ $$
 
 ## 21.4 避免后验坍塌
 
-如果解码器 $p_{\boldsymbol{\theta}}(\boldsymbol{x} \mid \boldsymbol{z})$ 足够强大（比如，pixel-CNN 或者text-RNN），那么 VAE 就不需要使用隐编码 $\boldsymbol{z}$ 。这被称为 **后验坍塌** （posterior\ collapse）或者 **变分过剪枝**（variational overpruning）（参见例如，[Che+17b; Ale+18; Hus17a; Phu+18; TT17; Yeu+17; Luc+19; DWW19; WBC21]）。要了解为什么会发生这种情况，请考虑方程（21.21）。如果存在一个生成器参数 $\boldsymbol{\theta}^*$ 设置，使得对于每个 $\boldsymbol{z}$，$p_{\boldsymbol{\theta}^*}(\boldsymbol{x} \mid \boldsymbol{z})=p_{\mathcal{D}}(\boldsymbol{x})$，则可以使得 $D_{\mathbb{K} \mathbb{L}}\left(p_{\mathcal{D}}(\boldsymbol{x}) \| p_{\boldsymbol{\theta}}(\boldsymbol{x})\right)=0$。由于生成器与潜变量无关，我们有 $p_{\boldsymbol{\theta}}(\boldsymbol{z} \mid \boldsymbol{x})=p_{\boldsymbol{\theta}}(\boldsymbol{z})$。先验 $p(\boldsymbol{z})$ 通常是一个简单的分布，如高斯分布，因此我们可以找到推断参数的设置，使得 $q_{\boldsymbol{\phi}^*}(\boldsymbol{z} \mid \boldsymbol{x})=p_{\boldsymbol{\theta}}(\boldsymbol{z})$，从而确保 $D_{\mathbb{K} \mathbb{L}}\left(q_{\boldsymbol{\phi}}(\boldsymbol{z} \mid \boldsymbol{x}) \| p_{\boldsymbol{\theta}}(\boldsymbol{z} \mid \boldsymbol{x})\right)=0$。因此，我们成功地最大化了ELBO，但我们没有学习到任何有用的数据潜变量表示，而这正是潜变量建模的目标之一。下面我们将讨论一些解决后验坍塌问题的方法。
+如果解码器 $p_{\boldsymbol{\theta}}(\boldsymbol{x} \mid \boldsymbol{z})$ 足够强大（比如，pixel-CNN 或者text-RNN），那么 VAE 就不需要使用隐编码 $\boldsymbol{z}$ 。这被称为 **后验坍塌** （posterior\ collapse）或者 **变分过剪枝**（variational overpruning）（参见例如，[Che+17b; Ale+18; Hus17a; Phu+18; TT17; Yeu+17; Luc+19; DWW19; WBC21]）。要了解为什么会发生这种情况，请考虑方程（21.21）。如果存在一个生成器参数 $\boldsymbol{\theta}^*$ 设置，使得对于每个 $\boldsymbol{z}$，$$p_{\boldsymbol{\theta}^*}(\boldsymbol{x} \mid \boldsymbol{z})=p_{\mathcal{D}}(\boldsymbol{x})$$，则可以使得 $$D_{\mathbb{K} \mathbb{L}}\left(p_{\mathcal{D}}(\boldsymbol{x}) \| p_{\boldsymbol{\theta}}(\boldsymbol{x})\right)=0$$。由于生成器与潜变量无关，我们有 $$p_{\boldsymbol{\theta}}(\boldsymbol{z} \mid \boldsymbol{x})=p_{\boldsymbol{\theta}}(\boldsymbol{z})$$。先验 $$p(\boldsymbol{z})$$ 通常是一个简单的分布，如高斯分布，因此我们可以找到推断参数的设置，使得 $$q_{\boldsymbol{\phi}^*}(\boldsymbol{z} \mid \boldsymbol{x})=p_{\boldsymbol{\theta}}(\boldsymbol{z})$$，从而确保 $D_{\mathbb{K} \mathbb{L}}\left(q_{\boldsymbol{\phi}}(\boldsymbol{z} \mid \boldsymbol{x}) \| p_{\boldsymbol{\theta}}(\boldsymbol{z} \mid \boldsymbol{x})\right)=0$。因此，我们成功地最大化了ELBO，但我们没有学习到任何有用的数据潜变量表示，而这正是潜变量建模的目标之一。下面我们将讨论一些解决后验坍塌问题的方法。
 
 ### 21.4.1 KL 退火
 
