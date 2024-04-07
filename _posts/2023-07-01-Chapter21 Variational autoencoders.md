@@ -1,5 +1,5 @@
 ---
-title: 21 变分自编码器
+title: 21 变分自编码器(draft)
 author: fengliang qi
 date: 2023-07-01 11:33:00 +0800
 categories: [BOOK-2, PART-IV]
