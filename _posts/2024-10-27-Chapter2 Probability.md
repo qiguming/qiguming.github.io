@@ -44,13 +44,13 @@ $$
 p_X(a)=\mathbb{P}[X=a]=\mathbb{P}\left[X^{-1}(a)\right] \tag{2.1}
 $$
 
-其中 $ X^{-1}(a) = \{ \omega \in \Omega \mid X(\omega) = a \} $ 是 $ a $ 的逆变换。这里 $ p_X $ 被称为随机变量 $ X $ 的**概率质量函数**（probability mass function, pmf）。在抛两次公平硬币的示例中，pmf 为 $ p_X(0) = P[\{(T, T)\}] = \frac{1}{4} $，$ p_X(1) = P[\{(T, H), (H, T)\}] = \frac{2}{4} $，和 $ p_X(2) = P[\{(H, H)\}] = \frac{1}{4} $。pmf 可以通过直方图或某些参数化函数表示（见第2.2.1节）。我们称 $ p_X $ 为随机变量 $ X $ 的**概率分布**（probability distribution）。通常在上下文明确时，我们会省略 $ p_X $ 中的 $ X $ 下标。
+其中 $$ X^{-1}(a) = \{ \omega \in \Omega \mid X(\omega) = a \} $$ 是 $ a $ 的逆变换。这里 $ p_X $ 被称为随机变量 $ X $ 的**概率质量函数**（probability mass function, pmf）。在抛两次公平硬币的示例中，pmf 为 $$ p_X(0) = P[\{(T, T)\}] = \frac{1}{4} $$，$$ p_X(1) = P[\{(T, H), (H, T)\}] = \frac{2}{4} $$，和 $$ p_X(2) = P[\{(H, H)\}] = \frac{1}{4} $$。pmf 可以通过直方图或某些参数化函数表示（见第2.2.1节）。我们称 $ p_X $ 为随机变量 $ X $ 的**概率分布**（probability distribution）。通常在上下文明确时，我们会省略 $ p_X $ 中的 $ X $ 下标。
 
 ### 2.1.3 连续随机变量
 
 我们也可以考虑具有连续结果的实验。在这种情况下，我们假设样本空间是实数域的某个子集 $ \Omega \subseteq \mathbb{R} $，并将每个连续随机变量定义为恒等函数 $ X(\omega) = \omega $。
 
-例如，考虑测量某个事件的持续时间（以秒为单位）。我们定义样本空间为 $ \Omega = \{ t : 0 \leq t \leq T_{\text{max}} \} $。由于这是一个不可数集合，我们不能像离散情况那样通过枚举定义所有可能的子集。相反，我们需要根据**Borel sigma-field**定义事件空间，也称为Borel sigma-algebra。我们说 $ \mathcal{F} $ 是一个 $\sigma$-域，如果满足以下条件：(1) $ \emptyset \in \mathcal{F} $ 且 $ \Omega \in \mathcal{F} $；(2) $ \mathcal{F} $ 对补集是封闭的，即如果 $ E \in \mathcal{F} $，则 $ E^c \in \mathcal{F} $；(3) $ \mathcal{F} $ 对可数集合的并集与交集也是封闭的，这意味着如果 $ E_1, E_2, \ldots \in \mathcal{F} $，则 $ \bigcup_{i=1}^{\infty} E_i \in \mathcal{F} $ 和 $ \bigcap_{i=1}^{\infty} E_i \in \mathcal{F} $。最后，我们说 $ \mathcal{B} $ 是一个Borel sigma-field，如果它是由形式为 $ (-\infty, b] = \{ x : -\infty < x \leq b \} $ 的半闭区间生成的 $\sigma$-域。通过取这些区间的并、交和补集，我们可以看到 $ \mathcal{B} $ 包含以下集合：
+例如，考虑测量某个事件的持续时间（以秒为单位）。我们定义样本空间为 $$ \Omega = \{ t : 0 \leq t \leq T_{\text{max}} \} $$。由于这是一个不可数集合，我们不能像离散情况那样通过枚举定义所有可能的子集。相反，我们需要根据**Borel sigma-field**定义事件空间，也称为Borel sigma-algebra。我们说 $ \mathcal{F} $ 是一个 $\sigma$-域，如果满足以下条件：(1) $ \emptyset \in \mathcal{F} $ 且 $ \Omega \in \mathcal{F} $；(2) $ \mathcal{F} $ 对补集是封闭的，即如果 $ E \in \mathcal{F} $，则 $ E^c \in \mathcal{F} $；(3) $ \mathcal{F} $ 对可数集合的并集与交集也是封闭的，这意味着如果 $ E_1, E_2, \ldots \in \mathcal{F} $，则 $ \bigcup_{i=1}^{\infty} E_i \in \mathcal{F} $ 和 $ \bigcap_{i=1}^{\infty} E_i \in \mathcal{F} $。最后，我们说 $ \mathcal{B} $ 是一个Borel sigma-field，如果它是由形式为 $$ (-\infty, b] = \{ x : -\infty < x \leq b \} $$ 的半闭区间生成的 $\sigma$-域。通过取这些区间的并、交和补集，我们可以看到 $ \mathcal{B} $ 包含以下集合：
 
 $$
 (a, b),[a, b],(a, b],[a, b],\{b\},-\infty \leq a \leq b \leq \infty \tag{2.2}
@@ -58,18 +58,24 @@ $$
 
  在我们的连续时间示例中，我们可以进一步限制事件空间，使其只包含下限为$0$且上限为 $T_{\text{max}}$ 的区间。
 
-为了定义概率测度，我们为每个 $x \in \Omega$ 分配一个权重函数 $p_X(x) \geq 0$，称为**概率密度函数**（probability density function, pdf）。有关常见概率密度函数的列表，请参见第2.2.2节。然后，我们可以使用以下公式推导事件 $E = [a, b]$ 的概率： 
+为了定义概率测度，我们为每个 $x \in \Omega$ 分配一个权重函数 $p_X(x) \geq 0$，称为**概率密度函数**（probability density function, pdf）。有关常见概率密度函数的列表，请参见第2.2.2节。然后，我们可以使用以下公式推导事件 $E = [a, b]$ 的概率：
+
 $$
 \mathbb{P}([a, b])=\int_E d \mathbb{P}=\int_a^b p(x) d x \tag{2.3}
 $$
- 我们还可以为随机变量 $X$ 定义**累积分布函数**（cumulative distribution function, cdf），其定义如下： 
+
+ 我们还可以为随机变量 $X$ 定义**累积分布函数**（cumulative distribution function, cdf），其定义如下：
+
 $$
 P_X(x) \triangleq \mathbb{P}[X \leq x]=\int_{-\infty}^x p_X\left(x^{\prime}\right) d x^{\prime} \tag{2.4}
 $$
+
 由此，我们可以通过以下公式计算区间的概率：
+
 $$
 \mathbb{P}([a, b])=p(a \leq X \leq b)=P_X(b)-P_X(a) \tag{2.5}
 $$
+
  术语“概率分布”可以指代概率密度函数 $p_X$、累积分布函数 $F_X$ 或者概率测度 $P$。
 
 我们可以将上述定义推广到多维空间 $\mathbb{R}^n$，以及更复杂的样本空间，例如函数。 
@@ -82,19 +88,23 @@ $$
 
 - **规范化**：整个样本空间的概率为1，即 $ P[\Omega] = 1 $。
 
-- **可加性**：对于任意可数序列的两两不相交集合 $\left\{E_1, E_2, \ldots,\right\}$，我们有：
+- **可加性**：对于任意可数序列的两两不相交集合 $$\left\{E_1, E_2, \ldots,\right\}$$，我们有：
+
   $$
   \mathbb{P}\left[\cup_{i=1}^{\infty} E_i\right]=\sum_{i=1}^{\infty} \mathbb{P}\left[E_i\right] \tag{2.6}
   $$
+
   
   在有限情况下，当我们只有两个不相交的集合 $E_1$ 和 $E_2$ 时，上式可写成： 
   
   $$
   \mathbb{P}\left[E_1 \cup E_2\right]=\mathbb{P}\left[E_1\right]+\mathbb{P}\left[E_2\right] \tag{2.7}
   $$
+
   这对应于事件 $E_1$ 或 $E_2$ 的概率，此时的事件是互斥的（不相交的集合）。 
   
    从这些公理，我们可以推导出**补充规则**（complement rule）： 
+
   $$
   \mathbb{P}\left[E^c\right]=1-\mathbb{P}[E] \tag{2.8}
   $$
@@ -102,30 +112,41 @@ $$
  其中 $E^c = \bar{E}$ 是事件 $E$ 的补集。（这是因为 $P[\Omega] = 1 = P[E \cup E^c] = P[E] + P[E^c]$）。我们还可以证明 $P[E] \leq 1$（通过反证法），以及 $P[\emptyset] = 0$（这从第一个推论中得出，当 $E = \emptyset$ 时）。 
 
  我们还可以证明以下结果，称为**加法规则**：
+
 $$
 \mathbb{P}\left[E_1 \cup E_2\right]=\mathbb{P}\left[E_1\right]+\mathbb{P}\left[E_2\right]-\mathbb{P}\left[E_1 \cap E_2\right] \tag{2.9}
 $$
+
 这适用于任何一对事件，即使它们不是互斥的。
 
 ### 2.1.5 条件概率
 
  考虑两个事件$E_1$ 和 $E_2$。如果 $ P[E_2] \neq 0 $，我们定义事件 $ E_1 $ 在给定 $ E_2 $ 下的**条件概率**（conditional probability）为：  
+
 $$
 \mathbb{P}\left[E_1 \mid E_2\right] \triangleq \frac{\mathbb{P}\left[E_1 \cap E_2\right]}{\mathbb{P}\left[E_2\right]} \tag{2.10}
 $$
+
  由此，我们可以得到**乘法规则**（multiplication rule）： 
+
 $$
 \mathbb{P}\left[E_1 \cap E_2\right]=\mathbb{P}\left[E_1 \mid E_2\right] \mathbb{P}\left[E_2\right]=\mathbb{P}\left[E_2 \mid E_1\right] \mathbb{P}\left[E_1\right] \tag{2.11}
 $$
+
 条件概率衡量了事件 $E_1$ 在事件 $E_2$ 已发生的情况下发生的可能性。然而，如果这两个事件无关，概率将不会改变。正式地，我们说事件 $E_1$ 和 $E_2$ 是**独立事件**（independent events），如果： 
+
 $$
 \mathbb{P}\left[E_1 \cap E_2\right]=\mathbb{P}\left[E_1\right] \mathbb{P}\left[E_2\right] \tag{2.12}
 $$
+
 如果 $\mathbb{P}\left[E_1\right]>0$ 且 $\mathbb{P}\left[E_2\right]>0$，这等价于要求 $ P[E_1 | E_2] = P[E_1] $，或者等价地，$ P[E_2 | E_1] = P[E_2] $。类似地，我们说事件 $E_1$ 和 $E_2$ 在给定 $E_3$ 的情况下是条件独立的，如果 
+
 $$
 \mathbb{P}\left[E_1 \cap E_2 \mid E_3\right]=\mathbb{P}\left[E_1 \mid E_3\right] \mathbb{P}\left[E_2 \mid E_3\right] \tag{2.13}
 $$
+
  根据条件概率的定义，我们可以推导出**全概率法则**（law of total probability），它表明：如果$\left\{A_1, \ldots, A_n\right\}$ 是样本空间 $\Omega$ 的一个划分，那么对于任何事件 $B \subseteq \Omega$，我们有：
+
 $$
 \mathbb{P}[B]=\sum_{i=1}^n \mathbb{P}\left[B \mid A_i\right] \mathbb{P}\left[A_i\right] \tag{2.14}
 $$
