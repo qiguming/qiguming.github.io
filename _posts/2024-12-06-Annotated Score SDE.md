@@ -1,9 +1,9 @@
 ---
-title: YangSong论文解读
+title: NVIDIA_EDM论文解读
 author: fengliang qi
-date: 2024-12-06 11:33:00 +0800
+date: 2024-12-10 11:33:00 +0800
 categories: [PaperRead]
-tags: [score-based model, generative model, songyang]
+tags: [edm, score-based model, generative model]
 math: true
 mermaid: true
 toc: true
@@ -11,17 +11,51 @@ comments: true
 
 ---
 
-> 本文持续更新OpenAI的研究员[SongYang（宋飏）](https://yang-song.net/)论文解读。
-生成模型（图像）相较于判别模型在理解上相对困难。尤其是在理论层面，从概率论角度对其相对系统的介绍。本文主要介绍OpenAI的研究员SongYang的与生成模型相关的文章，尽量做到“事无巨细”而又相对宏观，尽量以相对直白的语言对晦涩的理论进行介绍。我以为文中涉及到的数学部分大部分集中在高等数学部分，所以单纯地理解难度并不大。
-我们将以**要点概述**，**深度解读**，以及**结论总结**三个方面介绍相关的论文，同时我们也鼓励读者阅读原文。如有对原文解读有异议的，也希望留言，谢谢！
+> 本文主要介绍Nvida发表的关于score-based的文章 Elucidating the Design Space of Diffusion-Based Generative Models，该文从采样方法，训练方法和数据预处理三个维度对score-based模型进行了优化。
+
 
 * TOC
 {:toc}
 
 
-## 1. Score-based generative models
 
-> Generative Modeling by Estimating Gradients of the Data Distribution.*Yang Song*, and [Stefano Ermon](https://cs.stanford.edu/~ermon/).*In the 33rd Conference on Neural Information Processing Systems, 2019.**Oral Presentation [top 0.5%]**
+
+
+## 1. 扩散过程的一般性表达
+
+根据[Song][^Song]的工作，扩散过程可以形式化为一个概率流常微分方程（PF ODE），即：
+
+$$
+\mathrm{d} \boldsymbol{x}=\left[f(t) \boldsymbol{x}-\frac{1}{2} g(t)^2 \nabla_{\boldsymbol{x}} \log p_t(\boldsymbol{x})\right] \mathrm{d} t . \tag{1}
+$$
+
+本文作者对上式进行了重参数化（具体推导过程可以参考附录B.2），得到：
+
+$$
+\mathrm{d} \boldsymbol{x}= \left[\frac{\dot{s}(t)}{s(t)} \boldsymbol{x}-s(t)^2 \dot{\sigma}(t) \sigma(t) \nabla_{\boldsymbol{x}} \log p\left(\frac{\boldsymbol{x}}{s(t)} ; \sigma(t)\right)\right] \mathrm{d} t . \tag{2}
+$$
+
+其中 $s(t)$ 表示对输入 $\boldsymbol{x}$ 的缩放，即$$\boldsymbol{x}=s(t) \hat{\boldsymbol{x}}$$。$\hat{\boldsymbol{x}}$ 表示未缩放的版本。
+
+需要注意的是，式（2）中除了score $\nabla_{\boldsymbol{x}} \log p$ 需要通过训练神经网络估计得到外，其他都是预设的超参数。
+
+假设我们已有score函数，那根据式（2）就可以使用一些ODE-Solver生成样本。不同求解器（一阶or二阶），求解节点（离散化方式）决定了最终求解的精度以及所需要的时间复杂度。常见的欧拉法是一阶近似，作者推荐使用二阶Heun近似，并在不同模型上验证了该采样方法的有效性。
+
+根据公式（2），作者概述了当前几种主流生成模型的参数配置。
+
+|                    | VP[Song][^Song] 参考C1.1 | VE[Song][^Song] 参考C2.1 |
+| :----------------: | -------------- | -------------- |
+| ODE solver         |     Euler     |   Euler       |
+| Timesteps $t_{i<N}$ | $1+\frac{i}{N-1}\left(\epsilon_{\mathrm{s}}-1\right)$  | $\sigma_{\max }^2\left(\sigma_{\min }^2 / \sigma_{\max }^2\right)^{\frac{i}{N-1}}$   |
+| Schedule $\sigma(t)$ | $\sqrt{e^{\frac{1}{2} \beta_d t^2+\beta_{\min} t}-1}$ |    $\sqrt{t}$           |
+| Scaling $s(t)$ | $1 / \sqrt{e^{\frac{1}{2} \beta_{\mathrm{d}} t^2+\beta_{\min } t}}$ |   $1$            |
+
+## 2. 确定性采样的改进
+
+作者认为，在训练阶段所使用的配置——也就是 $\sigma(t)$，$s(t)$ 以及 $\left\{t_i\right\}$ 不一定沿用到推理阶段，反之亦然。
+
+
+[^Song]:Y. Song, J. Sohl-Dickstein, D. P. Kingma, A. Kumar, S. Ermon, and B. Poole. Score-based generative modeling through stochastic differential equations. In Proc. ICLR, 2021.
 
 ### 1.1 要点概述
 本文提出了一种新的基于score的生成模型，所谓score可以大概理解成（对数）概率密度关于**样本**（$\mathbf{x}$） 的导数。换句话说，如果知道了score值，那么也就知道了**样本沿着什么方向的演变可以使自身发生的概率变大**，而那些概率更大的样本也就是相对正常的样本。而使得训练中的训练样本对应的概率密度最大对应的就是极大似然估计。
