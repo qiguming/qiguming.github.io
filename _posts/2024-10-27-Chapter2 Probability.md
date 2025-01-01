@@ -53,7 +53,7 @@ $$
 例如，考虑测量某个事件的持续时间（以秒为单位）。我们定义样本空间为 $$ \Omega = \{ t : 0 \leq t \leq T_{\text{max}} \} $$。由于这是一个不可数集合，我们不能像离散情况那样通过枚举定义所有可能的子集。相反，我们需要根据**Borel sigma-field**定义事件空间，也称为Borel sigma-algebra。我们说 $ \mathcal{F} $ 是一个 $\sigma$-域，如果满足以下条件：(1) $ \emptyset \in \mathcal{F} $ 且 $ \Omega \in \mathcal{F} $；(2) $ \mathcal{F} $ 对补集是封闭的，即如果 $ E \in \mathcal{F} $，则 $ E^c \in \mathcal{F} $；(3) $ \mathcal{F} $ 对可数集合的并集与交集也是封闭的，这意味着如果 $ E_1, E_2, \ldots \in \mathcal{F} $，则 $ \bigcup_{i=1}^{\infty} E_i \in \mathcal{F} $ 和 $ \bigcap_{i=1}^{\infty} E_i \in \mathcal{F} $。最后，我们说 $ \mathcal{B} $ 是一个Borel sigma-field，如果它是由形式为 $$ (-\infty, b] = \{ x : -\infty < x \leq b \} $$ 的半闭区间生成的 $\sigma$-域。通过取这些区间的并、交和补集，我们可以看到 $ \mathcal{B} $ 包含以下集合：
 
 $$
-(a, b),[a, b],(a, b],[a, b],\{b\},-\infty \leq a \leq b \leq \infty \tag{2.2}
+(a, b),\left[a, b\right],(a, b],[a, b],\{b\},-\infty \leq a \leq b \leq \infty \tag{2.2}
 $$
 
  在我们的连续时间示例中，我们可以进一步限制事件空间，使其只包含下限为$0$且上限为 $T_{\text{max}}$ 的区间。
@@ -301,7 +301,7 @@ $$
 其中 $ \mu $ 表示均值，$ \sigma > 0 $ 是尺度参数（不是标准差），$ \nu > 0 $ 被称为**自由度**（尽管一个更好的术语可能是“正态度”[Kru13][^Kru13]，因为 $ \nu $ 值越大，分布表现得越像高斯分布）。这里的 $ \Gamma(a) $ 是**伽玛函数**（gamma function），定义为：
 
 $$
-\Gamma(a) \triangleq \int_0^{\infty} x^{a-1} e^{-x} d x
+\Gamma(a) \triangleq \int_0^{\infty} x^{a-1} e^{-x} d x \tag{2.32}
 $$
 
 并且 $ B(a; b) $ 是**贝塔函数**（beta function），定义为：
@@ -552,10 +552,10 @@ $$
 如果 $ D = 2 $，另一种选择是使用单位圆上的**冯·米塞斯**（von Mises）分布，其形式为：
 
 $$
-\begin{aligned}
-\operatorname{vMF}(x \mid \mu, \kappa) & =\frac{1}{Z} \exp (\kappa \cos (x-\mu)) \\
-Z & =2 \pi I_0(\kappa)
-\end{aligned}
+\begin{align}
+\operatorname{vMF}(x \mid \mu, \kappa) & =\frac{1}{Z} \exp (\kappa \cos (x-\mu)) \tag{2.54}\\
+Z & =2 \pi I_0(\kappa) \tag{2.55}
+\end{align}
 $$
 
 #### 2.2.5.4  矩阵正态分布（Matrix Normal Distribution，简称MN ）
@@ -566,7 +566,7 @@ $$
 \mathcal{M N}(\mathbf{X} \mid \mathbf{M}, \mathbf{U}, \mathbf{V}) \triangleq \frac{|\mathbf{V}|^{n / 2}}{2 \pi^{n p / 2}|\mathbf{U}|^{p / 2}} \exp \left\{-\frac{1}{2} \operatorname{tr}\left[(\mathbf{X}-\mathbf{M})^{\boldsymbol{\top}} \mathbf{U}^{-1}(\mathbf{X}-\mathbf{M}) \mathbf{V}\right]\right\} \tag{2.56}
 $$
 
-其中  $\mathbf{M} \in \mathbb{R}^{n \times p}$ 是 $\mathbf{X}$ 的均值矩阵，$\mathbf{U} \in \mathbb{S}_{n \times n}^{++}$ 是行与行之间的协方差矩阵，$\mathbf{V} \in \mathbb{S}_{p \times p}^{++}$ 是列与列之间的精度矩阵。可以看出，
+其中  $\mathbf{M} \in \mathbb{R}^{n \times p}$ 是 $$\mathbf{X}$$ 的均值矩阵，$$\mathbf{U} \in \mathbb{S}_{n \times n}^{++}$$ 是行与行之间的协方差矩阵，$$\mathbf{V} \in \mathbb{S}_{p \times p}^{++}$$ 是列与列之间的精度矩阵。可以看出，
 
 $$
 \operatorname{vec}(\mathbf{X}) \sim \mathcal{N}\left(\operatorname{vec}(\mathbf{M}), \mathbf{V}^{-1} \otimes \mathbf{U}\right) \tag{2.57}
@@ -613,7 +613,7 @@ $$
 
 如果 $s=2$，该分布将退化为卡方分布。
 
-Wishart分布和高斯分布之间有一个有趣的联系。具体而言，设 $\boldsymbol{x}_n \sim N(0, \boldsymbol{\Sigma})$。可以证明，scatter矩阵 $\mathbf{S} = \sum_{n=1}^{N} \boldsymbol{x}_n \boldsymbol{x}_n^T$ 服从Wishart分布：$\mathbf{S} \sim \text{Wi}(\boldsymbol{\Sigma}; N)$。
+Wishart分布和高斯分布之间有一个有趣的联系。具体而言，设 $$\boldsymbol{x}_n \sim N(0, \boldsymbol{\Sigma})$$。可以证明，scatter矩阵 $$\mathbf{S} = \sum_{n=1}^{N} \boldsymbol{x}_n \boldsymbol{x}_n^T$$ 服从Wishart分布：$$\mathbf{S} \sim \text{Wi}(\boldsymbol{\Sigma}; N)$$。
 
 #### 2.2.5.6 逆威沙特分布
 
@@ -688,7 +688,7 @@ $$
 
 通常我们使用形式为 $\alpha_k = \alpha = \frac{1}{K}$ 的对称Dirichlet先验。在这种情况下，我们有 $\mathbb{E}[x_k] = \frac{1}{K}$，并且 $\mathbb{V}[x_k] = \frac{K-1}{K^2(\alpha+1)}$。因此，我们可以看到增加 $\alpha$ 会增加分布的精度（减少方差）。
 
-Dirichlet分布有助于区分偶然性（数据）不确定性和认知不确定性。为了理解这一点，考虑一个三面的骰子。如果我们知道每个结果出现的可能性是相等的，我们可以使用一个“尖锐”的对称Dirichlet分布，比如图2.6(b)中显示的$\text{Dir}(20; 20; 20)$；这反映了我们确信结果将是不可预测的。相比之下，如果我们不确定结果会是什么样子（例如，它可能是一个有偏的骰子），那么我们可以使用一个“平坦”的对称Dirichlet分布，比如$\text{Dir}(1; 1; 1)$，它可以生成一系列可能的结果分布。我们可以使Dirichlet分布依赖于输入，从而形成所谓的**先验网络**（prior network）[MG18][^MG18]，因为它编码的是$p(\theta|x)$（输出是一个分布）而不是$p(y|x)$（输出是一个标签）。
+Dirichlet分布有助于区分偶然性（数据）不确定性和认知不确定性。为了理解这一点，考虑一个三面的骰子。如果我们知道每个结果出现的可能性是相等的，我们可以使用一个“尖锐”的对称Dirichlet分布，比如图2.6(b)中显示的$\text{Dir}(20; 20; 20)$；这反映了我们确信结果将是不可预测的。相比之下，如果我们不确定结果会是什么样子（例如，它可能是一个有偏的骰子），那么我们可以使用一个“平坦”的对称Dirichlet分布，比如$\text{Dir}(1; 1; 1)$，它可以生成一系列可能的结果分布。我们可以使Dirichlet分布依赖于输入，从而形成所谓的**先验网络**（prior network）[MG18][^MG18]，因为它编码的是$p(\theta \mid x)$（输出是一个分布）而不是$p(y \mid x)$（输出是一个标签）。
 
 [^MG18]:
 
@@ -708,7 +708,7 @@ $$
 \mathcal{N}(\boldsymbol{x} \mid \boldsymbol{\mu}, \boldsymbol{\Sigma}) \triangleq \frac{1}{(2 \pi)^{D / 2}|\boldsymbol{\Sigma}|^{1 / 2}} \exp \left[-\frac{1}{2}(\boldsymbol{x}-\boldsymbol{\mu})^{\top} \boldsymbol{\Sigma}^{-1}(\boldsymbol{x}-\boldsymbol{\mu})\right] \tag{2.71}
 $$
 
-其中 $\boldsymbol{\mu}=\mathbb{E}[\boldsymbol{x}] \in \mathbb{R}^D$ 表示均值向量，而 $\boldsymbol{\Sigma} = \text{Cov}[\boldsymbol{x}]$ 表示大小为 $D \times D$ 的协方差矩阵。归一化常数 $Z = (2\pi)^{D/2}|\boldsymbol{\Sigma}|^{-1/2}$ 确保概率密度函数（pdf）的积分为 1。指数内的表达式（忽略 $-0.5$ 因子）是数据向量 $\boldsymbol{x}$ 和均值向量 $\boldsymbol{\mu}$ 之间的平方**马氏距离**（Mahalanobis distance），由以下公式给出：
+其中 $\boldsymbol{\mu}=\mathbb{E}[\boldsymbol{x}] \in \mathbb{R}^D$ 表示均值向量，而 $\boldsymbol{\Sigma} = \text{Cov}[\boldsymbol{x}]$ 表示大小为 $D \times D$ 的协方差矩阵。归一化常数 $Z = (2\pi)^{D/2}\lvert\boldsymbol{\Sigma}\rvert^{-1/2}$ 确保概率密度函数（pdf）的积分为 1。指数内的表达式（忽略 $-0.5$ 因子）是数据向量 $\boldsymbol{x}$ 和均值向量 $\boldsymbol{\mu}$ 之间的平方**马氏距离**（Mahalanobis distance），由以下公式给出：
 
 $$
 d_{\boldsymbol{\Sigma}}(\boldsymbol{x}, \boldsymbol{\mu})^2=(\boldsymbol{x}-\boldsymbol{\mu})^{\top} \boldsymbol{\Sigma}^{-1}(\boldsymbol{x}-\boldsymbol{\mu}) \tag{2.72}
@@ -795,7 +795,7 @@ $$
 \end{align}
 $$
 
-需要注意的是，条件分布 $p(\boldsymbol{x}_1 | \boldsymbol{x}_2)$ 的均值是关于 $\boldsymbol{x}_2$ 的线性函数，但协方差与 $\boldsymbol{x}_2$ 本身无关，这是高斯分布的一个特殊性质。
+需要注意的是，条件分布 $p(\boldsymbol{x}_1 \mid \boldsymbol{x}_2)$ 的均值是关于 $\boldsymbol{x}_2$ 的线性函数，但协方差与 $\boldsymbol{x}_2$ 本身无关，这是高斯分布的一个特殊性质。
 
 #### 2.3.1.4 Information(canonical) 形式
 
@@ -940,7 +940,7 @@ $$
 \end{align}
 $$
 
-其中 $\boldsymbol{\Sigma} / \boldsymbol{\Sigma}_{22}$ 表示 $\boldsymbol{\Sigma}$ 关于 $\boldsymbol{\Sigma}_{22}$ 的 Schur complement。
+其中 $$\boldsymbol{\Sigma} / \boldsymbol{\Sigma}_{22}$$ 表示 $$\boldsymbol{\Sigma}$$ 关于 $$\boldsymbol{\Sigma}_{22}$$ 的 Schur complement。
 
 #### 2.3.1.6 推导：  information 形式
 
@@ -970,7 +970,7 @@ $$
 
 其中的常数项与 $\boldsymbol{x}_1$ 或 $\boldsymbol{x}_2$ 无关。
 
-为了计算条件分布 $p\left(\boldsymbol{x}_1 \mid \boldsymbol{x}_2\right)$ 的参数，我们固定 $\boldsymbol{x}_2$ 的取值，并收集条件精度在 $\boldsymbol{x}_1$ 中为二次的项，然后收集条件精度加权平均值在 $\boldsymbol{x}_1$ 中呈线性的项。$\boldsymbol{x}_1$ 中的二次项仅为 $-\frac{1}{2} \boldsymbol{x}_1^{\top} \boldsymbol{\Lambda}_{11} \boldsymbol{x}_1$，因此
+为了计算条件分布 $$p\left(\boldsymbol{x}_1 \mid \boldsymbol{x}_2\right)$$ 的参数，我们固定 $$\boldsymbol{x}_2$$ 的取值，并收集条件精度在 $$\boldsymbol{x}_1$$ 中为二次的项，然后收集条件精度加权平均值在 $\boldsymbol{x}_1$ 中呈线性的项。$$\boldsymbol{x}_1$$ 中的二次项仅为 $$-\frac{1}{2} \boldsymbol{x}_1^{\top} \boldsymbol{\Lambda}_{11} \boldsymbol{x}_1$$，因此
 
 $$
 \boldsymbol{\Lambda}_{1 \mid 2}^c=\boldsymbol{\Lambda}_{11} \tag{2.107}
@@ -982,7 +982,7 @@ $$
 -\frac{1}{2} \boldsymbol{x}_1^{\top} \boldsymbol{\Lambda}_{12} \boldsymbol{x}_2-\frac{1}{2} \boldsymbol{x}_2^{\top} \boldsymbol{\Lambda}_{21} \boldsymbol{x}_1+\boldsymbol{x}_1^{\top} \boldsymbol{\eta}_1=\boldsymbol{x}_1^{\top}\left(\boldsymbol{\eta}_1-\boldsymbol{\Lambda}_{12} \boldsymbol{x}_2\right) \tag{2.108}
 $$
 
-考虑到 $\mathbf{\Lambda}_{21}^{\top}=\mathbf{\Lambda}_{12}$。所以条件精度加权期望为
+考虑到 $$\mathbf{\Lambda}_{21}^{\top}=\mathbf{\Lambda}_{12}$$。所以条件精度加权期望为
 
 $$
 \boldsymbol{\eta}_{1 \mid 2}^c=\boldsymbol{\eta}_1-\boldsymbol{\Lambda}_{12} \boldsymbol{x}_2 \tag{2.109}
@@ -1003,7 +1003,7 @@ $$
 p\left(\boldsymbol{x}_2\right) \propto \exp \left\{-\frac{1}{2} \boldsymbol{x}_2^{\top} \boldsymbol{\Lambda}_{22} \boldsymbol{x}_2+\boldsymbol{x}_2^{\top} \boldsymbol{\eta}_2\right\} \int \exp \left\{-\frac{1}{2} \boldsymbol{x}_1^{\top} \boldsymbol{\Lambda}_{11} \boldsymbol{x}_1+\boldsymbol{x}_1^{\top}\left(\boldsymbol{\eta}_1-\boldsymbol{\Lambda}_{12} \boldsymbol{x}_2\right)\right\} d \boldsymbol{x}_1,
 $$
 
-我们可以将被积函数识别为指数二次型。因此，积分等于高斯函数的归一化常数，精度为 $\boldsymbol{\Lambda}_{11}$，精度加权平均值为 $\boldsymbol{\eta}_1-\boldsymbol{\Lambda}_{12} \boldsymbol{x}_2$，由方程（2.83）的倒数给出。将其代入我们的方程式，
+我们可以将被积函数识别为指数二次型。因此，积分等于高斯函数的归一化常数，精度为 $$\boldsymbol{\Lambda}_{11}$$，精度加权平均值为 $$\boldsymbol{\eta}_1-\boldsymbol{\Lambda}_{12} \boldsymbol{x}_2$$，由方程（2.83）的倒数给出。将其代入我们的方程式，
 
 $$
 \begin{align}
@@ -1165,7 +1165,7 @@ $$
 \phi(\boldsymbol{x} ; p, \boldsymbol{\mu}, \boldsymbol{\Sigma})=p \times \exp \left(-\frac{1}{2}(\boldsymbol{x}-\boldsymbol{\mu})^{\mathrm{T}} \mathbf{\Sigma}^{-1}(\boldsymbol{x}-\boldsymbol{\mu})\right) \tag{2.131}
 $$
 
-其中  $p=(2 \pi)^{-n / 2}|\mathbf{\Sigma}|^{-\frac{1}{2}}$是保证 $\int_x \phi(\boldsymbol{x} ; p, \boldsymbol{\mu}, \mathbf{\Sigma})=1$ 的归一化常数（$n$是$\boldsymbol{x}$的维数。）。展开二次项并合并相关项，我们得到规范形式：
+其中  $p=(2 \pi)^{-n / 2}\lvert\mathbf{\Sigma}\rvert^{-\frac{1}{2}}$是保证 $\int_x \phi(\boldsymbol{x} ; p, \boldsymbol{\mu}, \mathbf{\Sigma})=1$ 的归一化常数（$n$是$\boldsymbol{x}$的维数。）。展开二次项并合并相关项，我们得到规范形式：
 
 $$
 \phi(\boldsymbol{x} ; g, \boldsymbol{h}, \mathbf{K})=\exp \left(g+\boldsymbol{x}^{\boldsymbol{\top}} \boldsymbol{h}-\frac{1}{2} \boldsymbol{x}^{\boldsymbol{\top}} \mathbf{K} \boldsymbol{x}\right)=\exp \left(g+\sum_i h_i x_i-\frac{1}{2} \sum_i \sum_k K_{\mathrm{i} j} x_i x_j\right) \tag{2.132}
@@ -1187,7 +1187,7 @@ $\mathbf{K}$ 通常被称为精度矩阵。
 
 #### 2.3.3.2 乘法和除法
 
-使用规范形式的参数化，我们可以定义高斯分布的乘法和除法操作。为了将 $\phi_1\left(x_1, \ldots, x_k ; g_1, \boldsymbol{h}_1, \mathbf{K}_1\right)$ 乘以 $\phi_2\left(x_{k+1}, \ldots, x_n ; g_2, \boldsymbol{h}_2, \mathbf{K}_2\right)$，我们可以通过在适当的维度上补零，将它们都扩展到相同的域 $x_1, \ldots, x_n$ ，然后计算
+使用规范形式的参数化，我们可以定义高斯分布的乘法和除法操作。为了将 $$\phi_1\left(x_1, \ldots, x_k ; g_1, \boldsymbol{h}_1, \mathbf{K}_1\right)$$ 乘以 $$\phi_2\left(x_{k+1}, \ldots, x_n ; g_2, \boldsymbol{h}_2, \mathbf{K}_2\right)$$，我们可以通过在适当的维度上补零，将它们都扩展到相同的域 $x_1, \ldots, x_n$ ，然后计算
 
 $$
 \left(g_1, \boldsymbol{h}_1, \mathbf{K}_1\right) *\left(g_2, \boldsymbol{h}_2, \mathbf{K}_2\right)=\left(g_1+g_2, \boldsymbol{h}_1+\boldsymbol{h}_2, \mathbf{K}_1+\mathbf{K}_2\right) \tag{2.136}
@@ -1270,7 +1270,7 @@ p(\boldsymbol{x} \mid \boldsymbol{u}) & =c \exp \left[-\frac{1}{2}\left(\left(\b
 \end{align}
 $$
 
-其中 $c=(2 \pi)^{-n / 2}|\boldsymbol{\Sigma}|^{-\frac{1}{2}}$。因此，我们将规范参数设置为
+其中 $c=(2 \pi)^{-n / 2}\lvert\boldsymbol{\Sigma}\rvert^{-\frac{1}{2}}$。因此，我们将规范参数设置为
 
 $$
 \begin{align}
@@ -1350,7 +1350,7 @@ $$
 p(\boldsymbol{x} \mid \boldsymbol{\eta}) \triangleq \frac{1}{Z(\boldsymbol{\eta})} h(\boldsymbol{x}) \exp \left[\boldsymbol{\eta}^{\top} \mathcal{T}(\boldsymbol{x})\right]=h(\boldsymbol{x}) \exp \left[\boldsymbol{\eta}^{\top} \mathcal{T}(\boldsymbol{x})-A(\boldsymbol{\eta})\right] \tag{2.160}
 $$
 
-其中 $h(\boldsymbol{x})$ 表示缩放常数（又被称为base measure，通常取值为1），$\mathcal{T}(\boldsymbol{x}) \in \mathbb{R}^K$ 表示 **充分统计量**（sufficient statistics），$\boldsymbol{\eta}$ 为 **自然参数**（natural parameters）或 **规范参数**（canonical parameters），$Z(\boldsymbol{\eta})$ 是归一化常数，又被称为 **配分函数**（partition function）。$A(\boldsymbol{\eta})=\log Z(\boldsymbol{\eta})$ 表示 **对数配分函数**（log partition function）。在2.4.3节，我们将展示 $A$ 是一个定义在凸集合 $\Omega \triangleq\left\{\boldsymbol{\eta} \in \mathbb{R}^K: A(\boldsymbol{\eta})<\infty\right\}$ 上的凸函数。
+其中 $h(\boldsymbol{x})$ 表示缩放常数（又被称为base measure，通常取值为1），$\mathcal{T}(\boldsymbol{x}) \in \mathbb{R}^K$ 表示 **充分统计量**（sufficient statistics），$\boldsymbol{\eta}$ 为 **自然参数**（natural parameters）或 **规范参数**（canonical parameters），$Z(\boldsymbol{\eta})$ 是归一化常数，又被称为 **配分函数**（partition function）。$A(\boldsymbol{\eta})=\log Z(\boldsymbol{\eta})$ 表示 **对数配分函数**（log partition function）。在2.4.3节，我们将展示 $A$ 是一个定义在凸集合 $$\Omega \triangleq\left\{\boldsymbol{\eta} \in \mathbb{R}^K: A(\boldsymbol{\eta})<\infty\right\}$$ 上的凸函数。
 
 如果自然参数彼此独立，则很方便。从形式上讲，如果不存在 $\boldsymbol{\eta} \in \mathbb{R}^K \backslash\{0\}$ 使得 $\boldsymbol{\eta}^{\top} \mathcal{T}(\boldsymbol{x})=0$，则指数族是**最小的**（minimal）。在多项式分布的情况下，由于参数和为一的约束，可能会违反最后一个条件；然而，使用 $K-1$ 独立参数很容易对分布进行重新参数化，如下所示。
 
@@ -1834,7 +1834,7 @@ $$
 p_y(\boldsymbol{y})=p_x\left(f^{-1}(\boldsymbol{y})\right)\left|\operatorname{det}\left[\mathbf{J}_{f-1}(\boldsymbol{y})\right]\right| \tag{2.257}
 $$
 
-其中 $\mathbf{J}_{f-1}(\boldsymbol{y})$ 表示逆变换 $f^{-1}$ 在 $\boldsymbol{y}$ 处的雅各比矩阵，$|\operatorname{det} \mathbf{J}|$ 表示 $\mathbf{J}$ 的行列式的绝对值。换句话说，
+其中 $\mathbf{J}_{f-1}(\boldsymbol{y})$ 表示逆变换 $f^{-1}$ 在 $\boldsymbol{y}$ 处的雅各比矩阵，$\lvert\operatorname{det} \mathbf{J}\rvert$ 表示 $\mathbf{J}$ 的行列式的绝对值。换句话说，
 
 $$
 \mathbf{J}_{f^{-1}}(\boldsymbol{y})=\left(\begin{array}{ccc}
@@ -1931,9 +1931,9 @@ $$
 
 #### 2.6.1.1 马尔可夫转移核
 
-条件概率分布 $p\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}\right)$ 被称为 **转移函数**（transition function），**转移核**（transition kernel）或者 **马尔可夫核**（Markov kernel）。该条件分布满足约束 $p\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}\right) \geq 0$ 和 $\int_{\boldsymbol{x} \in \mathcal{X}} d x p\left(x_t=x \mid x_{t-1}\right)=1$ 。
+条件概率分布 $$p\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}\right)$$ 被称为 **转移函数**（transition function），**转移核**（transition kernel）或者 **马尔可夫核**（Markov kernel）。该条件分布满足约束 $$p\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}\right) \geq 0$$ 和 $$\int_{\boldsymbol{x} \in \mathcal{X}} d x p\left(x_t=x \mid x_{t-1}\right)=1$$ 。
 
-如果我们假设转移函数 $p\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{1: t-1}\right)$ 与时间无关，此时的模型被称为是 homogeneous, stationary, or time-invariant。这便是 parameter tying，因为同样的参数在不同的变量之间共享。上述假设允许我们使用固定数量的参数对任意数量的变量进行建模。在剩下的内容中，我们的讨论将基于这个假设。
+如果我们假设转移函数 $$p\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{1: t-1}\right)$$ 与时间无关，此时的模型被称为是 homogeneous, stationary, or time-invariant。这便是 parameter tying，因为同样的参数在不同的变量之间共享。上述假设允许我们使用固定数量的参数对任意数量的变量进行建模。在剩下的内容中，我们的讨论将基于这个假设。
 
 ![image-20241231185752186](/assets/img/figures/book2/2.15.png)
 
@@ -1999,12 +1999,12 @@ $$
 一阶马尔可夫的假设还是太强了。我们可以将一阶模型推广到高阶版本，此时当前状态依赖最近的 $n$ 个观测值，对应的联合概率分布为：
 
 $$
-p\left(\boldsymbol{x}_{1: T}\right)=p\left(\boldsymbol{x}_{1: n}\right) \prod_{t=n+1}^T p\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-n: t-1}\right)
+p\left(\boldsymbol{x}_{1: T}\right)=p\left(\boldsymbol{x}_{1: n}\right) \prod_{t=n+1}^T p\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-n: t-1}\right) \tag{2.272}
 $$
 
-这被称为 **n 阶马尔可夫模型**。如果 $n=1$，上式被称为 **二元模型**（bigram model），因为我们需要建立成对状态之间的关系。如果 $n=2$，上式被称为 **三元模型**（trigram model），因为我们需要建立状态三元组之间的关系 $p\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}, \boldsymbol{x}_{t-2}\right)$。总体而言，上式被称为 **n-gram model**。
+这被称为 **n 阶马尔可夫模型**。如果 $n=1$，上式被称为 **二元模型**（bigram model），因为我们需要建立成对状态之间的关系。如果 $n=2$，上式被称为 **三元模型**（trigram model），因为我们需要建立状态三元组之间的关系 $$p\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}, \boldsymbol{x}_{t-2}\right)$$。总体而言，上式被称为 **n-gram model**。
 
-然而，请注意，我们总是可以通过定义一个包含过去 $n$ 个观测值的增广状态空间，将高阶马尔可夫模型转换为一阶马尔可夫模型。比方说，如果 $n=2$，我们定义 $\tilde{\boldsymbol{x}}_t=\left(\boldsymbol{x}_{t-1}, \boldsymbol{x}_t\right)$ 并定义联合概率分布为：
+然而，请注意，我们总是可以通过定义一个包含过去 $n$ 个观测值的增广状态空间，将高阶马尔可夫模型转换为一阶马尔可夫模型。比方说，如果 $n=2$，我们定义 $$\tilde{\boldsymbol{x}}_t=\left(\boldsymbol{x}_{t-1}, \boldsymbol{x}_t\right)$$ 并定义联合概率分布为：
 
 $$
 p\left(\tilde{\boldsymbol{x}}_{1: T}\right)=p\left(\tilde{\boldsymbol{x}}_2\right) \prod_{t=3}^T p\left(\tilde{\boldsymbol{x}}_t \mid \tilde{\boldsymbol{x}}_{t-1}\right)=p\left(\boldsymbol{x}_1, \boldsymbol{x}_2\right) \prod_{t=3}^T p\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{t-1}, \boldsymbol{x}_{t-2}\right)
@@ -2059,7 +2059,7 @@ $$
 \log p(\mathcal{D} \mid \boldsymbol{\theta})=\sum_{i=1}^N \log p\left(\boldsymbol{x}_i \mid \boldsymbol{\theta}\right)=\sum_j N_j^1 \log \pi_j+\sum_j \sum_k N_{j k} \log A_{j k} \tag{2.276}
 $$
 
-其中 $\boldsymbol{x}_i=\left(x_{i 1}, \ldots, x_{i, T_i}\right)$ 表示长度为 $T_i$ 的序列。
+其中 $$\boldsymbol{x}_i=\left(x_{i 1}, \ldots, x_{i, T_i}\right)$$ 表示长度为 $T_i$ 的序列。
 
 接下来，我们定义如下的统计量：
 
@@ -2153,7 +2153,7 @@ $$
 
 为了找到稳态分布，我们需要求解特征向量方程 $\mathbf{A}^{\top} \boldsymbol{v}=\boldsymbol{v}$，然后令 $\boldsymbol{\pi}=\boldsymbol{v}^{\top}$，其中 $\boldsymbol{v}$ 是特征值为 $1$ 的特征向量。（考虑到 $\mathbf{A}$ 是行随机矩阵，所以 $\mathbf{A1}=\mathbf{1}$ 必然成立，换句话说，矩阵 $\mathbf{A}$ 必然存在一个特征值为 $1$ 的特征向量 $\mathbf{1}$；考虑到 $\mathbf{A}$ 和 $\mathbf{A}^\text{T}$ 的特征值是相同的，所以 $\mathbf{A}^\text{T}$ 也存在特征向量 $\mathbf{1}$）当然，由于特征向量本身只在比例上是唯一的（即可以乘以任意非零常数得到相同方向的特征向量），我们必须在最后对 $\boldsymbol{v}$ 进行归一化，以确保它的分量和为 $1$。
 
-然而，请注意，只有当矩阵中的所有项都严格为正时，$A_{ij}>0$，特征向量才保证为实值（因此由于和为 $1$ 的约束，所以 $A_{ij}<1$）。一种更通用的方法可以处理存在转移概率为 $0$ 或 $1$ 的链（如图2.18（a））。 $\pi(\mathbf{I}-\mathbf{A})=\mathbf{0}_{K \times 1}$ 包含 $K$ 个约束和 $\boldsymbol{\pi} \mathbf{1}_{K \times 1}=1$ 包含 $1$ 个约束。因此，我们必须求解 $\boldsymbol{\pi} \mathbf{M}=\boldsymbol{r}$，其中 $\mathbf{M}=[\mathbf{I}-\mathbf{A}, \mathbf{1}]$ 是大小为 $K \times(K+1)$ 的矩阵，$\boldsymbol{r}=[0,0, \ldots, 0,1]$ 是大小为 $1 \times(K+1)$ 的向量。然而，这是 overconstrained 的，因此我们将删除 $\mathbf{M}$ 定义中 $\mathbf{I}-\mathbf{A}$ 的最后一列，并从 $\boldsymbol{r}$ 中删除最后一个$0$。例如，对于3态链，我们必须求解这个线性系统：
+然而，请注意，只有当矩阵中的所有项都严格为正时，$A_{ij}>0$，特征向量才保证为实值（因此由于和为 $1$ 的约束，所以 $A_{ij}<1$）。一种更通用的方法可以处理存在转移概率为 $0$ 或 $1$ 的链（如图2.18（a））。 $$\pi(\mathbf{I}-\mathbf{A})=\mathbf{0}_{K \times 1}$$ 包含 $K$ 个约束和 $$\boldsymbol{\pi} \mathbf{1}_{K \times 1}=1$$ 包含 $1$ 个约束。因此，我们必须求解 $$\boldsymbol{\pi} \mathbf{M}=\boldsymbol{r}$$，其中 $\mathbf{M}=[\mathbf{I}-\mathbf{A}, \mathbf{1}]$ 是大小为 $K \times(K+1)$ 的矩阵，$\boldsymbol{r}=[0,0, \ldots, 0,1]$ 是大小为 $1 \times(K+1)$ 的向量。然而，这是 overconstrained 的，因此我们将删除 $\mathbf{M}$ 定义中 $$\mathbf{I}-\mathbf{A}$$ 的最后一列，并从 $\boldsymbol{r}$ 中删除最后一个$0$。例如，对于3态链，我们必须求解这个线性系统：
 
 $$
 \left(\begin{array}{lll}
@@ -2179,11 +2179,13 @@ $$
 
 现在考虑图2.15（a）中的$2$-状态链。只要 $\alpha, \beta>0$，这就是不可约的。假设 $\alpha=\beta=0.9$。通过对称性可以清楚地看出，这条链将在每个状态中花费$50\%$的时间。因此 $\boldsymbol{\pi}=(0.5,0.5)$。但现在假设 $\alpha=\beta=1$。在这种情况下，链将在两个状态之间振荡，但状态的长期分布取决于你从哪里开始。如果我们从状态$1$开始，那么在每个奇数时间步 $(1,3,5, \ldots)$ 上，我们将处于状态$1$；但如果我们从状态$2$开始，那么在每个奇数时间步上，我们都会处于状态$2$。
 
-这个例子激发了以下定义。我们称一个链存在某个**极限分布**，如果存在 $\pi_j=\lim _{n \rightarrow \infty} A_{i j}^n$ ，并且与所有 $j$ 的起始状态 $i$ 无关。如果这成立，那么长期分布将与起始状态无关：
+这个例子激发了以下定义。我们称一个链存在某个**极限分布**，如果存在 $$\pi_j=\lim _{n \rightarrow \infty} A_{i j}^n$$ ，并且与所有 $j$ 的起始状态 $i$ 无关。如果这成立，那么长期分布将与起始状态无关：
+
 $$
 p\left(X_t=j\right)=\sum_i p\left(X_0=i\right) A_{i j}(t) \rightarrow \pi_j \text { as } t \rightarrow \infty \tag{2.284}
 $$
-现在让我们描述一下什么情况存在极限分布。将状态 $i$ 的**周期**（period）定义为 $d(i) \triangleq \operatorname{gcd}\left\{t: A_{i i}(t)>0\right\}$ ，其中gcd代表**最大公约数**，即将集合中所有成员分开的最大整数。例如，在图2.18（a）中，我们有 $d(1)=d(2)=\operatorname{gcd}(2,3,4,6, \ldots)=1$ ，$d(3)=\operatorname{gcd}(3,5,6, \ldots)=1$。如果 $d(i)=1$，我们说状态 $i$ 是非周期性的。（确保这一点的充分条件是状态 $i$ 具有自循环，但这不是必要条件。）如果一个链的所有状态都是非周期性的，我们就说它是非周期的。可以得到以下重要结果：
+
+现在让我们描述一下什么情况存在极限分布。将状态 $i$ 的**周期**（period）定义为 $$d(i) \triangleq \operatorname{gcd}\left\{t: A_{i i}(t)>0\right\}$$ ，其中gcd代表**最大公约数**，即将集合中所有成员分开的最大整数。例如，在图2.18（a）中，我们有 $d(1)=d(2)=\operatorname{gcd}(2,3,4,6, \ldots)=1$ ，$d(3)=\operatorname{gcd}(3,5,6, \ldots)=1$。如果 $d(i)=1$，我们说状态 $i$ 是非周期性的。（确保这一点的充分条件是状态 $i$ 具有自循环，但这不是必要条件。）如果一个链的所有状态都是非周期性的，我们就说它是非周期的。可以得到以下重要结果：
 
 **定理2.6.1**。每个不可约（单连通）的非周期有限状态马尔可夫链都有一个极限分布，它等于 $\boldsymbol{\pi}$ ，即其唯一的稳态分布。
 
@@ -2239,7 +2241,7 @@ $$
 
 ## 2.7 概率分布之间的距离测度
 
-本节，我们将讨论如何衡量两个定义在同一空间内的概率分布 $P$ 和 $Q$ 之间的差距。举例来说，假设分布是以样本的形式定义——$\mathcal{X}=\left\{x_{1, \ldots,} x_N\right\} \sim P$ 和 $\mathcal{X}^{\prime \prime}=\left\{\bar{x}_1, \ldots, \bar{x}_M\right\} \sim Q$。判断样本是否来自于同一个分布的问题被称为 **two-sample 检验** （参考图2.19）。为了解决这个问题，我们可以引入某些合适的 **divergence metric** $D(P,Q)$ ，并且与某个阈值进行比较。（我们使用术语 'divergence' 而不是 'distance'，因为我们并不要求 $D$ 是对称的。）假设 $P$ 是数据的经验分布，$Q$ 是通过模型拟合的近似分布。我们可以使用对比 $D(P,Q)$ 和一个阈值来评估模型对数据的近似程度；这被称为 **goodness-of-fit** 测试。
+本节，我们将讨论如何衡量两个定义在同一空间内的概率分布 $P$ 和 $Q$ 之间的差距。举例来说，假设分布是以样本的形式定义——$$\mathcal{X}=\left\{x_{1, \ldots,} x_N\right\} \sim P$$ 和 $$\mathcal{X}^{\prime \prime}=\left\{\bar{x}_1, \ldots, \bar{x}_M\right\} \sim Q$$。判断样本是否来自于同一个分布的问题被称为 **two-sample 检验** （参考图2.19）。为了解决这个问题，我们可以引入某些合适的 **divergence metric** $D(P,Q)$ ，并且与某个阈值进行比较。（我们使用术语 'divergence' 而不是 'distance'，因为我们并不要求 $D$ 是对称的。）假设 $P$ 是数据的经验分布，$Q$ 是通过模型拟合的近似分布。我们可以使用对比 $D(P,Q)$ 和一个阈值来评估模型对数据的近似程度；这被称为 **goodness-of-fit** 测试。
 
 存在两种主要的方式来对比一对分布：基于$P-Q$ 项 [Sug+13][^Sug13] 或者基于 $P/Q$ 项 [SSK12][^SSK12] 。接下来我们将介绍这些方案。（部分内容参考了[GSJ19][^GSJ19]）。
 
@@ -2351,7 +2353,7 @@ $$
 
 有几种定义函数类 $\mathcal{F}$ 的方式。一种是使用一个 $\mathrm{RKHS}$（Reproducing Kernel Hilbert Space），基于一个正定核函数定义；此时的方法被称为 maximum mean discrepancy 或者 MMD。参考2.7.3节的更多细节。
 
-另一种方式是将 $\mathcal{F}$ 定义所有**Lipschitz 连续函数**（函数的梯度大小受限）的集合，即 $\mathcal{F}=\left\{\|f\|_L \leq 1\right\}$，其中
+另一种方式是将 $\mathcal{F}$ 定义所有**Lipschitz 连续函数**（函数的梯度大小受限）的集合，即 $$\mathcal{F}=\left\{\|f\|_L \leq 1\right\}$$，其中
 
 $$
 \|f\|_L=\sup _{\boldsymbol{x} \neq \boldsymbol{x}^{\prime}} \frac{\left|f(\boldsymbol{x})-f\left(\boldsymbol{x}^{\prime}\right)\right|}{\left\|\boldsymbol{x}-\boldsymbol{x}^{\prime}\right\|} \tag{2.296}
@@ -2399,7 +2401,7 @@ $$
 
 #### 2.7.3.2 使用 kernel trick 计算 MMD
 
-本节，我们介绍如何在实践中计算公式（2.301）。给定两个样本集合 $\mathcal{X}=\left\{\boldsymbol{x}_n\right\}_{n=1}^N$ 和 $\mathcal{X}^{\prime}=\left\{\boldsymbol{x}_m^{\prime}\right\}_{m=1}^M$，其中 $\boldsymbol{x}_n \sim P$ ，$x_m^{\prime} \sim Q$。令 $\boldsymbol{\mu}_P=\frac{1}{N} \sum_{n=1}^N \phi\left(\boldsymbol{x}_n\right)$ ，$\boldsymbol{\mu}_Q=\frac{1}{M} \sum_{m=1}^M \phi\left(\boldsymbol{x}_m^{\prime}\right)$ 分别表示两个分布的核均值表征的经验估计。则 squared MMD 由下式计算
+本节，我们介绍如何在实践中计算公式（2.301）。给定两个样本集合 $$\mathcal{X}=\left\{\boldsymbol{x}_n\right\}_{n=1}^N$$ 和 $$\mathcal{X}^{\prime}=\left\{\boldsymbol{x}_m^{\prime}\right\}_{m=1}^M$$，其中 $\boldsymbol{x}_n \sim P$ ，$x_m^{\prime} \sim Q$。令 $$\boldsymbol{\mu}_P=\frac{1}{N} \sum_{n=1}^N \phi\left(\boldsymbol{x}_n\right)$$ ，$\boldsymbol{\mu}_Q=\frac{1}{M} \sum_{m=1}^M \phi\left(\boldsymbol{x}_m^{\prime}\right)$ 分别表示两个分布的核均值表征的经验估计。则 squared MMD 由下式计算
 
 $$
 \begin{align}
@@ -2431,7 +2433,7 @@ $$
 \mathrm{UME}^2(P, Q)=\frac{1}{J} \sum_{j=1}^J\left[\boldsymbol{\mu}_P\left(\boldsymbol{v}_j\right)-\boldsymbol{\mu}_Q\left(\boldsymbol{v}_j\right)\right]^2 \tag{2.306}
 $$
 
-其中 $\boldsymbol{\mu}_P(\boldsymbol{v})=\mathbb{E}_{p(\boldsymbol{x})}[\mathcal{K}(\boldsymbol{x}, \boldsymbol{v})]$ 可以在 $O(N)$ 的时间复杂度下估计得到。
+其中 $$\boldsymbol{\mu}_P(\boldsymbol{v})=\mathbb{E}_{p(\boldsymbol{x})}[\mathcal{K}(\boldsymbol{x}, \boldsymbol{v})]$$ 可以在 $O(N)$ 的时间复杂度下估计得到。
 
 [Jit+16][^Jit16] 中提出了一种UME 的归一化版本—— NME。通过关于位置 $\boldsymbol{v}_j$ 最大化 NME，我们可以最大化测试位置的统计效率，同时找到那些分布 $P$ 和 $Q$ 差别最大的位置。这为高维数据提供一种可解释的 two-sample 检验。
 
@@ -2474,7 +2476,7 @@ $$
 D_{\mathrm{TV}}(p, q) \triangleq \frac{1}{2}\|\boldsymbol{p}-\boldsymbol{q}\|_1=\frac{1}{2} \int|p(\boldsymbol{x})-q(\boldsymbol{x})| d \boldsymbol{x} \tag{2.307}
 $$
 
-上式等价于 $f(r)=|r-1| / 2$ 时的 $f\mathrm{-divergence}$，因为
+上式等价于 $f(r)=\lvert r-1 \rvert / 2$ 时的 $f\mathrm{-divergence}$，因为
 
 $$
 \frac{1}{2} \int q(\boldsymbol{x})\left|\frac{p(\boldsymbol{x})}{q(\boldsymbol{x})}-1\right| d \boldsymbol{x}=\frac{1}{2} \int q(\boldsymbol{x})\left|\frac{p(\boldsymbol{x})-q(\boldsymbol{x})}{q(\boldsymbol{x})}\right| d \boldsymbol{x}=\frac{1}{2} \int|p(\boldsymbol{x})-q(\boldsymbol{x})| d \boldsymbol{x} \tag{2.308}
@@ -2508,7 +2510,7 @@ $$
 
 我们也可以使用其他的损失函数 $\ell(y, h(\boldsymbol{x}))$ 实现同样的目标（参考26.2.2节）。
 
-令 $R_{h^*}^{\ell}=\inf _{h \in \mathcal{F}} R(h)$ 表示损失函数 $\ell$ 可获得的最小风险，其中我们在某个函数类 $\mathcal{F}$ 空间内进行最小化。[NWJ09][^NWJ09] 表明对于每一个 $f\mathrm{-divergence}$，存在一个损失函数 $\ell$ 使得 $-D_f(P, Q)=R_{h^*}^{\ell}$。举例来说（使用符号 $\tilde{y} \in\{-1,1\}$ 而非 $y \in\{0,1\}$），全变差距离对应于铰链损失 $\ell(\tilde{y}, h)=\max (0,1-\tilde{y} h)$；Helliinger 距离对应于指数损失 $\ell(\tilde{y}, h)=\exp (-\tilde{y} h)$ ；$\chi^2$散度对应于 logistic 损失 $\ell(\tilde{y}, h)=\log (1+\exp (-\tilde{y} h))$。
+令 $$R_{h^*}^{\ell}=\inf _{h \in \mathcal{F}} R(h)$$ 表示损失函数 $\ell$ 可获得的最小风险，其中我们在某个函数类 $\mathcal{F}$ 空间内进行最小化。[NWJ09][^NWJ09] 表明对于每一个 $f\mathrm{-divergence}$，存在一个损失函数 $\ell$ 使得 $$-D_f(P, Q)=R_{h^*}^{\ell}$$。举例来说（使用符号 $$\tilde{y} \in\{-1,1\}$$ 而非 $y \in\{0,1\}$），全变差距离对应于铰链损失 $$\ell(\tilde{y}, h)=\max (0,1-\tilde{y} h)$$；Helliinger 距离对应于指数损失 $$\ell(\tilde{y}, h)=\exp (-\tilde{y} h)$$ ；$\chi^2$散度对应于 logistic 损失 $$\ell(\tilde{y}, h)=\log (1+\exp (-\tilde{y} h))$$。
 
 我们也可以建立二元分类器与IPMs之间的联系 [Sri+09][^Sri09] 。具体而言，令 $\ell(\tilde{y}, h)=-2 \tilde{y} h$，$p(\tilde{y}=1)=p(\tilde{y}=-1)=0.5$。我们有
 
