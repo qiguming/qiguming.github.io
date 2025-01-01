@@ -2401,7 +2401,7 @@ $$
 
 #### 2.7.3.2 使用 kernel trick 计算 MMD
 
-本节，我们介绍如何在实践中计算公式（2.301）。给定两个样本集合 $$\mathcal{X}=\left\{\boldsymbol{x}_n\right\}_{n=1}^N$$ 和 $$\mathcal{X}^{\prime}=\left\{\boldsymbol{x}_m^{\prime}\right\}_{m=1}^M$$，其中 $\boldsymbol{x}_n \sim P$ ，$x_m^{\prime} \sim Q$。令 $$\boldsymbol{\mu}_P=\frac{1}{N} \sum_{n=1}^N \phi\left(\boldsymbol{x}_n\right)$$ ，$\boldsymbol{\mu}_Q=\frac{1}{M} \sum_{m=1}^M \phi\left(\boldsymbol{x}_m^{\prime}\right)$ 分别表示两个分布的核均值表征的经验估计。则 squared MMD 由下式计算
+本节，我们介绍如何在实践中计算公式（2.301）。给定两个样本集合 $$\mathcal{X}=\left\{\boldsymbol{x}_n\right\}_{n=1}^N$$ 和 $$\mathcal{X}^{\prime}=\left\{\boldsymbol{x}_m^{\prime}\right\}_{m=1}^M$$，其中 $$\boldsymbol{x}_n \sim P$$ ，$$x_m^{\prime} \sim Q$$。令 $$\boldsymbol{\mu}_P=\frac{1}{N} \sum_{n=1}^N \phi\left(\boldsymbol{x}_n\right)$$ ，$$\boldsymbol{\mu}_Q=\frac{1}{M} \sum_{m=1}^M \phi\left(\boldsymbol{x}_m^{\prime}\right)$$ 分别表示两个分布的核均值表征的经验估计。则 squared MMD 由下式计算
 
 $$
 \begin{align}
@@ -2527,3 +2527,10 @@ $$
 
 [^NWJ09]:
 [^Sri09]:
+
+---
+以下无正文！！！
+
+![image-wechat](/assets/img/figures/微信二维码1.png)
+
+![image-wechat](/assets/img/figures/微信二维码2.png)
