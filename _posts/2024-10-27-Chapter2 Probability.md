@@ -165,7 +165,7 @@ $$
 p(X=k \mid E)=\frac{p(E \mid X=k) p(X=k)}{p(E)}=\frac{p(E \mid X=k) p(X=k)}{\sum_{k^{\prime}=1}^K p\left(E \mid X=k^{\prime}\right) p\left(X=k^{\prime}\right)} \tag{2.16}
 $$
 
- 此处 $ P(X = k) $ 表示**先验概率**（prior probability），$$ P(E | X = k) $$ 表示**似然**（likelihood），$$ P(X = k | E) $$ 是**后验概率**（posterior probability），而 $ P(E) $ 是归一化常数，称为**边际似然**（marginal likelihood）。 
+ 此处 $ P(X = k) $ 表示**先验概率**（prior probability），$$ P(E \mid X = k) $$ 表示**似然**（likelihood），$$ P(X = k \mid E) $$ 是**后验概率**（posterior probability），而 $ P(E) $ 是归一化常数，称为**边际似然**（marginal likelihood）。 
 
  类似地，对于一个连续随机变量 $ X $，我们可以将贝叶斯定理写为：
 
@@ -279,7 +279,7 @@ $$
 
 #### 2.2.2.2 半正态分布
 
- 对于某些场景，我们希望在非负实数上定义一个分布。构建这样一个分布的一种方法是定义 $$ Y = |X| $$，其中 $$ X \sim N(0, \sigma^2) $$。由此产生的关于 $ Y $ 的分布被称为**半正态分布**（half-normal distribution），其概率密度函数（pdf）定义为：
+ 对于某些场景，我们希望在非负实数上定义一个分布。构建这样一个分布的一种方法是定义 $$ Y = \lvert X \rvert $$，其中 $$ X \sim N(0, \sigma^2) $$。由此产生的关于 $ Y $ 的分布被称为**半正态分布**（half-normal distribution），其概率密度函数（pdf）定义为：
 
 $$
 \mathcal{N}_{+}(y \mid \sigma) \triangleq 2 \mathcal{N}\left(y \mid 0, \sigma^2\right)=\frac{\sqrt{2}}{\sigma \sqrt{\pi}} \exp \left(-\frac{y^2}{2 \sigma^2}\right) \quad y \geq 0 \tag{2.29}
@@ -543,7 +543,7 @@ Z & =\frac{(2 \pi)^{D / 2} I_{D / 2-1}(\kappa)}{\kappa^{D / 2-1}} \tag{2.53}
 \end{align}
 $$
 
-其中 $ \boldsymbol{\mu} $ 是均值（满足 $ |\mu| = 1 $），$ \kappa \geq 0 $ 是集中度或精确度参数（类似于标准高斯分布中的 $ \frac{1}{\sigma} $），$ Z $ 是归一化常数，$ I_r(\kappa) $ 是第一类修正贝塞尔函数，阶数为 $ r $。冯·米塞斯-费舍尔分布类似于球面多变量高斯分布，它的参数化是基于余弦距离而不是欧几里得距离。
+其中 $ \boldsymbol{\mu} $ 是均值（满足 $ \lvert \mu \rvert = 1 $），$ \kappa \geq 0 $ 是集中度或精确度参数（类似于标准高斯分布中的 $ \frac{1}{\sigma} $），$ Z $ 是归一化常数，$ I_r(\kappa) $ 是第一类修正贝塞尔函数，阶数为 $ r $。冯·米塞斯-费舍尔分布类似于球面多变量高斯分布，它的参数化是基于余弦距离而不是欧几里得距离。
 
 冯·米塞斯-费舍尔（vMF）分布可以在混合模型中使用，用于聚类“2-归一化”向量，作为使用高斯混合模型的替代方案[Ban+05][^Ban05]。如果 $ \kappa \to 0 $，这会简化为球面$\text{K-means}$算法。它还可以在混合模型（主要部分$28.4.2$）中使用；这被称为球面主题模型[Rei+10][^Rei10]。
 
