@@ -139,7 +139,7 @@ $$
 \mathbb{P}\left[E_1 \cap E_2\right]=\mathbb{P}\left[E_1\right] \mathbb{P}\left[E_2\right] \tag{2.12}
 $$
 
-如果 $$\mathbb{P}\left[E_1\right]>0$$ 且 $$\mathbb{P}\left[E_2\right]>0$$，这等价于要求 $$P[E_1 | E_2] = P[E_1]$$，或者等价地，$$P[E_2 | E_1] = P[E_2]$$。类似地，我们说事件 $E_1$ 和 $E_2$ 在给定 $E_3$ 的情况下是条件独立的，如果
+如果 $$\mathbb{P}\left[E_1\right]>0$$ 且 $$\mathbb{P}\left[E_2\right]>0$$，这等价于要求 $$P[E_1 | E_2] = P[E_1]$$，或者等价地，$P[E_2 | E_1] = P[E_2]$。类似地，我们说事件 $$E_1$$ 和 $E_2$ 在给定 $$E_3$$ 的情况下是条件独立的，如果
 
 $$
 \mathbb{P}\left[E_1 \cap E_2 \mid E_3\right]=\mathbb{P}\left[E_1 \mid E_3\right] \mathbb{P}\left[E_2 \mid E_3\right] \tag{2.13}
