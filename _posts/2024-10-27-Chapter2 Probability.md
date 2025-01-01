@@ -410,7 +410,7 @@ $$
 \chi_\nu^2(x) \triangleq \mathrm{Ga}\left(x \mid \text { shape }=\frac{\nu}{2}, \text { rate }=\frac{1}{2}\right) \tag{2.41}
 $$
 
-其中 $\nu$ 被称为自由度。这是高斯随机变量平方和的分布。更精确地说，如果 $Z_i \sim N(0, 1)$，并且 $S = \sum_{i=1}^{\nu} Z_i^2$，那么 $S \sim \chi^2_{\nu}$。因此，如果 $X \sim N(0, \sigma^2)$ 那么 $X^2 \sim \sigma^2 \chi^2_{1}$。由于 $E\left[\chi^2_{1}\right] = 1$ 且 $V\left[\chi^2_{1}\right] = 2$，我们有：
+其中 $\nu$ 被称为自由度。这是高斯随机变量平方和的分布。更精确地说，如果 $Z_i \sim N(0, 1)$，并且 $$S = \sum_{i=1}^{\nu} Z_i^2$$，那么 $$S \sim \chi^2_{\nu}$$。因此，如果 $$X \sim N(0, \sigma^2)$$ 那么 $$X^2 \sim \sigma^2 \chi^2_{1}$$。由于 $$E\left[\chi^2_{1}\right] = 1$$ 且 $$V\left[\chi^2_{1}\right] = 2$$，我们有：
 
 $$
 \mathbb{E}\left[X^2\right]=\sigma^2, \mathbb{V}\left[X^2\right]=2 \sigma^4 \tag{2.42}
