@@ -139,7 +139,7 @@ $$
 \mathbb{P}\left[E_1 \cap E_2\right]=\mathbb{P}\left[E_1\right] \mathbb{P}\left[E_2\right] \tag{2.12}
 $$
 
-如果 $\mathbb{P}\left[E_1\right]>0$ 且 $\mathbb{P}\left[E_2\right]>0$，这等价于要求 $ P[E_1 | E_2] = P[E_1] $，或者等价地，$ P[E_2 | E_1] = P[E_2] $。类似地，我们说事件 $E_1$ 和 $E_2$ 在给定 $E_3$ 的情况下是条件独立的，如果 
+如果 $\mathbb{P}\left[E_1\right]>0$ 且 $\mathbb{P}\left[E_2\right]>0$，这等价于要求 $$ P[E_1 | E_2] = P[E_1] $$，或者等价地，$$ P[E_2 | E_1] = P[E_2] $$。类似地，我们说事件 $E_1$ 和 $E_2$ 在给定 $E_3$ 的情况下是条件独立的，如果 
 
 $$
 \mathbb{P}\left[E_1 \cap E_2 \mid E_3\right]=\mathbb{P}\left[E_1 \mid E_3\right] \mathbb{P}\left[E_2 \mid E_3\right] \tag{2.13}
@@ -165,7 +165,7 @@ $$
 p(X=k \mid E)=\frac{p(E \mid X=k) p(X=k)}{p(E)}=\frac{p(E \mid X=k) p(X=k)}{\sum_{k^{\prime}=1}^K p\left(E \mid X=k^{\prime}\right) p\left(X=k^{\prime}\right)} \tag{2.16}
 $$
 
- 此处 $ P(X = k) $ 表示**先验概率**（prior probability），$ P(E | X = k) $ 表示**似然**（likelihood），$ P(X = k | E) $ 是**后验概率**（posterior probability），而 $ P(E) $ 是归一化常数，称为**边际似然**（marginal likelihood）。 
+ 此处 $ P(X = k) $ 表示**先验概率**（prior probability），$$ P(E | X = k) $$ 表示**似然**（likelihood），$$ P(X = k | E) $$ 是**后验概率**（posterior probability），而 $ P(E) $ 是归一化常数，称为**边际似然**（marginal likelihood）。 
 
  类似地，对于一个连续随机变量 $ X $，我们可以将贝叶斯定理写为：
 
@@ -279,7 +279,7 @@ $$
 
 #### 2.2.2.2 半正态分布
 
- 对于某些场景，我们希望在非负实数上定义一个分布。构建这样一个分布的一种方法是定义 $ Y = |X| $，其中 $ X \sim N(0, \sigma^2) $。由此产生的关于 $ Y $ 的分布被称为**半正态分布**（half-normal distribution），其概率密度函数（pdf）定义为：
+ 对于某些场景，我们希望在非负实数上定义一个分布。构建这样一个分布的一种方法是定义 $$ Y = |X| $$，其中 $$ X \sim N(0, \sigma^2) $$。由此产生的关于 $ Y $ 的分布被称为**半正态分布**（half-normal distribution），其概率密度函数（pdf）定义为：
 
 $$
 \mathcal{N}_{+}(y \mid \sigma) \triangleq 2 \mathcal{N}\left(y \mid 0, \sigma^2\right)=\frac{\sqrt{2}}{\sigma \sqrt{\pi}} \exp \left(-\frac{y^2}{2 \sigma^2}\right) \quad y \geq 0 \tag{2.29}
