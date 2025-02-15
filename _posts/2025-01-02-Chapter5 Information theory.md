@@ -50,15 +50,19 @@ comments: true
 4. **对均匀分布的单调性**：虽然一般情况下很难确定信念更新的幅度，但在某些特殊情况下我们可以有清晰的直觉。例如，如果我们的信念从 $N$ 个元素的均匀分布更新为 $N'$ 个元素的均匀分布，那么信息增益应该是关于 $N$ 的递增函数，同时是 $N'$ 的递减函数。例如，从所有四种花色的均匀分布 $[\frac{1}{4}, \frac{1}{4}, \frac{1}{4}, \frac{1}{4} ]$（$N = 4$）更新到仅一种花色（如全是梅花）$[1, 0, 0, 0]$（$N' = 1$）的更新幅度，比更新为仅黑色的花色 $[ \frac{1}{2}, \frac{1}{2}, 0, 0 ]$（$N' = 2$）的更新幅度更大。
 
 5. **满足自然链式法则**：到目前为止，我们一直在描述对下一张抽牌结果的信念，这个信念是一个表示下一张牌花色的随机变量（$S\in${♣,♠,♡,♢}。我们也可以等效地将上述过程拆分成两个步骤。首先，考虑一个表示牌的颜色的随机变量（$C\in\{\blacksquare，\square\}$），其中黑色$\blacksquare$表示 {♣,♠}，红色$\square$表示 {♡,♢}。然后，如果我们抽到的是红色牌，然后进一步描述它是红心（♡）还是方块（♢）的概率分布；如果抽到的是黑色牌，然后进一步描述它是梅花（♣）还是黑桃（♠）的概率分布。这种方式可以将联合概率分布表示为关于花色的边际分布和以花色为条件的概率分布的因式分解形式，并且符合自然链式法则。比方说：
+
    $$
    p(S)=\left[\frac{3}{8}, \frac{2}{8}, \frac{2}{8}, \frac{1}{8}\right]\tag{5.1}
    $$
+
    拆分成
+
    $$
    p(C)=\left[\frac{5}{8}, \frac{3}{8}\right] \quad p(\{\clubsuit, \spadesuit\} \mid C=\blacksquare)=\left[\frac{3}{5}, \frac{2}{5}\right] \quad p(\{\heartsuit, \diamondsuit\} \mid C=\square)=\left[\frac{2}{3}, \frac{1}{3}\right] \tag{5.2}
    $$
 
 ​	同样地，我们可以对均匀分布 $q$ 进行分解。显然，为了使我们的信息度量具有实用性，不论我们如何拆分同一个物理过程，信息更新的幅度需要保持一致。我们需要的是一种方法，将四种不同的信息增益关联起来：
+
 $$
 \begin{align}
 & I_S \equiv I[p(S) \| q(S)] \tag{5.3}\\
@@ -67,26 +71,35 @@ $$
 & I_{\square} \equiv I[p(\{\heartsuit, \diamondsuit\} \mid C=\square) \| q(\{\heartsuit, \diamondsuit\} \mid C=\square)] \tag{5.6}
 \end{align}
 $$
+
 显然 $I_S$ 应该是关于 $\{I_C, I_\blacksquare, I_\square\}$ 的某个函数。所以，我们的最后一个理想条件是 $I_S$ 是 $I_C, I_\blacksquare, I_\square$ 的线性组合。具体而言，我们要求它们以加权线性组合的形式结合，其中权重根据分布 $p$ 决定：
+
 $$
 I_S = I_C +p(C=\blacksquare)I_\blacksquare+p(C=\square)I_\square=I_C+\frac{5}{8}I_\blacksquare+\frac{3}{8}I_\square \tag{5.7}
 $$
+
 更正式的表述为：如果我们将 $\boldsymbol{x}$ 拆分成两个部分 $[\boldsymbol{x}_L,\boldsymbol{x}_R]$，那么我们有 $p(\boldsymbol{x})=p\left(\boldsymbol{x}_L\right) p\left(\boldsymbol{x}_R \mid \boldsymbol{x}_L\right)$，同样 $q$ 也有类似的表达，那更新的幅度应该是
+
 $$
 I[p(\boldsymbol{x}) \| \boldsymbol{q}(\boldsymbol{x})]=I\left[p\left(\boldsymbol{x}_L\right) \| q\left(\boldsymbol{x}_L\right)\right]+\mathbb{E}_{p\left(\boldsymbol{x}_L\right)}\left[I\left[p\left(\boldsymbol{x}_R \mid \boldsymbol{x}_L\right) \| q\left(\boldsymbol{x}_R \mid \boldsymbol{x}_L\right)\right]\right] \tag{5.8}
 $$
+
 请注意，这一要求打破了两个分布之间的对称性：右侧要求我们根据边缘分布计算条件信息增益的期望，但我们需要决定以哪一个边缘分布来计算期望。
 
 ### 5.1.2 KL散度唯一满足上述条件
 
 我们现在将定义一个满足上述所有要求（除一个乘法常数外）的唯一的度量。**Kullback-Leibler 散度**（或称为 KL 散度），也称为**信息增益**（information gain）或**相对熵**（relative entropy），其定义如下：
+
 $$
 D_{\mathrm{KL}}(p \| q) \triangleq \sum_{k=1}^K p_k \log \frac{p_k}{q_k} \tag{5.9}
 $$
+
 扩展到连续分布：
+
 $$
 D_{\mathrm{KL}}(p \| q) \triangleq \int d x p(x) \log \frac{p(x)}{q(x)} \tag{5.10}
 $$
+
 接下来，我们将验证此定义是否满足我们的所有要求。（例如，可以在[Hob69][^Hob69]；[Rén61][^Ren61]中找到证明它是满足这些属性的唯一度量的证据。）
 
 [^Hob69]:
@@ -95,22 +108,27 @@ $$
 #### 5.1.2.1 KL的连续性
 
 KL散度显然是连续的，除了两种情况需要额外考虑一下，即当 $p_k$ 或 $q_k$ 等于0的时候。首先考虑第一种情况，注意到当 $p \rightarrow 0$，KL的极限情况表现依然良好：
+
 $$
 \lim _{p \rightarrow 0} p \log \frac{p}{q}=0 \tag{5.11}
 $$
+
 将此作为$p=0$时被积函数的结果，将使KL在$p=0$处连续。问题在于当 $p \neq 0$ 而 $q=0$ 时。所以信息增益要求原始信念分布 $q$ 在更新分布 $p$ 有定义的任何地方同样有定义。直观上，将完全为 0 的信念（$q_k=0$）更新到某个正值（$p_k\gt0$），需要无穷的信息。
 
 #### 5.1.2.2 KL 的非负性
 
 本节，我们将证明 KL 散度永远是非负的。这里将使用 **琴森不等式**（Jensen's inequality），即，对于任意凸函数 $f$，我们有
+
 $$
 f\left(\sum_{i=1}^n \lambda_i \boldsymbol{x}_i\right) \leq \sum_{i=1}^n \lambda_i f\left(\boldsymbol{x}_i\right) \tag{5.12}
 $$
+
 其中 $\lambda_i \ge 0$，$\Sigma_{i=1}^n\lambda_i=1$。上式可以通过归纳法来证明，其中$n=2$的情况遵循凸性的定义。
 
 **定理5.1.1.** （信息不等式）$D_{\mathrm{KL}}(p \| q) \geq 0$ 当且仅当 $p=q$ 时，等号满足。
 
 *证明*。沿用 [CT06][^CT06] 的方法。正如我们在前文中提到的，KL散度需要额外考虑 $p(x)=0$ 或 $q(x)=0$ 的特殊情况，此处也一样。令 $A=\{x:p(x)\gt0\}$ 表示 $p(x)$ 的支撑集。利用负对数函数是凸函数的性质和琴森不等式，我们有
+
 $$
 \begin{align}
 -D_{\mathrm{KL}}(p \| q) & =-\sum_{x \in A} p(x) \log \frac{p(x)}{q(x)}=\sum_{x \in A} p(x) \log \frac{q(x)}{p(x)} 		\tag{5.13}\\
@@ -118,6 +136,7 @@ $$
 & \leq \log \sum_{x \in \mathcal{X}} q(x)=\log 1=0 \tag{5.15}
 \end{align}
 $$
+
 考虑到 $\log(x)$ 是严格凹函数（所以$-\log(x)$ 是凸函数），式（5.14）的不等式中等号成立的充要条件是 $p(x)=cq(x)$ ，其中常数 $c$ 用于表示整个空间 $\mathcal{X}$ 中集合 $A$ 所占的比例。公式（5.15）等号成立的充要条件是 $\sum_{x \in A} q(x)=\sum_{x \in \mathcal{X}} q(x)=1$，即 $c=1$。所以 $D_{\mathbb{KL}}(p \| q)=0$ 的充要条件是对于所有的 $x$ ，满足 $p(x)=q(x)$。
 
 KL 散度的非负性往往被认为是信息论中最有用的结论之一。每当你能够将一个表达式重新写成包含 KL 散度的形式时，由于 KL 散度保证是非负的，直接忽略相关项就能立即得到一个表达式的确界（bound）。
@@ -127,17 +146,21 @@ KL 散度的非负性往往被认为是信息论中最有用的结论之一。�
 我们希望信息度量对标签的排列具有不变性。离散形式的信念显然具有置换不变性，就像求和一样。KL散度显然满足重参数不变性。换句话说，如果使用一个可逆映射对随机变量进行变换，这个过程并不会改变KL散度本身。
 
 假设将随机变量 $x$ 映射到 $y=f(x)$ ，已知 $p(x) d x=p(y) d y$ 和 $q(x) d x=q(y) d y$。所以 KL 散度对于两个随机变量是相同的：
+
 $$
 D_{\mathbb{KL}}(p(x) \| q(x))=\int d x p(x) \log \frac{p(x)}{q(x)}=\int d y p(y) \log \left(\frac{p(y)\left|\frac{d y}{d x}\right|}{q(y)\left|\frac{d y}{d x}\right|}\right)=D_{\mathbb{KL}}(p(y) \| q(y)) \tag{5.16}
 $$
+
 由于这种重参数不变性，我们可以放心地认为，当我们衡量两个分布之间的KL散度时，我们衡量的是分布的某些特性，而不是变量所在的空间。因此，我们可以自由地将变量映射到便于分析的空间——例如图像的傅里叶空间——而不会影响结果。
 
 #### 5.1.2.4 均匀分布的单调性
 
 考虑从一个包含 $N$ 个元素的均匀分布更新到一个包含 $N'$ 个元素的均匀分布。KL散度为：
+
 $$
 D_{\mathbb{KL}}(p \| q)=\sum_k \frac{1}{N^{\prime}} \log \frac{\frac{1}{N^{\prime}}}{\frac{1}{N}}=\log \frac{N}{N^{\prime}} \tag{5.17}
 $$
+
 上式也可以解释为更新前后元素数量比的对数。这满足单调性的要求。
 
 我们可以这样解读这个结果：考虑通过二分法在一个已排序的数组中查找某个元素。一个设计良好的“是/否”问题可以将搜索空间一分为二。以比特为单位，KL散度告诉我们，从 $q$ 到 $p$ 平均需要多少个设计良好的“是/否”问题。
@@ -175,6 +198,7 @@ KL散度会告诉你，在你最初的假设下，平均需要多少个“是/�
 #### 5.1.2.5 KL散度的链式法则
 
 此处，我们将介绍 KL 散度满足的自然链式法则：
+
 $$
 \begin{align}
 D_{\mathbb{KL}}(p(x, y) \| q(x, y)) & =\int d x d y p(x, y) \log \frac{p(x, y)}{q(x, y)} \tag{5.18}\\
@@ -182,9 +206,11 @@ D_{\mathbb{KL}}(p(x, y) \| q(x, y)) & =\int d x d y p(x, y) \log \frac{p(x, y)}{
 & =D_{\mathbb{KL}}(p(x) \| q(x))+\mathbb{E}_{p(x)}\left[D_{\mathbb{KL}}(p(y \mid x) \| q(y \mid x))\right] . \tag{5.20}
 \end{align}
 $$
+
 所以，实际上我们将分布分解为对应的条件分布形式，而KL散度直接可以相加。
 
 为了符号上的简洁，我们定义 **条件KL散度** 为两个条件概率分布的KL散度的期望：
+
 $$
 D_{\mathbb{KL}}(p(y \mid x) \| q(y \mid x)) \triangleq \int d x p(x) \int d y p(y \mid x) \log \frac{p(y \mid x)}{q(y \mid x)} \tag{5.21}
 $$
@@ -200,6 +226,7 @@ $$
 如果使用底数为2的对数，则KL的单位为 **bits**，全称为 "binary digits"。如果使用自然对数，单位为 **nats**，即 "natural units"。
 
 两种单位的切换很简单，使用 $\log _2 y=\frac{\log y}{\log 2}$。所以
+
 $$
 \begin{align}
 & 1 \text { bit }={\ln (2)} \text { nats } \approx 0.693 \text { nats }\tag{5.22} \\
@@ -212,33 +239,45 @@ $$
 KL 散度在两个分布之间并不是对称的。虽然许多人在初次接触时会觉得这种不对称令人困惑，但我们可以看到，这种不对称源于我们在5.1.2.5节介绍的自然链式法则。当我们将分布分解为条件分布时，需要在某个分布下求解期望。在 KL 散度中，我们是在第一个分布 $p(x)$ 下计算期望的。这打破了两个分布之间的对称性。
 
 从直观的角度，我们可以看到，从 $q$ 更新到 $p$ 所需的信息通常不同于从 $p$ 更新到 $q$ 所需的信息。例如，考虑两个伯努利分布之间的 KL 散度，第一个分布的成功概率为 0.443，第二个分布的成功概率为 0.975：
+
 $$
 \mathrm{D}_{\mathbb{KL}}=0.975 \log \frac{0.975}{0.443}+0.025 \log \frac{0.025}{0.557}=0.692 \text { nats } \sim 1.0 \text { bits. } \tag{5.24}
 $$
+
 所以从分布 $[0.443,0.557]$ 更新到伯努利分布 $[0.975, 0.025]$ 消耗 $1$ bit 的信息。那反过来会是什么情况呢？
+
 $$
 \mathrm{D}_{\mathbb{KL}}=0.443 \log \frac{0.443}{0.975}+0.557 \log \frac{0.557}{0.025}=1.38 \text { nats } \sim 2.0 \text { bits, } \tag{5.25}
 $$
+
 因此，反向更新所需的信息量是两个比特，或者说是两倍的信息量。因此，我们可以看到，从一个几乎均匀的分布更新到一个几乎确定的分布大约需要 1 比特的信息，或者说需要一个设计得当的“是/否”问题。而要从接近确定的分布更新到类似于抛硬币的随机分布，需要更多的说服力（信息）。
 
 #### 5.1.3.3 KL as expected weight of evidence
 
 假设我们需要在两个候选分布 $P$ 和 $Q$ 之间进行选择。你收集了一些数据 $D$。贝叶斯定理告诉我们如何更新某个假设的正确性：
+
 $$
 \operatorname{Pr}(P \mid D)=\frac{\operatorname{Pr}(D \mid P)}{\operatorname{Pr}(D)} \operatorname{Pr}(P) . \tag{5.26}
 $$
+
 正常情况下，我们需要计算边际似然 $\text{Pr}(D)$，这一点很困难。如果我们考虑两个假设的后验分布的比率：
+
 $$
 \frac{\operatorname{Pr}(P \mid D)}{\operatorname{Pr}(Q \mid D)}=\frac{\operatorname{Pr}(D \mid P)}{\operatorname{Pr}(D \mid Q)} \frac{\operatorname{Pr}(P)}{\operatorname{Pr}(Q)}, \tag{5.27}
 $$
+
 此时的边际似然可以被绕开。对上式两边取对数：
+
 $$
 \log \frac{\operatorname{Pr}(P \mid D)}{\operatorname{Pr}(Q \mid D)}=\log \frac{p(D)}{q(D)}+\log \frac{\operatorname{Pr}(P)}{\operatorname{Pr}(Q)} \tag{5.28}
 $$
+
 某个假设相较于另一个假设的对数后验概率比等于对数先验分布比加上 **weight of evidence **[Goo85][^Goo85] ：
+
 $$
 w[P / Q ; D] \triangleq \log \frac{p(D)}{q(D)} \tag{5.29}
 $$
+
 基于这个解释，KL 散度实际上是假设 $P$ 相较于假设 $Q$ 的 weight of evidence 的期望值，该期望值在假设分布 $P$ 下进行计算（假设 $P$ 是正确的）。由于KL散度始终为非负值，当我们采样更多数据时，它通常会帮助我们更加支持正确的假设，而不是反对它。实际上，可以将 weight of evidence 解释为 KL 的一种简化版，它们都衡量了两个假设在同一组 evidence （即采样到的数据）上的表现能力。
 
 ![image-20250126095453940](/assets/img/figures/book2/5.1.png)
@@ -274,16 +313,21 @@ KL 的非对称性说明最小化 $D_{\mathbb{KL}}(p \| q)$ （又被称为 incl
 #### 5.1.4.2 Moment projection (mode covering)
 
 考虑通过最小化 forwards KL 计算分布 $q$:
+
 $$
 q=\underset{q}{\operatorname{argmin}} D_{\mathbb{KL}}(p \| q) \tag{5.30}
 $$
+
 这被称为 **M-projection** 或者 **moment projection**，因为正如我们接下来要证明的，最优的 $q$ 将与真实的 $p$ 的矩相匹配。 所以优化 $q$ 的过程又被称为 **moment matching**。
 
 为了说明为什么最优的 $q$ 必须与 $p$ 的矩匹配，不妨假设分布 $q$ 是一个指数族分布：
+
 $$
 q(\boldsymbol{x})=h(\boldsymbol{x}) \exp \left[\boldsymbol{\eta}^{\top} \mathcal{T}(\boldsymbol{x})-\log Z(\boldsymbol{\eta})\right] \tag{5.31}
 $$
+
 其中 $\mathcal{T}(\boldsymbol{x})$ 被称为充分统计量向量， $\boldsymbol{\eta}$ 被称为自然参数。一阶最优解为：
+
 $$
 \begin{align}
 \partial_{\eta_i} D_{\mathbb{KL}}(p \| q) & =-\partial_{\eta_i} \int_{\boldsymbol{x}} p(\boldsymbol{x}) \log q(\boldsymbol{x}) \tag{5.32}\\
@@ -293,9 +337,11 @@ $$
 & =-\mathbb{E}_{p(\boldsymbol{x})}\left[\mathcal{T}_i(\boldsymbol{x})\right]+\mathbb{E}_{q(\boldsymbol{x})}\left[\mathcal{T}_i(\boldsymbol{x})\right]=0 \tag{5.36}
 \end{align}
 $$
+
 上式倒数第二行利用了*对数配分函数的导数等于充分统计量的期望值*（参考公式 2.216）。所以两个分布的充分统计量的期望值（即分布的矩）必须匹配。
 
 举个例子，假设真实的目标分布 $p$ 是一个具有完全协方差矩阵的 $2d$ 高斯分布，$p(\boldsymbol{x})=\mathcal{N}(\boldsymbol{x} \mid \boldsymbol{\mu}, \boldsymbol{\Sigma})=\mathcal{N}\left(\boldsymbol{x} \mid \boldsymbol{\mu}, \boldsymbol{\Lambda}^{-1}\right)$，其中
+
 $$
 \boldsymbol{\mu}=\binom{\mu_1}{\mu_2}, \quad \boldsymbol{\Sigma}=\left(\begin{array}{ll}
 \Sigma_{11} & \Sigma_{12} \\
@@ -305,22 +351,29 @@ $$
 \Lambda_{12}^{\top} & \Lambda_{22}
 \end{array}\right) \tag{5.37}
 $$
+
 我们使用2个1d对角高斯分布的乘积 $q$ 来近似分布 $p$：
+
 $$
 q(\boldsymbol{x} \mid \boldsymbol{m}, \mathbf{V})=\mathcal{N}\left(x_1 \mid m_1, v_1\right) \mathcal{N}\left(x_2 \mid m_2, v_2\right) \tag{5.38}
 $$
+
 如果我们使用矩匹配，最优的 $q$ 必然满足如下的形式：
+
 $$
 q(\boldsymbol{x})=\mathcal{N}\left(x_1 \mid \mu_1, \Sigma_{11}\right) \mathcal{N}\left(x_2 \mid \mu_2, \Sigma_{22}\right) \tag{5.39}
 $$
+
 在图5.2(a) 中，我们展示了最终的分布。我们发现 $q$ 覆盖（包含）$p$，但它的支撑集覆盖面更广（相应的，每个点的概率值偏低，即under-confidence）。
 
 #### 5.1.4.3 Information projection (mode seeking)
 
 现在通过最小化 reverse KL 优化 $q$:
+
 $$
 q=\underset{q}{\operatorname{argmin}} D_{\mathbb{KL}}(q \| p) \tag{5.40}
 $$
+
 这被称为 **I-projection** 或者 **information projection**。该优化问题通常更加简单，因为优化目标需要关于分布 $q$ 计算期望，所以我们可以选择那些容易处理的分布族。
 
 作为一个例子，同样假设真实分布是一个具有完全协方差矩阵的高斯分布，$p(\boldsymbol{x})=\mathcal{N}\left(\boldsymbol{x} \mid \boldsymbol{\mu}, \boldsymbol{\Lambda}^{-1}\right)$，同时令近似的分布是一个具有对角协方差矩阵的高斯分布 $q(\boldsymbol{x})=\mathcal{N}(\boldsymbol{x} \mid \boldsymbol{m}, \operatorname{diag}(\boldsymbol{v}))$。可以证明（参考附录 5.1.2 节）最优的变分参数满足 $\boldsymbol{m}=\boldsymbol{\mu}$ 和 $v_i=\boldsymbol{\Lambda}_{i i}^{-1}$。图5.2(b) 给出了说明。我们发现近似的分布方差特别狭窄，换句话说，近似的分布是over-confident 的。然而需要注意的是，最小化 reverse KL 并不总是导致一个过于紧凑的近似分布，相关解释参考 [Tur+08][^Tur08]。
@@ -336,25 +389,35 @@ $$
 KL散度的一个重要属性是压缩引理（compression lemma）：
 
 **定理5.1.2.** 对任意具有良好KL定义的分布 $P$ 和 $Q$，任意与分布处于同一定义域的标量函数 $\phi$ 满足：
+
 $$
 \mathbb{E}_P[\phi] \leq \log \mathbb{E}_Q\left[e^\phi\right]+D_{\mathbb{KL}}(P \| Q) \tag{5.41}
 $$
+
  *证明.* 已知任意两个分布之间的 KL 散度总是非负的。考虑如下形式的分布：
+
 $$
 g(x)=\frac{q(x)}{\mathcal{Z}} e^{\phi(x)} \tag{5.42}
 $$
+
 其中 *配分函数* 定义为：
+
 $$
 \mathcal{Z}=\int d x q(x) e^{\phi(x)} \tag{5.43}
 $$
+
 计算分布 $p(x)$ 和 $g(x)$ 之间的 KL 散度，我们有：
+
 $$
 D_{\mathbb{KL}}(P \| G)=D_{\mathbb{KL}}(P \| Q)-\mathbb{E}_P[\phi(x)]+\log (\mathcal{Z}) \geq 0. \tag{5.44}
 $$
+
 compression lemma实际上提供了KL散度的Donsker-Varadhan变分表示：
+
 $$
 D_{\mathbb{KL}}(P \| Q)=\sup _\phi \mathbb{E}_P[\phi(x)]-\log \mathbb{E}_Q\left[e^{\phi(x)}\right] . \tag{5.45}
 $$
+
 对所有定义域与分布相同的函数 $\phi$，KL散度是式（5.45）右侧能取到的最大值。对于任意固定的函数 $\phi(x)$，上式右侧提供了一个关于KL散度的下确界。
 
 压缩引理的另一个用途是，它提供了一种估计某些函数在未知分布 $P$ 下的期望的方法。基于这种思想，压缩引理可以用来推导一组PAC-Bayes确界的结果，这些确界将损失函数（如上式的 $\phi$）相对于真实分布（如分布 $P$）的表现与在有限训练集（如分布 $Q$）上测量的损失联系起来。例如，参考第17.4.5节或Banerjee [Ban06][^Ban06]。
@@ -366,10 +429,13 @@ $$
 对于来自两个不同分布的样本，任何对样本进行的后处理都会使两个分布彼此更加接近。这被称为**数据处理不等式**（data processing inequality），因为它表明，通过对数据进行处理，并不能增加从 $q$ 到 $p$ 的信息增益。
 
 **定理5.1.3.** 考虑两个不同的分布 $p(x)$ 和 $q(x)$，以及一个概率信道 $t(y∣x)$。如果 $p(y)$ 是 $p(x)$ 经过信道 $t(y∣x)$ 后得到的分布，同理 $q(y)$ 也是 $q(x)$ 经过信道处理后得到的分布，则我们有：
+
 $$
 D_{\mathbb{KL}}(p(x) \| q(x)) \geq D_{\mathbb{KL}}(p(y) \| q(y)) \tag{5.46}
 $$
+
 *证明.* 证明过程再次使用了 5.1.2.2 节的琴森不等式。考虑到 $p(x, y)=p(x) t(y \mid x)$ 和 $q(x, y)=q(x) t(y \mid x)$。
+
 $$
 \begin{align}
 D_{\mathbb{KL}}(p(x) \| q(x)) & =\int d x p(x) \log \frac{p(x)}{q(x)} \tag{5.47} \\
@@ -381,15 +447,19 @@ D_{\mathbb{KL}}(p(x) \| q(x)) & =\int d x p(x) \log \frac{p(x)}{q(x)} \tag{5.47}
 & =\int d y p(y) \log \frac{p(y)}{q(y)}=D_{\mathbb{KL}}(p(y) \| q(y)) \tag{5.53}
 \end{align}
 $$
+
 上述结果的一种解释是，任何对随机样本的处理都会使两个分布变得难以区分。
 
 作为一种特殊的数据处理方式式，我们可以仅对部分随机变量进行边缘化。
 
 **推论 5.1.1.** （KL散度的单调性）
+
 $$
 D_{\mathbb{KL}}(p(x, y) \| q(x, y)) \geq D_{\mathbb{KL}}(p(x) \| q(x)) \tag{5.54}
 $$
+
 *证明.* 证明过程跟上面一样。
+
 $$
 \begin{align}
 D_{\mathbb{KL}}(p(x, y) \| q(x, y)) & =\int d x \int d y p(x, y) \log \frac{p(x, y)}{q(x, y)} \tag{5.55}\\
@@ -398,20 +468,25 @@ D_{\mathbb{KL}}(p(x, y) \| q(x, y)) & =\int d x \int d y p(x, y) \log \frac{p(x,
 & =\int d y p(y) \log \frac{p(y)}{q(y)}=D_{\mathbb{KL}}(p(y) \| q(y)) \tag{5.58}
 \end{align}
 $$
+
 对该结果的一种直观解释是，相较于观测到全部随机变量，只观测到部分随机变量，会增加区分两个分布的难度。
 
 ### 5.1.6 KL散度和MLE
 
  假设我们想找到与分布 $p$ 在 KL 散度维度最近的分布 $q$： 
+
 $$
 q^*=\arg \min _q D_{\mathbb{KL}}(p \| q)=\arg \min _q \int p(x) \log p(x) d x-\int p(x) \log q(x) d x \tag{5.60}
 $$
 
 假设 $p$ 是一个经验分布，该分布将全部概率质量分配到观测数据：
+
 $$
 p_{\mathcal{D}}(x)=\frac{1}{N} \sum_{n=1}^N \delta\left(x-x_n\right) \tag{5.61}
 $$
+
 使用 delta 函数的平移属性，我们有
+
 $$
 \begin{align}
 D_{\mathbb{KL}}\left(p_{\mathcal{D}} \| q\right) & =-\int p_{\mathcal{D}}(x) \log q(x) d x+C \tag{5.62}\\
@@ -419,16 +494,21 @@ D_{\mathbb{KL}}\left(p_{\mathcal{D}} \| q\right) & =-\int p_{\mathcal{D}}(x) \lo
 & =-\frac{1}{N} \sum_n \log q\left(x_n\right)+C \tag{5.64}
 \end{align}
 $$
+
 其中 $C=\int p_{\mathcal{D}}(x) \log p_{\mathcal{D}}(x)$ 是与 $q$ 无关的常量。
 
 我们可以将上式重写成
+
 $$
 D_{\mathbb{KL}}\left(p_{\mathcal{D}} \| q\right)=\mathbb{H}_{c e}\left(p_{\mathcal{D}}, q\right)-\mathbb{H}\left(p_{\mathcal{D}}\right) \tag{5.65}
 $$
+
 其中
+
 $$
 \mathbb{H}_{c e}(p, q) \triangleq-\sum_k p_k \log q_k \tag{5.66}
 $$
+
 被称为 **交叉熵**（cross entropy）。$\mathbb{H}_{c e}\left(p_{\mathcal{D}}, q\right)$ 是分布 $q$ 在训练集上的平均负对数似然。所以，最小化与经验分布之间的KL散度等价于最大似然。
 
 这一视角指出了基于似然的训练方法的缺陷，即它过分依赖于训练集本身。在大多数应用中，我们并不认为经验分布是对真实分布的良好近似，因为它只是将“尖峰”集中在有限的几个数据点上，而在其他地方的密度为零。即使数据集非常大（比如 100 万张图片），从中采样的数据的“宇宙”通常更大（例如，“所有自然图像”的集合远大于 100 万）。因此，我们需要以某种方式通过在“相似”的输入之间共享概率质量来平滑经验分布。
@@ -438,27 +518,37 @@ $$
 贝叶斯推断本身可以看作一个通过最小化KL散度得到的特定解。
 
 考虑先验分布的形式为一个联合概率分布 $q(\theta, D)=q(\theta) q(D \mid \theta)$，包含某个先验 $q(\theta)$ 和某个似然 $q(D \mid \theta)$。如果我们刚好观察到某些特定的数据集 $D_0$，我们如何更新我们的信念呢？我们需要搜索尽可能接近已有信念的联合分布，但要同时满足已有数据的约束：
+
 $$
 p(\theta, D)=\operatorname{argmin} D_{\mathbb{KL}}(p(\theta, D) \| q(\theta, D)) \text { such that } p(D)=\delta\left(D-D_0\right) . \tag{5.67}
 $$
+
 其中 $\delta\left(D-D_0\right)$ 是一个退化分布，它将所有的概率质量集中在与$D_0$完全相同的数据集 $D$ 上。将 KL 散度展开为链式法则形式：
+
 $$
 D_{\mathbb{KL}}(p(\theta, D) \| q(\theta, D))=D_{\mathbb{KL}}(p(D) \| q(D))+D_{\mathbb{KL}}(p(\theta \mid D) \| q(\theta \mid D)) \tag{5.68}
 $$
+
 显然，最优解为：
+
 $$
 p(\theta, D)=p(D) p(\theta \mid D)=\delta\left(D-D_0\right) q(\theta \mid D) \tag{5.69}
 $$
+
 更新后的边际分布为：
+
 $$
 p(\theta)=\int d D p(\theta, D)=\int d D \delta\left(D-D_0\right) q(\theta \mid D)=q\left(\theta \mid D=D_0\right), \tag{5.70}
 $$
+
 这只是我们基于我们观察到的数据，从先验信念中得到的一般形式的贝叶斯后验。
 
 相比之下，贝叶斯定理的通常表述只是对概率链式法则的一个简单利用：
+
 $$
 q(\theta, D)=q(D) q(\theta \mid D)=q(\theta) q(D \mid \theta) \Longrightarrow q(\theta \mid D)=\frac{q(D \mid \theta)}{q(D)} q(\theta) . \tag{5.71}
 $$
+
 注意到，上式将条件分布  $q(\theta \mid D)$与$q(D \mid \theta)$ 、$q(\theta)$ 和 $q(D)$ 进行了关联，但这些都是表示同一分布的不同方式。贝叶斯定理并没有告诉我们在得到证据后应如何更新我们的信念，对于这一点，我们需要其他的方法 [Cat+11][^Cat11]。
 
 这段关于贝叶斯推理的解释有一个优点，那就是它自然地可以推广到其他形式的约束，而不是假设我们已经完全观测到数据。
@@ -466,9 +556,11 @@ $$
 如果存在一些额外的测量误差，并且这些误差是我们充分理解的，那么我们应该做的不是将更新后的信念限定为一个狄拉克δ函数——只针对观测到的数据，而是将其固定为我们理解的分布 $p(D)$。例如，我们可能不知道数据的确切值，但在测量后，我们认为它是一个具有某个均值和标准差的高斯分布。
 
 由于KL散度的链式法则，这对我们更新后的条件分布没有影响，条件分布仍然是贝叶斯后验：$p(\theta \mid D)=q(\theta \mid D)$。然而，这会改变我们对参数的边际信念，这些边际信念现在是：
+
 $$
 p(\theta)=\int d D p(D) q(\theta \mid D) \tag{5.72}
 $$
+
 贝叶斯法则的这个推广有时被称为**杰弗瑞条件化规则**（Jeffrey's conditionalization rule）[Cat08][^Cat08]。
 
 [^Cat11]:
@@ -479,22 +571,28 @@ $$
 对于同属指数族中的两个同类分布，它们之间的KL散度具有很好的闭合形式，如下所述。
 
 考虑 $p(\boldsymbol{x})$ 的自然参数 $\boldsymbol{\eta}$， base measure $h(\boldsymbol{x})$ 和充分统计量 $\mathcal{T}(\boldsymbol{x})$：
+
 $$
 p(\boldsymbol{x})=h(\boldsymbol{x}) \exp \left[\boldsymbol{\eta}^{\top} \mathcal{T}(\boldsymbol{x})-A(\boldsymbol{\eta})\right] \tag{5.73}
 $$
+
 其中
+
 $$
 A(\boldsymbol{\eta})=\log \int h(\boldsymbol{x}) \exp \left(\boldsymbol{\eta}^{\top} \mathcal{T}(\boldsymbol{x})\right) d \boldsymbol{x} \tag{5.74}
 $$
+
 表示*对数配分函数*，它是关于 $\boldsymbol{\eta}$ 的凸函数。
 
 两个同属指数族的同类分布之间的KL散度为：
+
 $$
 \begin{align}
 D_{\mathrm{KL}}\left(p\left(\boldsymbol{x} \mid \boldsymbol{\eta}_1\right) \| p\left(\boldsymbol{x} \mid \boldsymbol{\eta}_2\right)\right) & =\mathbb{E}_{\boldsymbol{\eta}_1}\left[\left(\boldsymbol{\eta}_1-\boldsymbol{\eta}_2\right)^{\mathrm{T}} \mathcal{T}(\boldsymbol{x})-A\left(\boldsymbol{\eta}_1\right)+A\left(\boldsymbol{\eta}_2\right)\right] \tag{5.75}\\
 & =\left(\boldsymbol{\eta}_1-\boldsymbol{\eta}_2\right)^{\top} \boldsymbol{\mu}_1-A\left(\boldsymbol{\eta}_1\right)+A\left(\boldsymbol{\eta}_2\right) \tag{5.76}
 \end{align}
 $$
+
 其中 $\boldsymbol{\mu}_j \triangleq \mathbb{E}_{\boldsymbol{\eta}_j}[\mathcal{T}(\boldsymbol{x})]$。
 
 #### 5.1.8.1 案例：高斯分布之间的KL散度
