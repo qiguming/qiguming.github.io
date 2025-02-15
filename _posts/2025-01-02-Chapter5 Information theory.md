@@ -593,7 +593,7 @@ D_{\mathrm{KL}}\left(p\left(\boldsymbol{x} \mid \boldsymbol{\eta}_1\right) \| p\
 \end{align}
 $$
 
-其中 $\boldsymbol{\mu}_j \triangleq \mathbb{E}_{\boldsymbol{\eta}_j}[\mathcal{T}(\boldsymbol{x})]$。
+其中 $$\boldsymbol{\mu}_j \triangleq \mathbb{E}_{\boldsymbol{\eta}_j}[\mathcal{T}(\boldsymbol{x})]$$。
 
 #### 5.1.8.1 案例：高斯分布之间的KL散度
 
