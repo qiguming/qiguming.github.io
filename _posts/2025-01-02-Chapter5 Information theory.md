@@ -241,7 +241,7 @@ w[P / Q ; D] \triangleq \log \frac{p(D)}{q(D)} \tag{5.29}
 $$
 基于这个解释，KL 散度实际上是假设 $P$ 相较于假设 $Q$ 的 weight of evidence 的期望值，该期望值在假设分布 $P$ 下进行计算（假设 $P$ 是正确的）。由于KL散度始终为非负值，当我们采样更多数据时，它通常会帮助我们更加支持正确的假设，而不是反对它。实际上，可以将 weight of evidence 解释为 KL 的一种简化版，它们都衡量了两个假设在同一组 evidence （即采样到的数据）上的表现能力。
 
-![image-20250126095453940](/Users/fengliangqi/Code/qiguming.github.io/assets/img/figures/book2/5.1.png)
+![image-20250126095453940](/assets/img/figures/book2/5.1.png)
 
 {: style="width: 100%;" class="center"}
 
@@ -263,7 +263,7 @@ KL 的非对称性说明最小化 $D_{\mathbb{KL}}(p \| q)$ （又被称为 incl
 
 两种优化目标的可视化结果可以参考 https://twitter.com/ari_seff/status/1303741288911638530。
 
-![image-20250126100714867](/Users/fengliangqi/Code/qiguming.github.io/assets/img/figures/book2/5.2.png)
+![image-20250126100714867](/assets/img/figures/book2/5.2.png)
 
 {: style="width: 100%;" class="center"}
 
@@ -531,7 +531,7 @@ $$
 $$
 因此，KL 散度大致等于使用 Fisher 信息矩阵作为度量的（平方）马氏距离。这个结论是第 6.4 节中讨论的**自然梯度**（natural gradient）方法的基础。
 
-![image-20250202160115427](/Users/fengliangqi/Code/qiguming.github.io/assets/img/figures/book2/5.3.png)
+![image-20250202160115427](/assets/img/figures/book2/5.3.png)
 
 {: style="width: 100%;" class="center"}
 
@@ -578,7 +578,7 @@ $$
 [^Bre67]:
 [^Ama09]:
 
-![image-20250202161356944](/Users/fengliangqi/Code/qiguming.github.io/assets/img/figures/book2/5.4.png)
+![image-20250202161356944](/assets/img/figures/book2/5.4.png)
 
 {: style="width: 100%;" class="center"}
 
@@ -617,7 +617,7 @@ $$
 $$
 这被称为 **二元熵函数**（binary entropy function），也可以写成 $\mathbb{H}(\theta)$。我们可以绘制如 5.4 的图。不难发现，最大值出现在 $\theta=0.5$ 处，此时对应的最大值为 1 bit——一枚均质的硬币需要一个是/否的问题来确定其状态。
 
-![image-20250202171622904](/Users/fengliangqi/Code/qiguming.github.io/assets/img/figures/book2/5.5.png)
+![image-20250202171622904](/assets/img/figures/book2/5.5.png)
 
 {: style="width: 100%;" class="center"}
 
@@ -720,7 +720,7 @@ $$
 $$
 当且仅当 $p(x, y)=p(x) p(y)$ 时，上式等于0.
 
-![image-20250202174700921](/Users/fengliangqi/Code/qiguming.github.io/assets/img/figures/book2/5.6.png)
+![image-20250202174700921](/assets/img/figures/book2/5.6.png)
 
 {: style="width: 100%;" class="center"}
 
@@ -812,7 +812,7 @@ $$
 $$
 可以证明完全相关性始终是非负的，且等于0的充要条件为 $p(\boldsymbol{x})=\prod_d p\left(x_d\right)$。然而，这意味着即使只有一对变量之间存在相互作用，完全相关性也不可能为零。例如，如果 $p(X, Y, Z) = p(X, Y)p(Z)$，那么完全相关性将是非零的，即使三者之间并没有相互作用。这也促使了第5.3.5.2节中交互信息的提出。
 
-![image-20250210231031729](/Users/fengliangqi/Code/qiguming.github.io/assets/img/figures/book2/5.7.png)
+![image-20250210231031729](/assets/img/figures/book2/5.7.png)
 
 {: style="width: 100%;" class="center"}
 
@@ -971,7 +971,7 @@ $$
 
 尽管这是一个有效的下确界，但如果互信息很大，我们可能需要使用较大的批次大小 $K$ 来估计 MI，因为 $\mathbb{I}_{\textrm{NCE}} ≤ \log K$。（最近 [SE20a] 提出使用多标签分类器而不是多类别分类器来克服这一限制。）
 
-![image-20250215142326191](/Users/fengliangqi/Code/qiguming.github.io/assets/img/figures/book2/5.8.png)
+![image-20250215142326191](/assets/img/figures/book2/5.8.png)
 
 {: style="width: 100%;" class="center"}
 
@@ -979,7 +979,7 @@ $$
 
 {:.image-caption}
 
-![image-20250215142733581](/Users/fengliangqi/Code/qiguming.github.io/assets/img/figures/book2/5.9.png)
+![image-20250215142733581](/assets/img/figures/book2/5.9.png)
 
 {: style="width: 100%;" class="center"}
 
@@ -1011,7 +1011,7 @@ $$
 
 实现无损编码的常见技术包括霍夫曼编码、算术编码和非对称数字系统 [Dud13]。这些算法的输入是一个字符串上的概率分布（这也是机器学习发挥作用的地方）。这种分布通常使用潜在变量模型来表示（参见例如 [TBB19; KAH19]）。
 
-![image-20250212225202325](/Users/fengliangqi/Code/qiguming.github.io/assets/img/figures/book2/5.10.png)
+![image-20250212225202325](/assets/img/figures/book2/5.10.png)
 
 {: style="width: 100%;" class="center"}
 
@@ -1098,7 +1098,7 @@ $$
 
 虽然在最初的表述中，bits back 的论点主要是理论性的，提供了一种思想实验来解释为什么我们应该用 KL 散度而不是交叉熵来惩罚模型，但最近已经开发了几种实际算法，真正实现了 bits back 的目标。这些算法包括 [HPHL19; AT20; TBB19; YBM20; HLA19; FHHL20]。
 
-![image-20250213000207982](/Users/fengliangqi/Code/qiguming.github.io/assets/img/figures/book2/5.11.png)
+![image-20250213000207982](/assets/img/figures/book2/5.11.png)
 
 {: style="width: 100%;" class="center"}
 
@@ -1128,7 +1128,7 @@ $$
 
 在本节中，我们将使用随机瓶颈（stochastic bottleneck）来防止在判别模型 $p(\boldsymbol{y} \mid \boldsymbol{x})$上的过拟合，进而提高鲁棒性和校准性。
 
-![image-20250213225331436](/Users/fengliangqi/Code/qiguming.github.io/assets/img/figures/book2/5.12.png)
+![image-20250213225331436](/assets/img/figures/book2/5.12.png)
 
 {: style="width: 100%;" class="center"}
 
@@ -1215,7 +1215,7 @@ $$
 
 图5.13中对此进行了说明，其中我们将一个多层感知器（MLP）模型拟合到MNIST数据集上。在传递到softmax之前，我们使用了一个2维的瓶颈层。在图a中，我们展示了一个确定性编码器学习到的嵌入。我们看到每张图像被映射到一个点，且类别之间或实例之间的重叠很少。在图b-c中，我们展示了一个随机编码器学习到的嵌入。每张图像被映射到一个高斯分布，我们分别展示了均值和协方差。类别仍然被很好地分开，但类别的个别实例不再可区分，因为这些信息对于预测目的并不重要。
 
-![image-20250215120457565](/Users/fengliangqi/Code/qiguming.github.io/assets/img/figures/book2/5.14.png)
+![image-20250215120457565](/assets/img/figures/book2/5.14.png)
 
 {: style="width: 100%;" class="center"}
 
