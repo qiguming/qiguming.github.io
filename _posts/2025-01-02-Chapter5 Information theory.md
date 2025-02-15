@@ -1503,13 +1503,13 @@ $$
 
 ## 5.7 算法信息论
 
-我们目前讨论的信息理论基于底层随机分布的特性，该分布被假设为生成观测数据的来源。然而，从许多方面来看，它并未捕捉到大多数人直观理解的“信息”概念。例如，考虑一个由均匀伯努利分布独立生成的$n$位序列。该分布每个元素的最大熵为 $H_2(0.5)=1$，因此长度为 $n$ 的序列的编码长度为 $-\log _2 p(\mathcal{D} \mid \theta)=-\sum_{i=1}^n \log _2 \operatorname{Ber}\left(x_i \mid \theta=0.5\right)=n$。然而，直观上，这样的序列并不包含太多信息。
+我们目前讨论的信息理论基于底层随机分布的特性，该分布被假设为生成观测数据的来源。然而，从许多方面来看，它并未捕捉到大多数人直观理解的“信息”概念。例如，考虑一个由均匀伯努利分布独立生成的$n$位序列。该分布每个元素的最大熵为 $H_2(0.5)=1$，因此长度为 $n$ 的序列的编码长度为 $$-\log _2 p(\mathcal{D} \mid \theta)=-\sum_{i=1}^n \log _2 \operatorname{Ber}\left(x_i \mid \theta=0.5\right)=n$$。然而，直观上，这样的序列并不包含太多信息。
 
 有一种替代方法可以量化给定序列中的信息量（与随机模型的信息内容相对），称为**算法信息论**（algorithmic information theory）。这一理论的根源由几位作者独立发展[Sol64; Kol65; Cha66; Cha69]。我们在下面提供一个简要概述。更多细节，请参阅例如[Hut07; GV08; LV19]。
 
 ### 5.7.1 柯尔莫哥洛夫复杂度（Kolmogorov Complexity）
 
-算法信息论中的关键概念是比特字符串 $\boldsymbol{x}=\boldsymbol{x}_{1: n}$ 的**柯尔莫哥洛夫复杂度**（Kolmogorov complexity），它被定义为能够生成字符串 $\boldsymbol{x}$ 的最短计算机程序  $p$ 的长度：$K(\boldsymbol{x})=\min _{p \in \mathcal{B}^*}[\ell(p): U(\boldsymbol{p})=\boldsymbol{x}]$ ，其中 $\mathcal{B}^*$ 表示任意长的比特字符串集合，$\ell(p)$ 表示程序 $p$ 的长度，$U$ 表示**通用图灵机**（universal Turing machine）（这个复杂度的定义可以从比特字符串 $\boldsymbol{x}$ 扩展到函数 $f$，但细节相当复杂。）可以证明，柯尔莫哥洛夫复杂度具有许多类似于香农熵的性质。例如，如果我们忽略加法常数以简化讨论，可以证明 $K(\boldsymbol{x} \mid \boldsymbol{y}) \leq K(\boldsymbol{x}) \leq K(\boldsymbol{x}, \boldsymbol{y})$，这与 $H(X \mid Y) \leq H(X) \leq H(X, Y)$ 类似。
+算法信息论中的关键概念是比特字符串 $\boldsymbol{x}=\boldsymbol{x}_{1: n}$ 的**柯尔莫哥洛夫复杂度**（Kolmogorov complexity），它被定义为能够生成字符串 $\boldsymbol{x}$ 的最短计算机程序  $p$ 的长度：$$K(\boldsymbol{x})=\min _{p \in \mathcal{B}^*}[\ell(p): U(\boldsymbol{p})=\boldsymbol{x}]$$ ，其中 $\mathcal{B}^*$ 表示任意长的比特字符串集合，$\ell(p)$ 表示程序 $p$ 的长度，$U$ 表示**通用图灵机**（universal Turing machine）（这个复杂度的定义可以从比特字符串 $\boldsymbol{x}$ 扩展到函数 $f$，但细节相当复杂。）可以证明，柯尔莫哥洛夫复杂度具有许多类似于香农熵的性质。例如，如果我们忽略加法常数以简化讨论，可以证明 $$K(\boldsymbol{x} \mid \boldsymbol{y}) \leq K(\boldsymbol{x}) \leq K(\boldsymbol{x}, \boldsymbol{y})$$，这与 $H(X \mid Y) \leq H(X) \leq H(X, Y)$ 类似。
 
 不幸的是，柯尔莫哥洛夫复杂度不是一个可计算的函数。然而，可以通过在柯尔莫哥洛夫复杂度中添加一个（对数级）时间复杂度项，从而得到**列文复杂度**（Levin complexity） [Lev73]，它是可以计算的。列文复杂度定义为：$L(\boldsymbol{x})=\min _{p \in \mathcal{B}^*}[\ell(p)+\log (\operatorname{time}(p)): U(\boldsymbol{p})=\boldsymbol{x}]$ ，其中 $\operatorname{time}(p)$是程序 $p$ 的运行时间。Levin复杂度可以通过**时间分片**的方式运行所有程序来计算，即为每个程序$p$ 分配时间 $2^{-\ell(p)}$ ，直到第一个程序运行结束并输出 $\boldsymbol{x}$；这种方法被称为**列文搜索**（Levin search）或**通用搜索**（universal search），并且需要的时间为 $\operatorname{time}(L S(\boldsymbol{x}))=2^{L(\boldsymbol{x})}$。
 
@@ -1527,7 +1527,7 @@ $$
 
 ### 5.7.2 所罗门诺夫归纳（Solomonoff Induction）
 
-现在考虑（在线）预测问题。假设我们已经观察到从某个未知分布 $\mu\left(x_{1: t}\right)$ 中抽取的序列 $\boldsymbol{x}_{1: t}$；我们希望用某种模型 $\nu$ 来近似 $\mu$，从而能够利用 $\nu\left(x_{t+1} \mid \boldsymbol{x}_{1: t}\right)$ 预测未来。这被称为**归纳问题**（problem of induction）。我们假设 $\nu \in \mathcal{M}$，其中 $\mathcal{M}$ 是一个可数的模型（分布）集合。令 $w_\nu$ 为模型 $\nu$ 的先验概率。在**所罗门诺夫归纳**（Solomonoff induction） [Sol64] 方法中，我们假设 $\mathcal{M}$ 是所有可计算函数的集合，并定义先验为 $w_\nu=2^{-K(\nu)}$。这是一个“通用先验”，因为它可以模拟任何可计算的分布 $\mu$。此外，这种特定的加权项受**奥卡姆剃刀原理**（Occam's razor）的启发，该原理指出我们应该选择能够解释数据的最简单模型。
+现在考虑（在线）预测问题。假设我们已经观察到从某个未知分布 $\mu\left(x_{1: t}\right)$ 中抽取的序列 $$\boldsymbol{x}_{1: t}$$；我们希望用某种模型 $\nu$ 来近似 $\mu$，从而能够利用 $$\nu\left(x_{t+1} \mid \boldsymbol{x}_{1: t}\right)$$ 预测未来。这被称为**归纳问题**（problem of induction）。我们假设 $\nu \in \mathcal{M}$，其中 $\mathcal{M}$ 是一个可数的模型（分布）集合。令 $w_\nu$ 为模型 $\nu$ 的先验概率。在**所罗门诺夫归纳**（Solomonoff induction） [Sol64] 方法中，我们假设 $\mathcal{M}$ 是所有可计算函数的集合，并定义先验为 $w_\nu=2^{-K(\nu)}$。这是一个“通用先验”，因为它可以模拟任何可计算的分布 $\mu$。此外，这种特定的加权项受**奥卡姆剃刀原理**（Occam's razor）的启发，该原理指出我们应该选择能够解释数据的最简单模型。
 
 给定这个先验（或实际上任何其他先验），我们可以使用以下贝叶斯混合模型来计算序列上的先验预测分布：
 
@@ -1576,7 +1576,7 @@ $$
 M(\boldsymbol{x})=\sum_{p: U(p)=\boldsymbol{x} *} 2^{-\ell(p)} \tag{5.199}
 $$
 
-值得注意的是，可以证明（见例如 [WSH13]），$M(\boldsymbol{x})=\xi(\boldsymbol{x})$。由此，我们可以计算后验预测分布 $M\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{<t}\right)=M\left(\boldsymbol{x}_{1: t}\right) / M\left(\boldsymbol{x}_{<t}\right)$。由于这是一个确定性分布的凸组合，它也可以用于模拟随机环境。
+值得注意的是，可以证明（见例如 [WSH13]），$M(\boldsymbol{x})=\xi(\boldsymbol{x})$。由此，我们可以计算后验预测分布 $$M\left(\boldsymbol{x}_t \mid \boldsymbol{x}_{<t}\right)=M\left(\boldsymbol{x}_{1: t}\right) / M\left(\boldsymbol{x}_{<t}\right)$$。由于这是一个确定性分布的凸组合，它也可以用于模拟随机环境。
 
 由于所罗门诺夫归纳依赖于柯尔莫哥洛夫复杂度来定义其先验，因此它是不可计算的。然而，可以通过各种方法对其进行近似。例如，最近的研究 [GM+24] 表明，可以使用元学习（见第 19.6.4 节）训练一个通用序列预测器，如 Transformer 或 LSTM，通过在由随机图灵机生成的数据上进行训练，使得 Transformer 学会近似一个通用预测器。
 
