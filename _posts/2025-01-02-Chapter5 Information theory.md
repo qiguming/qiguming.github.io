@@ -1381,7 +1381,7 @@ $$
 
 如果所有的随机变量都是离散的，并且 $\boldsymbol{z}=e(\boldsymbol{x})$ 是关于 $\boldsymbol{x}$ 的确定性函数，那么可以使用[TPB99][^TPB99]的算法来最小化第5.6节中的信息瓶颈（IB）目标。如果所有变量都服从联合高斯分布，该目标存在解析解[Che+05]（这种方法可以视为一种有监督PCA）。但一般来说，精确解决这个问题是棘手的。我们将在第5.6.2节讨论一种可行的近似方法。（更多细节可以参考例如[SZ22][^SZ22]。）
 
-![image-20250213232151801](/Users/fengliangqi/Library/Application Support/typora-user-images/image-20250213232151801.png)
+![image-20250213232151801](/assets/img/figures/book2/5.13.png)
 
 {: style="width: 100%;" class="center"}
 
