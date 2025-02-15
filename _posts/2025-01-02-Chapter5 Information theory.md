@@ -501,12 +501,13 @@ $$
 
 两个多变量高斯分布的KL散度为：
 $$
-\begin{aligned}
+\begin{align}
 & D_{\mathbb{KL}}\left(\mathcal{N}\left(\boldsymbol{x} \mid \boldsymbol{\mu}_1, \boldsymbol{\Sigma}_1\right) \| \mathcal{N}\left(\boldsymbol{x} \mid \boldsymbol{\mu}_2, \boldsymbol{\Sigma}_2\right)\right) \\
 & =\frac{1}{2}\left[\operatorname{tr}\left(\boldsymbol{\Sigma}_2^{-1} \boldsymbol{\Sigma}_1\right)+\left(\boldsymbol{\mu}_2-\boldsymbol{\mu}_1\right)^{\top} \boldsymbol{\Sigma}_2^{-1}\left(\boldsymbol{\mu}_2-\boldsymbol{\mu}_1\right)-D+\log \left(\frac{\operatorname{det}\left(\boldsymbol{\Sigma}_2\right)}{\operatorname{det}\left(\boldsymbol{\Sigma}_1\right)}\right)\right]
-\end{aligned} \tag{5.77}
+\end{align} \tag{5.77}
 $$
 在标量的情况下：
+
 $$
 D_{\mathbb{KL}}\left(\mathcal{N}\left(x \mid \mu_1, \sigma_1\right) \| \mathcal{N}\left(x \mid \mu_2, \sigma_2\right)\right)=\log \frac{\sigma_2}{\sigma_1}+\frac{\sigma_1^2+\left(\mu_1-\mu_2\right)^2}{2 \sigma_2^2}-\frac{1}{2} \tag{5.78}
 $$
@@ -514,21 +515,29 @@ $$
 ### 5.1.9 使用 Fisher 信息矩阵近似KL散度
 
 令 $p_\boldsymbol{\theta}(\boldsymbol{x})$ 和 $p_\boldsymbol{\theta'}(\boldsymbol{x})$ 表示两个分布，其中 $\boldsymbol{\theta}'=\boldsymbol{\theta}+\boldsymbol{\delta}$ 。我们可以评估两个分布之间的距离，通过它们的预测分布（而不是在参数空间对比分布）：
+
 $$
 D_{\mathbb{KL}}\left(p_{\boldsymbol{\theta}} \| p_{\boldsymbol{\theta}^{\prime}}\right)=\mathbb{E}_{p_{\boldsymbol{\theta}}(\boldsymbol{x})}\left[\log p_{\boldsymbol{\theta}}(\boldsymbol{x})-\log p_{\boldsymbol{\theta}^{\prime}}(\boldsymbol{x})\right] \tag{5.79}
 $$
+
 使用二阶泰勒展开对上式进行近似：
+
 $$
 D_{\mathbb{KL}}\left(p_{\boldsymbol{\theta}} \| p_{\boldsymbol{\theta}^{\prime}}\right) \approx-\boldsymbol{\delta}^{\top} \mathbb{E}\left[\nabla \log p_{\boldsymbol{\theta}}(\boldsymbol{x})\right]-\frac{1}{2} \boldsymbol{\delta}^{\top} \mathbb{E}\left[\nabla^2 \log p_{\boldsymbol{\theta}}(\boldsymbol{x})\right] \boldsymbol{\delta} \tag{5.80}
 $$
+
 考虑到 score function 的期望值为 0（根据式 (3.44)），我们有：
+
 $$
 D_{\mathbb{KL}}\left(p_{\boldsymbol{\theta}} \| p_{\boldsymbol{\theta}^{\prime}}\right) \approx \frac{1}{2} \boldsymbol{\delta}^{\top} \mathbf{F}(\boldsymbol{\theta}) \boldsymbol{\delta} \tag{5.81}
 $$
+
 其中 $\mathbf{F}$ 表示费舍尔信息矩阵
+
 $$
 \mathbf{F}=-\mathbb{E}\left[\nabla^2 \log p_{\boldsymbol{\theta}}(\boldsymbol{x})\right]=\mathbb{E}\left[\left(\nabla \log p_{\boldsymbol{\theta}}(\boldsymbol{x})\right)\left(\nabla \log p_{\boldsymbol{\theta}}(\boldsymbol{x})\right)^{\top}\right] \tag{5.82}
 $$
+
 因此，KL 散度大致等于使用 Fisher 信息矩阵作为度量的（平方）马氏距离。这个结论是第 6.4 节中讨论的**自然梯度**（natural gradient）方法的基础。
 
 ![image-20250202160115427](/assets/img/figures/book2/5.3.png)
