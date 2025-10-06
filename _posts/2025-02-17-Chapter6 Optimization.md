@@ -1304,9 +1304,9 @@ $$
 在指数族分布的情况下，可以通过**充分统计量期望矩匹配**（moment matching of the expected sufficient statistics）（第 2.4.5 节）得到参数的闭式解。  
 
 从上述分析可以看出，**E 步**实际上并不需要返回完整的后验分布集合 
-$\{q(\boldsymbol{z}_n)\}$，
+$$\{q(\boldsymbol{z}_n)\}$$，
 而只需返回充分统计量的期望值的总和 
-$\sum_n \mathbb{E}_{q(z_n)}[\mathcal{T}\left(\boldsymbol{y}_n, \boldsymbol{z}_n\right)]$。  
+$$\sum_n \mathbb{E}_{q(z_n)}[\mathcal{T}\left(\boldsymbol{y}_n, \boldsymbol{z}_n\right)]$$。  
 
 **EM 算法**的一个典型应用是**拟合混合模型**（mixture models），我们在本书的基础版 [Mur22] 中已讨论过。接下来，我们将给出一个不同的示例。
 
@@ -1446,22 +1446,22 @@ EM算法存在诸多变体与扩展形式，如[MK97]所述。以下简要总结
 #### 6.5.6.1 变分 EM
 
 在 E 步中，我们选择
-$q_n^*=\operatorname{argmin}_{q_n \in \mathcal{Q}} D_{\mathbb{K L}}\left(q_n \| p\left(\boldsymbol{z}_n \mid \boldsymbol{x}_n, \boldsymbol{\theta}\right)\right)$。
+$$q_n^*=\operatorname{argmin}_{q_n \in \mathcal{Q}} D_{\mathbb{K L}}\left(q_n \| p\left(\boldsymbol{z}_n \mid \boldsymbol{x}_n, \boldsymbol{\theta}\right)\right)$$。
 由于是在函数空间中进行优化，这被称为变分推断（详见第 10.1 节）。如果分布族 
 $\mathcal{Q}$ 
 足够丰富，能够包含真实后验 
-$q_n=p\left(\boldsymbol{z}_n \mid \boldsymbol{x}_n, \boldsymbol{\theta}\right)$，
+$$q_n=p\left(\boldsymbol{z}_n \mid \boldsymbol{x}_n, \boldsymbol{\theta}\right)$$，
 那么我们可以使 KL 散度为零。但通常出于计算复杂度考虑，我们可能会选择更受限的分布类。例如，即使真实后验的变量之间是相关的，我们仍可能使用 
-$q_n\left(\boldsymbol{z}_n\right)=\mathcal{N}\left(\boldsymbol{z}_n \mid \boldsymbol{\mu}_n, \operatorname{diag}\left(\boldsymbol{\sigma}_n\right)\right)$。
+$$q_n\left(\boldsymbol{z}_n\right)=\mathcal{N}\left(\boldsymbol{z}_n \mid \boldsymbol{\mu}_n, \operatorname{diag}\left(\boldsymbol{\sigma}_n\right)\right)$$。
 
 在 EM 的 E 步中使用受限后验分布族 $\mathcal{Q}$ 的方法称为变分 EM [NH98a]。与常规 EM 不同，变分 EM 并不能保证实际对数似然本身会增加（见图 6.9），但它确实能单调地提高变分下界。我们可以通过改变变分族 $\mathcal{Q}$ 来控制该下界的贴合度；当 $q_n = p_n$（对应于精确推断）时，我们就恢复了与常规 EM 相同的行为。更多讨论见第 10.1.3 节。
 
 #### 6.5.6.2 Hard EM
 
 假设我们在变分EM中使用退化的后验近似，即点估计 
-$q\left(\boldsymbol{z} \mid \boldsymbol{x}_n\right)=\delta_{\hat{\boldsymbol{z}}_n}(\boldsymbol{z})$，
+$$q\left(\boldsymbol{z} \mid \boldsymbol{x}_n\right)=\delta_{\hat{\boldsymbol{z}}_n}(\boldsymbol{z})$$，
 其中 
-$\hat{\boldsymbol{z}}_n=\operatorname{argmax}_{\boldsymbol{z}} p\left(\boldsymbol{z} \mid \boldsymbol{x}_n\right)$。
+$$\hat{\boldsymbol{z}}_n=\operatorname{argmax}_{\boldsymbol{z}} p\left(\boldsymbol{z} \mid \boldsymbol{x}_n\right)$$。
 这等价于hard EM，即在E步中忽略
 $\boldsymbol{z}_n$
 的不确定性。
@@ -1502,7 +1502,9 @@ $\nu^{t+1}=\arg \max _\nu Q\left(\left(\boldsymbol{\mu}^{t+1}, \boldsymbol{\Sigm
 
 在处理大规模或流式数据集时，能够进行在线学习非常重要，正如我们在第19.7.5节讨论的那样。文献中主要有两种在线EM方法。第一种方法称为**增量EM**（incremental EM）[NH98a]，它逐个优化下界 $Q(\theta, q_1, \ldots, q_N)$ 中的$q_n$，但这种方法需要存储每个数据点的期望充分统计量。  
 
-第二种方法称为**逐步EM**（stepwise EM）[SI00; LK09; CM09]，它基于随机梯度下降（stochastic gradient descent），在每一步优化$\ln(\theta) = \log p(x_n|\theta)$的局部上界。（关于随机和增量边界优化算法的更一般讨论，可参见[Mai13; Mai15]。）
+第二种方法称为**逐步EM**（stepwise EM）[SI00; LK09; CM09]，它基于随机梯度下降（stochastic gradient descent），在每一步优化
+$$\ln(\theta) = \log p(x_n|\theta)$$
+的局部上界。（关于随机和增量边界优化算法的更一般讨论，可参见[Mai13; Mai15]。）
 
 <img src="/assets/img/figures/book2/BayOp.png" alt="img" style="zoom:50%;" />
 
@@ -1527,26 +1529,40 @@ $\nu^{t+1}=\arg \max _\nu Q\left(\left(\boldsymbol{\mu}^{t+1}, \boldsymbol{\Sigm
 
 ### 6.6.1 基于序列模型的优化
 
-贝叶斯优化是**基于序列模型的优化**策略的一个典型实例 [HHLB11]。该方法的核心思想在于交替执行两个步骤：在某个点处查询函数值，然后基于新获得的数据更新代理模型。具体而言，在每次迭代 $ n $ ，我们拥有一个带标签的数据集 $ D_n = { (x_i, y_i) : i = 1 : n } $，其中记录了已查询的点 $ x_i $ 及其对应的函数值 $ y_i = f(x_i) + \epsilon_i $（$ \epsilon_i $ 为可选的噪声项）。利用该数据集，我们估计真实函数 $ f $ 的概率分布，记作 $ p(f|D_n) $。随后通过**采集函数**（acquisition function） $ \alpha(x; D_n) $ 选择下一个查询点 $ x_{n+1} $，该函数用于计算查询点 $ x $ 的期望效用（采集函数将在第6.6.3节详细讨论）。在观测到 $ y_{n+1} = f(x_{n+1}) + \epsilon_{n+1} $ 后，更新对函数的认知并重复上述过程。具体算法流程可参见算法6.5的伪代码实现。
+贝叶斯优化是**基于序列模型的优化**策略的一个典型实例 [HHLB11]。该方法的核心思想在于交替执行两个步骤：在某个点处查询函数值，然后基于新获得的数据更新代理模型。具体而言，在每次迭代 $ n $ ，我们拥有一个带标签的数据集 
+$$ D_n = { (x_i, y_i) : i = 1 : n } $$，
+其中记录了已查询的点 $ x_i $ 及其对应的函数值 
+$$ y_i = f(x_i) + \epsilon_i $$
+（$ \epsilon_i $ 为可选的噪声项）。利用该数据集，我们估计真实函数 $ f $ 的概率分布，记作 
+$$ p(f|D_n) $$
+。随后通过**采集函数**（acquisition function） $ \alpha(x; D_n) $ 选择下一个查询点 $ x_{n+1} $，该函数用于计算查询点 $ x $ 的期望效用（采集函数将在第6.6.3节详细讨论）。在观测到 
+$$ y_{n+1} = f(x_{n+1}) + \epsilon_{n+1} $$ 
+后，更新对函数的认知并重复上述过程。具体算法流程可参见算法6.5的伪代码实现。
 
 <img src="/assets/img/figures/book2/6.10.png" alt="image-20251006134216022" style="zoom:50%;" />
 
 该方法的工作原理如图6.10所示，其目标是找到黑色实线所代表函数的全局最优点。首行展示了先前查询的两个点 $ x_1 $ 和 $ x_2 $ 及其对应函数值 $ y_1 = f(x_1) $ 与 $ y_2 = f(x_2) $。由于在这些位置对函数 $ f $ 取值的不确定性为零（假设观测无噪声），后验置信区间（蓝色阴影区域）呈现“收缩”特征。相应地，采集函数（底部绿色曲线）在这些已查询点处的取值也为零。红色三角形标示了采集函数的极大值点，即下一个待查询点 $ x_3 $。第二行图示呈现了观测 $ y_3 = f(x_3) $ 后的结果，此举进一步降低了对函数形态的不确定性。第三行则展示了观测 $ y_4 = f(x_4) $ 后的状态。该过程将持续迭代，直至时间耗尽或确信不存在更具潜力的未探索查询点。
 
-构建贝叶斯优化算法需要提供两大核心要素：（1）表征并更新后验代理模型 $ p(f|D_n) $ 的方法；（2）定义并优化采集函数 $ \alpha(\boldsymbol{x}; D_n) $ 的方法。下文将分别对这两个主题展开讨论。
+构建贝叶斯优化算法需要提供两大核心要素：（1）表征并更新后验代理模型 
+$$ p(f|D_n) $$
+的方法；（2）定义并优化采集函数 
+$$ \alpha(\boldsymbol{x}; D_n) $$
+的方法。下文将分别对这两个主题展开讨论。
 
 ### 6.6.2 代理函数
 
-在本节中，我们将讨论函数后验分布 $p(f|D)$ 的表示与更新方法。
+在本节中，我们将讨论函数后验分布 $$p(f|D)$$ 的表示与更新方法。
 
 #### 6.6.2.1 高斯过程
 
 在贝叶斯优化中，采用高斯过程作为代理模型是极为常见的做法。高斯过程的详细原理将在第18章阐述，其核心思想是将 
-$p(f(x)|\mathcal{D}_n)$ 
+$$p(f(x)|\mathcal{D}_n)$$
 表示为高斯分布 
-$ \mathcal{N}(f|\mu_n(x), \sigma_n^2(x)) $，
-其中均值函数 $\mu_n(x)$ 与方差函数 $\sigma_n(x)$ 可通过训练数据 
-$\mathcal{D}_n = {(x_i, y_i) : i = 1 : n}$ 
+$$ \mathcal{N}(f|\mu_n(x), \sigma_n^2(x)) $$，
+其中均值函数 
+$\mu_n(x)$ 与方差函数 $\sigma_n(x)$ 
+可通过训练数据
+$$\mathcal{D}_n = {(x_i, y_i) : i = 1 : n}$$
 经由闭式解析方程推导得出。高斯过程需要预设核函数 
 $K_\theta(x, x')$ 
 来衡量输入点 
@@ -1568,9 +1584,11 @@ $x, x'$
 ### 6.6.3 采集函数
 
 在贝叶斯优化中，我们通过**采集函数**（亦称**评价函数**）来评估每个潜在查询点的期望效用：
-$\alpha\left(\boldsymbol{x} \mid \mathcal{D}_n\right)=\mathbb{E}_{p\left(y \mid \boldsymbol{x}, \mathcal{D}_n\right)}\left[U\left(\boldsymbol{x}, y ; \mathcal{D}_n\right)\right]$，
+$$\alpha\left(\boldsymbol{x} \mid \mathcal{D}_n\right)=\mathbb{E}_{p\left(y \mid \boldsymbol{x}, \mathcal{D}_n\right)}\left[U\left(\boldsymbol{x}, y ; \mathcal{D}_n\right)\right]$$，
 其中 
-$y = f(\boldsymbol{x}) $ 表示点 $\boldsymbol{x}$ 
+$$y = f(\boldsymbol{x}) $$
+表示点
+$\boldsymbol{x}$ 
 处未知的函数值，$ U() $ 为效用函数。正如后续将讨论的，不同的效用函数会衍生出不同的采集函数。我们通常选择的函数会使得已查询点的效用值较小（在无噪声观测场景下甚至为零），以此促进探索行为。
 
 #### 6.6.3.1 改进的概率
