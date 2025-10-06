@@ -1969,7 +1969,7 @@ $$
 #### 6.8.2.1 质量分割（Mass splitting）
 
 假设点 
-$$\mathbf{x}_i$ 和 $\mathbf{y}_j$$
+$$\mathbf{x}_i$$ 和 $$\mathbf{y}_j$$
 表示技能向量—— $\mathbf{x}_i$ 代表工人 $i$ 掌握的技能，
 $$\mathbf{y}_j$$
 表示完成任务 $j$ 所需的技能。由于寻找匹配等价于在 
@@ -2006,7 +2006,9 @@ $$
 q(T(x))=p(x)\left|J_T(x)\right|, \tag{6.193}
 $$
 
-其中 $\left|J_T(x)\right|$ 表示 $T$ 的雅可比矩阵在 $x$ 处的行列式。
+其中 
+$$\left|J_T(x)\right|$$
+表示 $T$ 的雅可比矩阵在 $x$ 处的行列式。
 
 当映射 $T$ 满足这些条件时（记作 $T_{\sharp} \mu=\nu$），Monge [Mon81] 问题变成寻找最优映射 $T$，以最小化点 $\mathbf{x}$ 与其变换 $T(\mathbf{x})$ 之间的平均成本：
 
@@ -2062,12 +2064,14 @@ $$
 $$
 
 其中符号 $\oplus$ 表示向量之间的张量加法，
-$\mathbf{f} \oplus \mathbf{g}=\left[\mathbf{f}_i+\mathbf{g}_j\right]_{i j}$，
+$$\mathbf{f} \oplus \mathbf{g}=\left[\mathbf{f}_i+\mathbf{g}_j\right]_{i j}$$，
 或者函数 
-$f \oplus g: \mathbf{x}, \mathbf{y} \mapsto f(\mathbf{x})+g(\mathbf{y})$。
+$$f \oplus g: \mathbf{x}, \mathbf{y} \mapsto f(\mathbf{x})+g(\mathbf{y})$$。
 换言之，对偶问题旨在寻找一对向量（或函数），使其在作用于 
-$\textbf{a}$ 和 $\textbf{b}$
-（或对 $\mu$ , $\nu$ 进行积分）时能获得尽可能高的期望值，但前提是这对向量（或函数）在任意两点 $\textbf{x}$, $\textbf{y}$ 之间的差异（以成本函数 $c$ 衡量）不能过大。
+$$\textbf{a}$ 和 $\textbf{b}$$
+（或对 $\mu$ , $\nu$ 进行积分）时能获得尽可能高的期望值，但前提是这对向量（或函数）在任意两点 
+$$\textbf{x}$, $\textbf{y}$$
+之间的差异（以成本函数 $c$ 衡量）不能过大。
 
 (6.192)和(6.196)中的对偶问题均包含两个变量。若聚焦于连续形式，经过仔细考察可以发现：在给定对应于第一个测度的函数 $f$ 后，我们能够计算出函数 $g$ 的最佳候选形式。该函数 $g$ 需在满足对所有 $\mathbf{x}$，$\mathbf{y}$ 均成立的不等式 $g(\mathbf{y}) \leq c(\mathbf{x}, \mathbf{y})-f(\mathbf{x})$ 的前提下尽可能取最大值，这使得
 
@@ -2124,28 +2128,28 @@ T^{\star}=\arg \min _{T: T_{\sharp} \mu=\nu} \int_{\mathcal{X}} \frac{1}{2}\|\ma
 \tag{6.205}
 $$
 
-存在，且是某个凸函数 $u: \mathbb{R}^d \rightarrow \mathbb{R}$ 的梯度，即 $T^{\star}=\nabla u$。反之，对任意凸函数 $u$，连接 $\mu$ 与位移测度 $\nabla u_{#} \mu$ 的最优传输映射必等于 $\nabla u$。
+存在，且是某个凸函数 $u: \mathbb{R}^d \rightarrow \mathbb{R}$ 的梯度，即 $T^{\star}=\nabla u$。反之，对任意凸函数 $u$，连接 $\mu$ 与位移测度 $\nabla u_\text{#} \mu$ 的最优传输映射必等于 $\nabla u$。
 
 我们给出证明概要：对于任何合理的代价函数 $c$（例如下有界且下半连续），总可利用原始-对偶关系：考虑 (6.196) 的最优耦合  $P^*$ 以及 (6.203) 的最优 c-凹对偶函数  $f^*$。这意味着 
-$(f^*, g^* = \overline{f^*})$ 
+$$(f^*, g^* = \overline{f^*})$$
 是 (6.199) 的最优解。该线性规划对的互补松弛条件表明：若 
-$\mathbf{x}_0, \mathbf{y}_0$ 
+$$\mathbf{x}_0, \mathbf{y}_0$$
 位于 $P^*$ 的支撑集中，则必然（且充分）有 
-$f^*(\mathbf{x}_0) + \overline{f^*}(\mathbf{y}_0) = c(\mathbf{x}_0, \mathbf{y}_0)$。
+$$f^*(\mathbf{x}_0) + \overline{f^*}(\mathbf{y}_0) = c(\mathbf{x}_0, \mathbf{y}_0)$$。
 现假设 
-$\mathbf{x}_0, \mathbf{y}_0$ 
+$$\mathbf{x}_0, \mathbf{y}_0$$
 确实属于 $P^*$ 的支撑集。由等式 
-$f^*(\mathbf{x}_0) + \overline{f^*}(\mathbf{y}_0) = c(\mathbf{x}_0, \mathbf{y}_0)$ 
+$$f^*(\mathbf{x}_0) + \overline{f^*}(\mathbf{y}_0) = c(\mathbf{x}_0, \mathbf{y}_0)$$
 可直接推得 
-$\overline{f}^*(\mathbf{y}_0) = c(\mathbf{x}_0, \mathbf{y}_0) - f^*(\mathbf{x}_0)$。
+$$\overline{f}^*(\mathbf{y}_0) = c(\mathbf{x}_0, \mathbf{y}_0) - f^*(\mathbf{x}_0)$$。
 但根据定义，
-$\overline{f}^*(\mathbf{y}_0) = \inf_{\mathbf{x}} c(\mathbf{x}, \mathbf{y}_0) - f^*(\mathbf{x})$。
+$$\overline{f}^*(\mathbf{y}_0) = \inf_{\mathbf{x}} c(\mathbf{x}, \mathbf{y}_0) - f^*(\mathbf{x})$$。
 因此，
 $\mathbf{x}_0$ 
 具有特殊性质：它最小化 
-$\mathbf{x} \to c(\mathbf{x}, \mathbf{y}_0) - f^*(\mathbf{x})$。
+$$\mathbf{x} \to c(\mathbf{x}, \mathbf{y}_0) - f^*(\mathbf{x})$$。
 若注意到本节假设 
-$c(\mathbf{x}, \mathbf{y}) = \frac{1}{2}\|\mathbf{x} - \mathbf{y}\|^2$，
+$$c(\mathbf{x}, \mathbf{y}) = \frac{1}{2}\|\mathbf{x} - \mathbf{y}\|^2$$，
 则 $\mathbf{x}_0$ 满足
 
 
@@ -2159,16 +2163,18 @@ $$
 \mathbf{y}_0-\mathbf{x}_0-\nabla f^{\star}\left(\mathbf{x}_0\right)=0 \Rightarrow \mathbf{y}_0=\mathbf{x}_0-\nabla f^{\star}\left(\mathbf{x}_0\right)=\nabla\left(\frac{1}{2}\|\cdot\|^2-f^{\star}\right)\left(\mathbf{x}_0\right) . \tag{6.207}
 $$
 
-因此，若 $(\mathbf{x}_0, \mathbf{y}_0)$ 属于 $P^*$ 的支撑集，则 $\mathbf{y}_0$ 被唯一确定，这证明 $P^*$ 实际上是伪装成耦合的蒙日映射，即
+因此，若 $(\mathbf{x}_0, \mathbf{y}_0)$ 属于 
+$$ P^* $$
+的支撑集，则 $\mathbf{y}_0$ 被唯一确定，这证明 $P^*$ 实际上是伪装成耦合的蒙日映射，即
 
 $$
 P^{\star}=\left(\operatorname{Id}, \nabla\left(\frac{1}{2}\|\cdot\|^2-f^{\star}\right)\right)_{\sharp} \mu . \tag{6.208}
 $$
 
 证明的剩余部分可推导如下：对任意函数 $h : \mathcal{X} \to \mathbb{R}$，利用 c-变换和勒让德变换的定义可证明，$\frac{1}{2}\|\cdot\|^2 - h$ 是凸函数当且仅当 $h$ 是 c-凹函数。该证明的中间步骤依赖于证明 $\frac{1}{2}\|\cdot\|^2 - \overline{h}$ 等于 $\frac{1}{2}\|\cdot\|^2 - h$ 的勒让德变换。因此，由 
-$f^*$ 
+$$f^*$$
 的 c-凹性可知函数 
-$\frac{1}{2}\|\cdot\|^2 - f^*$ 
+$$\frac{1}{2}\|\cdot\|^2 - f^*$$
 是凸函数，而最优传输映射本身即是凸函数的梯度。
 
 认识到平方欧几里得代价的最优传输映射必为凸函数梯度这一事实，对求解 (6.203) 极具价值。此认知可用于将估计范围限制在相关的函数族中，例如 [AXX17] 提出的输入凸神经网络的梯度，或如 [Mak+20] 与 [Kor+20] 所建议的方法，以及具有理想光滑性和强凸性常数的任意凸函数 [PdC20]。
@@ -2236,9 +2242,9 @@ OT_{C,\gamma}(\mathbf{a}, \mathbf{b}) = \max_{\mathbf{f} \in R^{n}, \mathbf{g} \
 $$
 
 其中 
-$K \triangleq e^{-C/\gamma}$ 
+$$K \triangleq e^{-C/\gamma}$$
 是 $-C/\gamma$ 的逐元素指数函数。这种正则化具有多重优势。原始-对偶关系揭示了（唯一）解 $P^{*}_{\gamma}$ 与最优对偶变量 
-$(\mathbf{f}^{*}, \mathbf{g}^{*})$ 
+$$(\mathbf{f}^{*}, \mathbf{g}^{*})$$
 之间的显式联系：
 
 $$
