@@ -1841,9 +1841,9 @@ $\boldsymbol{x}$
 进化算法（EA）维护着一个由优质候选解组成的**种群**，这可以被视为对**高适应度状态**的一种**隐式的（非参数的）密度模型**。[BC95] 的研究提出了一种“**从遗传算法（GAs）中去除遗传操作**”的方法，其核心是**显式地**在配置空间上学习一个**概率模型**，该模型将其概率质量集中于**高分解**上。也就是说，种群变成了一个生成模型的参数集 $\boldsymbol{\theta}_t$。
 
 学习此类模型的一种方法如下。我们首先从当前模型中抽取 $K^{\prime}>K$ 个候选解，生成一个样本集 
-$\mathcal{S}_t=\left\{\boldsymbol{x}_k \sim p\left(\boldsymbol{x} \mid \boldsymbol{\theta}_t\right)\right\}$。
+$$\mathcal{S}_t=\left\{\boldsymbol{x}_k \sim p\left(\boldsymbol{x} \mid \boldsymbol{\theta}_t\right)\right\}$$。
 然后，我们使用**适应度函数**对这些样本进行**排序**，并利用一个**选择算子**（这被称为**截断选择**）挑选出最具前景的、大小为 $K$ 的子集 $\mathcal{S}_t^*$。最后，我们使用**最大似然估计**，将一个新的概率模型 
-$p\left(\boldsymbol{x} \mid \boldsymbol{\theta}_{t+1}\right)$ 
+$$p\left(\boldsymbol{x} \mid \boldsymbol{\theta}_{t+1}\right)$$
 **拟合**到 
 $\mathcal{S}_t^*$ 
 上。这种方法被称为**估计分布算法（EDA）**（参见例如 [LL02; PSCP06; Hau+11; PHL12; Hu+12; San17; Bal17]）。
@@ -1865,7 +1865,7 @@ $$
 $$
 
 其中 
-$\bar{\theta}_{d, t}=\frac{1}{N_t} \sum_{k=1}^K \mathbb{I}\left(x_{k, d}=1\right)$ 
+$$\bar{\theta}_{d, t}=\frac{1}{N_t} \sum_{k=1}^K \mathbb{I}\left(x_{k, d}=1\right)$$
 是从当前迭代生成的 
 $K=\left|\mathcal{S}_t^*\right|$ 
 个样本中估计出的**最大似然估计（MLE）**，而 $\eta_t$ 是一个**学习率**。
@@ -1881,9 +1881,9 @@ $K=\left|\mathcal{S}_t^*\right|$
 ### 6.7.6 进化策略
 
 进入策略（Evolutionary strategies）[^Wie+14] 是一种基于分布的优化算法，其中的分布表示为高斯分布 
-$p\left(\boldsymbol{x} \mid \boldsymbol{\theta}_t\right)$
+$$p\left(\boldsymbol{x} \mid \boldsymbol{\theta}_t\right)$$
 （参考 [Sal+17b]）。与 CEM 不同，参数更新的方式是使用梯度下降，而不是关于精英集合中样本的MLE。更精确地讲，考虑光滑的目标函数 
-$\mathcal{L}(\boldsymbol{\theta})=\mathbb{E}_{p(\boldsymbol{x} \mid \boldsymbol{\theta})}[f(\boldsymbol{x})]$。
+$$\mathcal{L}(\boldsymbol{\theta})=\mathbb{E}_{p(\boldsymbol{x} \mid \boldsymbol{\theta})}[f(\boldsymbol{x})]$$。
 我们可以使用 REINFORCE 估计器（6.3.4节）来计算该目标函数的梯度：
 
 $$
@@ -1911,11 +1911,15 @@ $$
 ### 6.8.1 入门示例：两个点集之间的最优匹配
 
 假设存在两个点集 
-$\left(\mathbf{x}_1, \ldots, \mathbf{x}_n\right)$ 
+$$\left(\mathbf{x}_1, \ldots, \mathbf{x}_n\right)$$ 
 和 
-$\left(\mathbf{y}_1, \ldots, \mathbf{y}_n\right)$，
-每个集合包含取自集合 $\mathcal{X}$ 的 $n>1$ 个不同点。这两个点集之间的匹配是一种双射映射（bijective mapping）——将每个点 $\mathbf{x}_i$ 对应到另一个点 $\mathbf{y}_j$。这种对应关系可通过配对索引 
-$(i, j) \in\{1, \ldots, n\}^2$ 
+$$\left(\mathbf{y}_1, \ldots, \mathbf{y}_n\right)$$，
+每个集合包含取自集合 
+$\mathcal{X}$ 
+的 $n>1$ 个不同点。这两个点集之间的匹配是一种双射映射（bijective mapping）——将每个点 
+$\mathbf{x}_i$ 
+对应到另一个点 $\mathbf{y}_j$。这种对应关系可通过配对索引 
+$$(i, j) \in\{1, \ldots, n\}^2$$
 来表示，这些索引定义了对称群（symmetric group） $\mathcal{S}_n$ 中的某种置换 $\sigma$。按照此约定，在给定置换 $\sigma$ 的情况下，
 $\mathbf{x}_i$ 
 将被对应到第二个点集中的第 $\sigma_i$ 个元素 $\mathbf{y}_{\sigma_i}$。
@@ -1925,26 +1929,29 @@ $\mathbf{x}_i$
 ```
 
 **匹配成本.** 在将一个点集与另一个点集进行匹配时，自然需要考虑所有可能配对 
-$(i, j) \in\{1, \ldots, n\}^2$ 
+$$(i, j) \in\{1, \ldots, n\}^2$$
 所产生的成本。例如，
 $\mathbf{x}_i$ 
 可能表示出租车司机 $i$ 的当前位置信息，而 
-$\mathbf{y}_j$ 
+$$\mathbf{y}_j$$
 则对应刚发出用车请求的用户 $j$ 的位置；此时，
-$C_{i j} \in \mathbb{R}$ 
+$$C_{i j} \in \mathbb{R}$$
 可以量化司机 $i$ 前往用户 $j$ 所需耗费的时间、燃油或距离成本。另一种场景中，
-$\mathbf{x}_i$ 
+$$\mathbf{x}_i$$
 可能表示求职者 $i$ 所具备的技能向量，
 $\mathbf{y}_j$ 
-则代表胜任职位 $j$ 所需的技能向量；此时 $C_{i j}$ 可量化员工 $i$ 完成工作 $j$ 所需的时间。
+则代表胜任职位 $j$ 所需的技能向量；此时 $$C_{i j}$$ 可量化员工 $i$ 完成工作 $j$ 所需的时间。
 
 通常假设成本 $C_{i j}$ 是在点对 
-$\left(\mathbf{x}_i, \mathbf{y}_j\right)$ 
+$$\left(\mathbf{x}_i, \mathbf{y}_j\right)$$
 上计算成本函数 
-$c: \mathcal{X} \times \mathcal{X} \rightarrow \mathbb{R}$ 
+$$c: \mathcal{X} \times \mathcal{X} \rightarrow \mathbb{R}$$
 得到的，即 
-$C_{i j}=c\left(\mathbf{x}_i, \mathbf{y}_j\right)$。
-在最优传输的多数应用中，成本函数通常具有几何意义，一般表现为在 $\mathcal{X}$ 上的距离函数（如图 6.18 中 $\mathcal{X}=\mathbb{R}^2$ 
+$$C_{i j}=c\left(\mathbf{x}_i, \mathbf{y}_j\right)$$。
+在最优传输的多数应用中，成本函数通常具有几何意义，一般表现为在 
+$\mathcal{X}$ 
+上的距离函数（如图 6.18 中 
+$$\mathcal{X}=\mathbb{R}^2$$
 的情形），关于这一点，我们将在 6.8.2.4 节进一步讨论。
 
 **最小成本匹配.** 在给定成本函数 $c$ 的前提下，最优匹配（或分配）问题旨在找到一个能使总成本最小的置换方案，该总成本由以下函数定义：
@@ -1962,15 +1969,27 @@ $$
 #### 6.8.2.1 质量分割（Mass splitting）
 
 假设点 
-$\mathbf{x}_i$ 和 $\mathbf{y}_j$ 
-表示技能向量—— $\mathbf{x}_i$ 代表工人 $i$ 掌握的技能，$\mathbf{y}_j$ 表示完成任务 $j$ 所需的技能。由于寻找匹配等价于在 $\{1, \ldots, n\}$ 中寻找某种置换，因此问题(6.191)无法处理工人数量大于（或小于）任务数量的情况。更严重的是，匹配问题假设每个任务是不可分割的，且工人只能专职于单一任务，这种设定显然不符合实际。在现实中，某些任务可能需要投入多于（或少于）一名工人的工作量，而有些工人或许只能兼职工作，或者相反愿意加班。匹配问题中的置换是刚性的，无法处理这种情况。因为根据定义，置换是一一对应的关联。Kantorovich形式允许质量可分割，即工人提供的努力或完成给定任务所需的工作量是可以被分割的。在符号表达方面，除了 $\mathbf{x}_i$ 之外，还为每名工人（共 $n$ 名）关联一个正数 $\mathbf{a}_i>0$，该数字表示工人 $i$ 能够提供的工作时间。类似地，我们引入数字 $\mathbf{b}_j>0$ 来描述完成某项任务（共 $m$ 项）所需的时间（ $n$ 和 $m$ 不一定相等）。因此，工人 $i$ 被表示为 $\left(\mathbf{a}_i, \mathbf{x}_i\right)$，在数学上等价于加权狄拉克测度 
-$\mathbf{a}_i \delta_{\mathbf{x}_i}$，
+$$\mathbf{x}_i$ 和 $\mathbf{y}_j$$
+表示技能向量—— $\mathbf{x}_i$ 代表工人 $i$ 掌握的技能，
+$$\mathbf{y}_j$$
+表示完成任务 $j$ 所需的技能。由于寻找匹配等价于在 
+$$\{1, \ldots, n\}$$
+中寻找某种置换，因此问题(6.191)无法处理工人数量大于（或小于）任务数量的情况。更严重的是，匹配问题假设每个任务是不可分割的，且工人只能专职于单一任务，这种设定显然不符合实际。在现实中，某些任务可能需要投入多于（或少于）一名工人的工作量，而有些工人或许只能兼职工作，或者相反愿意加班。匹配问题中的置换是刚性的，无法处理这种情况。因为根据定义，置换是一一对应的关联。Kantorovich形式允许质量可分割，即工人提供的努力或完成给定任务所需的工作量是可以被分割的。在符号表达方面，除了 
+$\mathbf{x}_i$
+之外，还为每名工人（共 $n$ 名）关联一个正数 
+$$\mathbf{a}_i>0$$，
+该数字表示工人 $i$ 能够提供的工作时间。类似地，我们引入数字 
+$$\mathbf{b}_j>0$$
+来描述完成某项任务（共 $m$ 项）所需的时间（ $n$ 和 $m$ 不一定相等）。因此，工人 $i$ 被表示为 
+$$\left(\mathbf{a}_i, \mathbf{x}_i\right)$$，
+在数学上等价于加权狄拉克测度 
+$$\mathbf{a}_i \delta_{\mathbf{x}_i}$$，
 此时工厂可用的劳动力被定义为离散测度 
-$\sum_i \mathbf{a}_i \delta_{\mathbf{x}_i}$，
+$$\sum_i \mathbf{a}_i \delta_{\mathbf{x}_i}$$，
 而其任务所需劳动力定义为 
-$\sum_j \mathbf{b}_j \delta_{\mathbf{y}_j}$。
+$$\sum_j \mathbf{b}_j \delta_{\mathbf{y}_j}$$。
 如果进一步假设工厂的工作量是平衡的，即 
-$\sum_i \mathbf{a}_i=\sum_j \mathbf{b}_j$，
+$$\sum_i \mathbf{a}_i=\sum_j \mathbf{b}_j$$，
 最优传输的Kantorovich[Kan42]形式为：
 
 $$
