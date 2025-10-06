@@ -443,13 +443,13 @@ $$
 \mathcal{L}(\boldsymbol{\theta})=\frac{1}{N} \sum_{n=1}^N \tilde{\mathcal{L}}\left(\boldsymbol{\theta}, \boldsymbol{z}_n\right)=\frac{1}{N} \sum_{n=1}^N \ell\left(\boldsymbol{y}_n, f\left(\boldsymbol{x}_n ; \boldsymbol{\theta}\right)\right) \tag{6.50}
 $$
 
-其中 $\boldsymbol{z}_n=\left(\boldsymbol{x}_n, \boldsymbol{y}_n\right)$ 表示第 $n$ 个含标签数据， $f$ 表示预测函数。式（6.50）被称为 **有限和目标**（finite sum objective），形式上可以写成关于经验分布 $p_{\mathcal{D}}(\boldsymbol{x}, \boldsymbol{y})$ 的损失期望：
+其中 $\boldsymbol{z}_n=(\boldsymbol{x}_n, \boldsymbol{y}_n)$ 表示第 $n$ 个含标签数据， $f$ 表示预测函数。式（6.50）被称为 **有限和目标**（finite sum objective），形式上可以写成关于经验分布 $p_{\mathcal{D}}(\boldsymbol{x}, \boldsymbol{y})$ 的损失期望：
 
 $$
 \mathcal{L}(\boldsymbol{\theta})=\mathbb{E}_{p_{\mathcal{D}}(\boldsymbol{z})}[\tilde{\mathcal{L}}(\boldsymbol{\theta}, \boldsymbol{z})] \tag{6.51}
 $$
 
-因为期望所基于的分布只与数据有关，而与待优化的模型参数无关，所以我们可以使用一个 minibatch $B=|\mathcal{B}|$ 的数据近似梯度：
+因为期望所基于的分布只与数据有关，而与待优化的模型参数无关，所以我们可以使用一个 minibatch $B=\|\mathcal{B}\|$ 的数据近似梯度：
 
 $$
 \boldsymbol{g}_t=\nabla \mathcal{L}\left(\boldsymbol{\theta}_t\right)=\frac{1}{B} \sum_{n \in \mathcal{B}} \nabla \ell\left(\boldsymbol{y}_n, f\left(\boldsymbol{x}_n ; \boldsymbol{\theta}\right)\right) \tag{6.52}
@@ -554,13 +554,23 @@ $$
 
 #### 6.3.5.1 案例
 
-为了进一步解释重参数化技巧，举个简单例子，假设损失函数 $\tilde{\mathcal{L}}(z) = z^2 - 3z$，其期望值 $\mathcal{L}(\boldsymbol{\theta}) = \mathbb{E}_{\mathcal{N}(z|\mu,v)}[\tilde{\mathcal{L}}(z)]$，其中参数 $\boldsymbol{\theta} = (\mu, v)$ 且 $v = \sigma^2$。假设我们需要计算
+为了进一步解释重参数化技巧，举个简单例子，假设损失函数 
+$\tilde{\mathcal{L}}(z) = z^2 - 3z$，
+其期望值 
+$\mathcal{L}(\boldsymbol{\theta}) = \mathbb{E}_{\mathcal{N}(z|\mu,v)}[\tilde{\mathcal{L}}(z)]$，
+其中参数 
+$\boldsymbol{\theta} = (\mu, v)$ 
+且 
+$v = \sigma^2$。
+假设我们需要计算
 
 $$
 \nabla_{\boldsymbol{\theta}} \mathcal{L}(\boldsymbol{\theta})=\left[\frac{\partial}{\partial \mu} \mathbb{E}[\tilde{\mathcal{L}}(z)], \frac{\partial}{\partial v} \mathbb{E}[\tilde{\mathcal{L}}(z)]\right] \tag{6.65}
 $$
 
-由于高斯分布是可重参数化的，我们可以先采样$z \sim \mathcal{N}(z|\mu, v)$，然后使用自动微分计算每个梯度项，最后再求期望。
+由于高斯分布是可重参数化的，我们可以先采样
+$z \sim \mathcal{N}(z|\mu, v)$，
+然后使用自动微分计算每个梯度项，最后再求期望。
 
 不过对于高斯分布这一特殊情况，也可以直接计算梯度向量。具体而言，根据第6.4.5.1节介绍Bonnet定理：
 
