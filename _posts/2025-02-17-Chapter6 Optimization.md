@@ -445,7 +445,11 @@ $$
 
 其中 
 $\boldsymbol{z}_n=(\boldsymbol{x}_n, \boldsymbol{y}_n)$ 
-表示第 $n$ 个含标签数据， $f$ 表示预测函数。式（6.50）被称为 **有限和目标**（finite sum objective），形式上可以写成关于经验分布 
+表示第 
+$n$ 
+个含标签数据， 
+$f$ 
+表示预测函数。式（6.50）被称为 **有限和目标**（finite sum objective），形式上可以写成关于经验分布 
 $p_{\mathcal{D}}(\boldsymbol{x}, \boldsymbol{y})$ 
 的损失期望：
 
@@ -483,7 +487,9 @@ $$
 其中 
 $\boldsymbol{z}_s \sim q_{\boldsymbol{\theta}}$。
 需要注意的是，如果 
-$\tilde{\mathcal{L}}()$ 与 $\boldsymbol{\theta}$ 
+$\tilde{\mathcal{L}}()$ 
+与 
+$\boldsymbol{\theta}$ 
 无关，则无需考虑该项。
 
 现在考虑第二项，求解关于分布本身的梯度：
