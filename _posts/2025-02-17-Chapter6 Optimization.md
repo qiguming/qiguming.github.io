@@ -521,9 +521,9 @@ I \approx \frac{1}{S} \sum_{s=1}^S \tilde{\mathcal{L}}\left(\boldsymbol{\theta},
 $$
 
 其中 
-$\boldsymbol{z}_s \sim q_{\boldsymbol{\theta}}$。
+$$\boldsymbol{z}_s \sim q_{\boldsymbol{\theta}}$$。
 在式（6.59）中，仅要求采样分布是可微的，而目标函数 
-$\tilde{\mathcal{L}}(\boldsymbol{\theta}, \boldsymbol{z})$ 
+$$\tilde{\mathcal{L}}(\boldsymbol{\theta}, \boldsymbol{z})$$ 
 本身无需可微。这使得该方法能够适用于黑盒随机优化问题，例如变分优化（variational optimization）（补充材料的第6.4.3节）、黑盒变分推断（black-box variational inference）（第10.2.3节）、强化学习（第35.3.2节）等场景。 
 
 #### 6.3.4.1 控制变量
@@ -647,7 +647,19 @@ $$
 \end{align}
 $$
 
-式（6.73）的第一项表示 $\boldsymbol{\theta}$ 通过生成样本 $\boldsymbol{z}$ 对目标函数产生的间接影响。第二项是 $\boldsymbol{\theta}$ 对目标函数产生的直接影响。第二项的期望值等于零（因为它是评分函数，参考式(3.44)），但对于有限样本量可能并不等于零，即使当 $q(\boldsymbol{z}|\boldsymbol{\theta})=p(\boldsymbol{z}|\boldsymbol{x})$ 是真实后验时也是如此。在[RWD17]中，作者提出通过舍弃第二项来构建一个更低方差的估计器。这可以通过使用 $\log q(\boldsymbol{z}|\boldsymbol{\theta}^\prime)$ 来实现，其中 $\boldsymbol{\theta}^\prime$ 是与梯度计算"断开连接"的关于 $\boldsymbol{\theta}$ 副本。伪代码为：
+式（6.73）的第一项表示 
+$$\boldsymbol{\theta}$$ 
+通过生成样本 $\boldsymbol{z}$ 对目标函数产生的间接影响。第二项是 
+$\boldsymbol{\theta}$ 
+对目标函数产生的直接影响。第二项的期望值等于零（因为它是评分函数，参考式(3.44)），但对于有限样本量可能并不等于零，即使当 
+$$q(\boldsymbol{z}|\boldsymbol{\theta})=p(\boldsymbol{z}|\boldsymbol{x})$$ 
+是真实后验时也是如此。在[RWD17]中，作者提出通过舍弃第二项来构建一个更低方差的估计器。这可以通过使用 
+$$\log q(\boldsymbol{z}|\boldsymbol{\theta}^\prime)$$ 
+来实现，其中 
+$\boldsymbol{\theta}^\prime$ 
+是与梯度计算"断开连接"的关于 
+$\boldsymbol{\theta}$ 
+副本。伪代码为：
 
 $$
 \begin{align}
