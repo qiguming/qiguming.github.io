@@ -1842,18 +1842,20 @@ $\boldsymbol{x}$
 
 学习此类模型的一种方法如下。我们首先从当前模型中抽取 $K^{\prime}>K$ 个候选解，生成一个样本集 
 $$\mathcal{S}_t=\left\{\boldsymbol{x}_k \sim p\left(\boldsymbol{x} \mid \boldsymbol{\theta}_t\right)\right\}$$。
-然后，我们使用**适应度函数**对这些样本进行**排序**，并利用一个**选择算子**（这被称为**截断选择**）挑选出最具前景的、大小为 $K$ 的子集 $\mathcal{S}_t^*$。最后，我们使用**最大似然估计**，将一个新的概率模型 
+然后，我们使用**适应度函数**对这些样本进行**排序**，并利用一个**选择算子**（这被称为**截断选择**）挑选出最具前景的、大小为 $K$ 的子集 
+$$\mathcal{S}_t^*$$。
+最后，我们使用**最大似然估计**，将一个新的概率模型 
 $$p\left(\boldsymbol{x} \mid \boldsymbol{\theta}_{t+1}\right)$$
 **拟合**到 
-$\mathcal{S}_t^*$ 
+$$\mathcal{S}_t^*$$
 上。这种方法被称为**估计分布算法（EDA）**（参见例如 [LL02; PSCP06; Hau+11; PHL12; Hu+12; San17; Bal17]）。
 
 请注意，EDA **等价于**最小化由 
-$\mathcal{S}_t^*$ 
+$$\mathcal{S}_t^*$$
 定义的**经验分布**与模型分布 
-$p\left(\boldsymbol{x} \mid \boldsymbol{\theta}_{t+1}\right)$ 
+$$p\left(\boldsymbol{x} \mid \boldsymbol{\theta}_{t+1}\right)$$ 
 之间的**交叉熵**。因此，EDA 与**交叉熵方法（cross entropy method, CEM）** 相关，正如第6.7.5节所述，尽管 CEM 通常假设 
-$p(\boldsymbol{x} \mid \boldsymbol{\theta})=\mathcal{N}(\boldsymbol{x} \mid \boldsymbol{\mu}, \mathbf{\Sigma})$
+$$p(\boldsymbol{x} \mid \boldsymbol{\theta})=\mathcal{N}(\boldsymbol{x} \mid \boldsymbol{\mu}, \mathbf{\Sigma})$$
 （即**高斯分布**）这一特例。EDA 也与 **EM算法** 密切相关，正如 [Bro+20a] 中所讨论的。
 
 举一个简单的例子，假设**配置空间**是长度为 $D$ 的**比特串**，且**适应度函数**为 $f(x)=\sum_{d=1}^D x_d$（其中 $x_d \in\{0,1\}$，这在 EA 文献中被称为 **one-max 函数**）。针对此问题，一个简单的概率模型是形式为 $p(\boldsymbol{x} \mid \boldsymbol{\theta})=\prod_{d=1}^D \operatorname{Ber}\left(x_d \mid \theta_d\right)$ 的**完全因子化模型**。在**分布式贝叶斯优化（DBO）** 中使用此模型会得到一种称为**单变量边际分布算法（UMDA）** 的方法。
@@ -1915,14 +1917,19 @@ $$\left(\mathbf{x}_1, \ldots, \mathbf{x}_n\right)$$
 和 
 $$\left(\mathbf{y}_1, \ldots, \mathbf{y}_n\right)$$，
 每个集合包含取自集合 
-$\mathcal{X}$ 
-的 $n>1$ 个不同点。这两个点集之间的匹配是一种双射映射（bijective mapping）——将每个点 
+$$\mathcal{X}$$
+的 
+$$n>1$$
+个不同点。这两个点集之间的匹配是一种双射映射（bijective mapping）——将每个点 
 $\mathbf{x}_i$ 
-对应到另一个点 $\mathbf{y}_j$。这种对应关系可通过配对索引 
+对应到另一个点 
+$$\mathbf{y}_j$$。
+这种对应关系可通过配对索引 
 $$(i, j) \in\{1, \ldots, n\}^2$$
 来表示，这些索引定义了对称群（symmetric group） $\mathcal{S}_n$ 中的某种置换 $\sigma$。按照此约定，在给定置换 $\sigma$ 的情况下，
 $\mathbf{x}_i$ 
-将被对应到第二个点集中的第 $\sigma_i$ 个元素 $\mathbf{y}_{\sigma_i}$。
+将被对应到第二个点集中的第 $\sigma_i$ 个元素 
+$$\mathbf{y}_{\sigma_i}$$。
 
 ```deepseek
 对称群 是一个数学概念，特指在抽象代数，特别是群论领域中，某个集合上所有可能的置换所构成的群。
@@ -2130,7 +2137,11 @@ $$
 
 存在，且是某个凸函数 $u: \mathbb{R}^d \rightarrow \mathbb{R}$ 的梯度，即 $T^{\star}=\nabla u$。反之，对任意凸函数 $u$，连接 $\mu$ 与位移测度 $\nabla u_\text{#} \mu$ 的最优传输映射必等于 $\nabla u$。
 
-我们给出证明概要：对于任何合理的代价函数 $c$（例如下有界且下半连续），总可利用原始-对偶关系：考虑 (6.196) 的最优耦合  $P^*$ 以及 (6.203) 的最优 c-凹对偶函数  $f^*$。这意味着 
+我们给出证明概要：对于任何合理的代价函数 $c$（例如下有界且下半连续），总可利用原始-对偶关系：考虑 (6.196) 的最优耦合  
+$$P^*$$
+以及 (6.203) 的最优 c-凹对偶函数  
+$$f^*$$。
+这意味着 
 $$(f^*, g^* = \overline{f^*})$$
 是 (6.199) 的最优解。该线性规划对的互补松弛条件表明：若 
 $$\mathbf{x}_0, \mathbf{y}_0$$
