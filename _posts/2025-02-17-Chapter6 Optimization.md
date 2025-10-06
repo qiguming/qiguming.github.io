@@ -485,11 +485,11 @@ $$
 $$
 
 其中 
-$\boldsymbol{z}_s \sim q_{\boldsymbol{\theta}}$。
-需要注意的是，如果 
+$$\boldsymbol{z}_s \sim q_{\boldsymbol{\theta}}$$。
+需要注意的是，如果
 $\tilde{\mathcal{L}}()$ 
 与 
-$\boldsymbol{\theta}$ 
+$$\boldsymbol{\theta}$$
 无关，则无需考虑该项。
 
 现在考虑第二项，求解关于分布本身的梯度：
