@@ -443,7 +443,11 @@ $$
 \mathcal{L}(\boldsymbol{\theta})=\frac{1}{N} \sum_{n=1}^N \tilde{\mathcal{L}}\left(\boldsymbol{\theta}, \boldsymbol{z}_n\right)=\frac{1}{N} \sum_{n=1}^N \ell\left(\boldsymbol{y}_n, f\left(\boldsymbol{x}_n ; \boldsymbol{\theta}\right)\right) \tag{6.50}
 $$
 
-其中 $\boldsymbol{z}_n=(\boldsymbol{x}_n, \boldsymbol{y}_n)$ 表示第 $n$ 个含标签数据， $f$ 表示预测函数。式（6.50）被称为 **有限和目标**（finite sum objective），形式上可以写成关于经验分布 $p_{\mathcal{D}}(\boldsymbol{x}, \boldsymbol{y})$ 的损失期望：
+其中 
+$\boldsymbol{z}_n=(\boldsymbol{x}_n, \boldsymbol{y}_n)$ 
+表示第 $n$ 个含标签数据， $f$ 表示预测函数。式（6.50）被称为 **有限和目标**（finite sum objective），形式上可以写成关于经验分布 
+$p_{\mathcal{D}}(\boldsymbol{x}, \boldsymbol{y})$ 
+的损失期望：
 
 $$
 \mathcal{L}(\boldsymbol{\theta})=\mathbb{E}_{p_{\mathcal{D}}(\boldsymbol{z})}[\tilde{\mathcal{L}}(\boldsymbol{\theta}, \boldsymbol{z})] \tag{6.51}
@@ -476,7 +480,11 @@ $$
 \int\left[\nabla_\theta \tilde{\mathcal{L}}(\boldsymbol{\theta}, \boldsymbol{z})\right] q_\theta(\boldsymbol{z}) d \boldsymbol{z} \approx \frac{1}{S} \sum_{s=1}^S \nabla_\theta \tilde{\mathcal{L}}\left(\boldsymbol{\theta}, \boldsymbol{z}_s\right) \tag{6.55}
 $$
 
-其中 $\boldsymbol{z}_s \sim q_{\boldsymbol{\theta}}$。需要注意的是，如果 $\tilde{\mathcal{L}}()$ 与 $\boldsymbol{\theta}$ 无关，则无需考虑该项。
+其中 
+$\boldsymbol{z}_s \sim q_{\boldsymbol{\theta}}$。
+需要注意的是，如果 
+$\tilde{\mathcal{L}}()$ 与 $\boldsymbol{\theta}$ 
+无关，则无需考虑该项。
 
 现在考虑第二项，求解关于分布本身的梯度：
 
@@ -506,7 +514,11 @@ $$
 I \approx \frac{1}{S} \sum_{s=1}^S \tilde{\mathcal{L}}\left(\boldsymbol{\theta}, \boldsymbol{z}_s\right) \nabla_{\boldsymbol{\theta}} \log q_{\boldsymbol{\theta}}\left(\boldsymbol{z}_s\right) \tag{6.59}
 $$
 
-其中 $\boldsymbol{z}_s \sim q_{\boldsymbol{\theta}}$。在式（6.59）中，仅要求采样分布是可微的，而目标函数 $\tilde{\mathcal{L}}(\boldsymbol{\theta}, \boldsymbol{z})$ 本身无需可微。这使得该方法能够适用于黑盒随机优化问题，例如变分优化（variational optimization）（补充材料的第6.4.3节）、黑盒变分推断（black-box variational inference）（第10.2.3节）、强化学习（第35.3.2节）等场景。 
+其中 
+$\boldsymbol{z}_s \sim q_{\boldsymbol{\theta}}$。
+在式（6.59）中，仅要求采样分布是可微的，而目标函数 
+$\tilde{\mathcal{L}}(\boldsymbol{\theta}, \boldsymbol{z})$ 
+本身无需可微。这使得该方法能够适用于黑盒随机优化问题，例如变分优化（variational optimization）（补充材料的第6.4.3节）、黑盒变分推断（black-box variational inference）（第10.2.3节）、强化学习（第35.3.2节）等场景。 
 
 #### 6.3.4.1 控制变量
 
@@ -648,7 +660,24 @@ $$
 
 当处理离散变量时，我们无法直接使用重参数化技巧（reparameterization trick），因为重参数化技巧需要保证分布关于 $\boldsymbol{z}$ 是可微的。不过，通过将离散变量适当松弛（relax）为连续变量，我们通常仍能应用该技巧，具体方法如下所述：
 
-考虑一个$K$维的one-hot向量 $\boldsymbol{d}$，其中每个元素 $d_k \in \{0,1\}$ 且满足 $\sum_{k=1}^K d_k = 1$。这种表示法可用于描述一个$K$元变量 $d$。假设其概率分布为 $P(d) = \text{Cat}(d|\pi)$，其中 $\pi_k = P(d_k=1)$，同时满足 $0 \leq \pi_k \leq 1$。或者，我们也可以用 $(\alpha_1,...,\alpha_K)$ 来参数化这个分布，其中 $\pi_k = \alpha_k/(\sum_{k'=1}^K \alpha_{k'})$。这种参数化形式记作$d \sim \text{Cat}(d|\boldsymbol{\alpha})$。
+考虑一个$K$维的one-hot向量 
+$\boldsymbol{d}$，
+其中每个元素 
+$d_k \in \{0,1\}$ 
+且满足 
+$\sum_{k=1}^K d_k = 1$。
+这种表示法可用于描述一个$K$元变量 $d$。假设其概率分布为 
+$P(d) = \text{Cat}(d|\pi)$，
+其中 
+$\pi_k = P(d_k=1)$，
+同时满足 
+$0 \leq \pi_k \leq 1$。
+或者，我们也可以用 
+$(\alpha_1,...,\alpha_K)$ 
+来参数化这个分布，其中 
+$\pi_k = \alpha_k/(\sum_{k'=1}^K \alpha_{k'})$。
+这种参数化形式记作
+$d \sim \text{Cat}(d|\boldsymbol{\alpha})$。
 
 我们可以通过以下方式从该分布中采样一个one-hot向量 $\boldsymbol{d}$：
 
@@ -818,7 +847,11 @@ $$
 
 #### 6.4.2.2 NGD 是一种高斯牛顿方法
 
-若 $p(\boldsymbol{y}|\boldsymbol{x},\boldsymbol{\theta})$ 属于指数族分布，且其自然参数 $\boldsymbol{\eta} = f(\boldsymbol{x},\boldsymbol{\theta})$，则可以证明[Hes00; PB14]：自然梯度下降（NGD）与广义高斯-牛顿法（GGN，第17.3.2节）完全等价。此外，在线学习场景下，如[Oll18]所示，这些方法等价于使用扩展卡尔曼滤波器进行序列贝叶斯推断。
+若 
+$p(\boldsymbol{y}|\boldsymbol{x},\boldsymbol{\theta})$ 
+属于指数族分布，且其自然参数 
+$\boldsymbol{\eta} = f(\boldsymbol{x},\boldsymbol{\theta})$，
+则可以证明[Hes00; PB14]：自然梯度下降（NGD）与广义高斯-牛顿法（GGN，第17.3.2节）完全等价。此外，在线学习场景下，如[Oll18]所示，这些方法等价于使用扩展卡尔曼滤波器进行序列贝叶斯推断。
 
 ![image-20250615133219113](/assets/img/figures/book2/6.6.png)
 
@@ -914,7 +947,9 @@ $$
 
 #### 6.4.5.1 Analytic computation for the Gaussian case
 
-本节假设$q(z) = \mathcal{N}(z|m, V)$，我们将展示如何解析计算相关梯度。
+本节假设
+$q(z) = \mathcal{N}(z|m, V)$，
+我们将展示如何解析计算相关梯度。
 
 根据第2.4.2.5节，$q$的自然参数为：
 
@@ -1085,9 +1120,22 @@ $$
 p\left(y_n=c \mid \boldsymbol{x}_n, \boldsymbol{w}\right)=\frac{\exp \left(\boldsymbol{w}_c^{\top} \boldsymbol{x}_n\right)}{\sum_{i=1}^C \exp \left(\boldsymbol{w}_i^{\top} \boldsymbol{x}_n\right)} \tag{6.128}
 $$
 
-由于归一化条件 $\sum_{c=1}^C p(y_n=c|\mathbf{x}_n, \mathbf{w}) = 1$，我们可以设 $\mathbf{w}_C = \mathbf{0}$。（例如在二分类逻辑回归中，$C=2$，此时仅需学习一个权重向量。）因此，参数 $\theta$ 对应于一个大小为$D \times (C-1)$的权重矩阵 $\mathbf{w}$，其中 $\mathbf{x}_n \in \mathbb{R}^D$。
+由于归一化条件 
+$\sum_{c=1}^C p(y_n=c|\mathbf{x}_n, \mathbf{w}) = 1$，
+我们可以设 
+$\mathbf{w}_C = \mathbf{0}$。
+（例如在二分类逻辑回归中，$C=2$，此时仅需学习一个权重向量。）因此，参数 $\theta$ 对应于一个大小为
+$D \times (C-1)$
+的权重矩阵 
+$\mathbf{w}$，
+其中 
+$\mathbf{x}_n \in \mathbb{R}^D$。
 
-如果我们令 $\mathbf{p}_n(\mathbf{w}) = [p(y_n=1|\mathbf{x}_n, \mathbf{w}), \dots, p(y_n=C-1|\mathbf{x}_n, \mathbf{w})]$且$\mathbf{y}_n = [\mathbb{I}(y_n=1), \dots, \mathbb{I}(y_n=C-1)]$，则对数似然函数可表示为：
+如果我们令 
+$\mathbf{p}_n(\mathbf{w}) = [p(y_n=1|\mathbf{x}_n, \mathbf{w}), \dots, p(y_n=C-1|\mathbf{x}_n, \mathbf{w})]$
+且
+$\mathbf{y}_n = [\mathbb{I}(y_n=1), \dots, \mathbb{I}(y_n=C-1)]$，
+则对数似然函数可表示为：
 
 $$
 \ell(\boldsymbol{w})=\sum_{n=1}^N\left[\sum_{c=1}^{C-1} y_{n c} \boldsymbol{w}_c^{\top} \boldsymbol{x}_n-\log \sum_{c=1}^C \exp \left(\boldsymbol{w}_c^{\top} \boldsymbol{x}_n\right)\right] \tag{6.129}
@@ -1175,7 +1223,7 @@ $$
 \end{align}
 $$
 
-其中 $\mathbb{H}(q)$ 表示分布 $q$ 的熵，$\mathrm{Ł}\left(\boldsymbol{\theta},\left\{q_n\right\} \mid \mathcal{D}\right)$ 被称为 **证据下确界**（evidence lower bound，ELBO），因为它是对数边际似然 $\log p\left(\boldsymbol{y}_{1: N} \mid \boldsymbol{\theta}\right)$  的下确界，该对数似然又被称为证据。优化上述边际似然是变分推断的基础，我们将在10.1节进行讨论。
+其中 $\mathbb{H}(q)$ 表示分布 $q$ 的熵，$\mathrm{Ł}(\boldsymbol{\theta},{q_n} \mid \mathcal{D})$ 被称为 **证据下确界**（evidence lower bound，ELBO），因为它是对数边际似然 $\log p(\boldsymbol{y}_{1: N} \mid \boldsymbol{\theta})$  的下确界，该对数似然又被称为证据。优化上述边际似然是变分推断的基础，我们将在10.1节进行讨论。
 
 #### 6.5.3.2 E step
 
@@ -1190,7 +1238,7 @@ $$
 \end{align}
 $$
 
-其中 $D_{\mathbb{KL}}(q \| p) \triangleq \sum_z q(z) \log \frac{q(z)}{p(z)}$  表示KL 散度。我们在5.1节讨论了关于KL散度的更多细节，但核心的一点是 $D_{\mathbb{KL}}(q \| p) \geq 0$，且 $D_{\mathbb{KL}}(q \| p)=0$ 的充要条件是 $q=p$。所以在关于 $\left\{q_n\right\}$ 优化下确界 $\mathrm{Ł}\left(\boldsymbol{\theta},\left\{q_n\right\} \mid \mathcal{D}\right)$ 的阶段，可以令每一个分布 $q_n^*=p\left(\boldsymbol{z}_n \mid \boldsymbol{y}_n, \boldsymbol{\theta}\right)$，这被称为 **E step**。这将确保 ELBO 是一个紧凑的下确界：
+其中 $D_{\mathbb{KL}}(q \| p) \triangleq \sum_z q(z) \log \frac{q(z)}{p(z)}$  表示KL 散度。我们在5.1节讨论了关于KL散度的更多细节，但核心的一点是 $D_{\mathbb{KL}}(q \| p) \geq 0$，且 $D_{\mathbb{KL}}(q \| p)=0$ 的充要条件是 $q=p$。所以在关于 $\{q_n\}$ 优化下确界 $\mathrm{Ł}(\boldsymbol{\theta},\{q_n\} \mid \mathcal{D})$ 的阶段，可以令每一个分布 $q_n^*=p(\boldsymbol{z}_n \mid \boldsymbol{y}_n, \boldsymbol{\theta})$，这被称为 **E step**。这将确保 ELBO 是一个紧凑的下确界：
 
 $$
 \mathrm{Ł}\left(\boldsymbol{\theta},\left\{q_n^*\right\} \mid \mathcal{D}\right)=\sum_n \log p\left(\boldsymbol{y}_n \mid \boldsymbol{\theta}\right)=\ell(\boldsymbol{\theta} \mid \mathcal{D}) \tag{6.146}
@@ -1202,9 +1250,16 @@ $$
 Q\left(\boldsymbol{\theta}, \boldsymbol{\theta}^t\right)=\mathrm{Ł}\left(\boldsymbol{\theta},\left\{p\left(\boldsymbol{z}_n \mid \boldsymbol{y}_n ; \boldsymbol{\theta}^t\right)\right\}\right) \tag{6.147}
 $$
 
-接下来，我们有 $Q\left(\boldsymbol{\theta}, \boldsymbol{\theta}^t\right) \leq \ell(\boldsymbol{\theta})$，并且 $Q\left(\boldsymbol{\theta}^t, \boldsymbol{\theta}^t\right)=\ell\left(\boldsymbol{\theta}^t\right)$。
+接下来，我们有 
+$Q\left(\boldsymbol{\theta}, \boldsymbol{\theta}^t\right) \leq \ell(\boldsymbol{\theta})$，
+并且 
+$Q\left(\boldsymbol{\theta}^t, \boldsymbol{\theta}^t\right)=\ell\left(\boldsymbol{\theta}^t\right)$。
 
-然而，如果无法精确计算后验概率 $p(\boldsymbol{z}_n|\boldsymbol{y}_n; \boldsymbol{\theta}^t)$，仍可采用近似分布 $q\left(\boldsymbol{z}_n \mid \boldsymbol{y}_n ; \boldsymbol{\theta}^t\right)$，这将产生对数似然的一个非紧致下界。这种推广版本的EM算法被称为变分EM[NH98b]，详见章节6.5.6.1。
+然而，如果无法精确计算后验概率 
+$p(\boldsymbol{z}_n|\boldsymbol{y}_n; \boldsymbol{\theta}^t)$，
+仍可采用近似分布 
+$q\left(\boldsymbol{z}_n \mid \boldsymbol{y}_n ; \boldsymbol{\theta}^t\right)$，
+这将产生对数似然的一个非紧致下界。这种推广版本的EM算法被称为变分EM[NH98b]，详见章节6.5.6.1。
 
 #### 6.5.3.3 M step
 
@@ -1230,7 +1285,10 @@ $$
 
 在指数族分布的情况下，可以通过**充分统计量期望矩匹配**（moment matching of the expected sufficient statistics）（第 2.4.5 节）得到参数的闭式解。  
 
-从上述分析可以看出，**E 步**实际上并不需要返回完整的后验分布集合 $\{q(\boldsymbol{z}_n)\}$，而只需返回充分统计量的期望值的总和 $\sum_n \mathbb{E}_{q(z_n)}[\mathcal{T}\left(\boldsymbol{y}_n, \boldsymbol{z}_n\right)]$。  
+从上述分析可以看出，**E 步**实际上并不需要返回完整的后验分布集合 
+$\{q(\boldsymbol{z}_n)\}$，
+而只需返回充分统计量的期望值的总和 
+$\sum_n \mathbb{E}_{q(z_n)}[\mathcal{T}\left(\boldsymbol{y}_n, \boldsymbol{z}_n\right)]$。  
 
 **EM 算法**的一个典型应用是**拟合混合模型**（mixture models），我们在本书的基础版 [Mur22] 中已讨论过。接下来，我们将给出一个不同的示例。
 
@@ -1343,7 +1401,9 @@ $$
 Q\left(\boldsymbol{\theta}, \boldsymbol{\theta}^t\right)=-\sum_n \frac{\lambda_n}{2 \sigma^2}\left(y_n-\boldsymbol{w}^T \boldsymbol{x}_n\right)^2 \tag{6.168}
 $$
 
-其中 $\lambda_n^{(t)} \triangleq \mathbb{E}[1/z_n | y_n, \boldsymbol{x}_n, \boldsymbol{w}^{(t)}]$。可以看出，这实际上是一个**加权最小二乘**问题，每个数据点的权重为 $\lambda_n^{(t)}$。
+其中 
+$\lambda_n^{(t)} \triangleq \mathbb{E}[1/z_n | y_n, \boldsymbol{x}_n, \boldsymbol{w}^{(t)}]$。
+可以看出，这实际上是一个**加权最小二乘**问题，每个数据点的权重为 $\lambda_n^{(t)}$。
 
 接下来我们讨论如何计算这些权重。利用第2.2.3.4节的结果可以证明：
 
@@ -1367,13 +1427,26 @@ EM算法存在诸多变体与扩展形式，如[MK97]所述。以下简要总结
 
 #### 6.5.6.1 变分 EM
 
-在 E 步中，我们选择$q_n^*=\operatorname{argmin}_{q_n \in \mathcal{Q}} D_{\mathbb{K L}}\left(q_n \| p\left(\boldsymbol{z}_n \mid \boldsymbol{x}_n, \boldsymbol{\theta}\right)\right)$。由于是在函数空间中进行优化，这被称为变分推断（详见第 10.1 节）。如果分布族 $\mathcal{Q}$ 足够丰富，能够包含真实后验 $q_n=p\left(\boldsymbol{z}_n \mid \boldsymbol{x}_n, \boldsymbol{\theta}\right)$，那么我们可以使 KL 散度为零。但通常出于计算复杂度考虑，我们可能会选择更受限的分布类。例如，即使真实后验的变量之间是相关的，我们仍可能使用 $q_n\left(\boldsymbol{z}_n\right)=\mathcal{N}\left(\boldsymbol{z}_n \mid \boldsymbol{\mu}_n, \operatorname{diag}\left(\boldsymbol{\sigma}_n\right)\right)$。
+在 E 步中，我们选择
+$q_n^*=\operatorname{argmin}_{q_n \in \mathcal{Q}} D_{\mathbb{K L}}\left(q_n \| p\left(\boldsymbol{z}_n \mid \boldsymbol{x}_n, \boldsymbol{\theta}\right)\right)$。
+由于是在函数空间中进行优化，这被称为变分推断（详见第 10.1 节）。如果分布族 
+$\mathcal{Q}$ 
+足够丰富，能够包含真实后验 
+$q_n=p\left(\boldsymbol{z}_n \mid \boldsymbol{x}_n, \boldsymbol{\theta}\right)$，
+那么我们可以使 KL 散度为零。但通常出于计算复杂度考虑，我们可能会选择更受限的分布类。例如，即使真实后验的变量之间是相关的，我们仍可能使用 
+$q_n\left(\boldsymbol{z}_n\right)=\mathcal{N}\left(\boldsymbol{z}_n \mid \boldsymbol{\mu}_n, \operatorname{diag}\left(\boldsymbol{\sigma}_n\right)\right)$。
 
 在 EM 的 E 步中使用受限后验分布族 $\mathcal{Q}$ 的方法称为变分 EM [NH98a]。与常规 EM 不同，变分 EM 并不能保证实际对数似然本身会增加（见图 6.9），但它确实能单调地提高变分下界。我们可以通过改变变分族 $\mathcal{Q}$ 来控制该下界的贴合度；当 $q_n = p_n$（对应于精确推断）时，我们就恢复了与常规 EM 相同的行为。更多讨论见第 10.1.3 节。
 
 #### 6.5.6.2 Hard EM
 
-假设我们在变分EM中使用退化的后验近似，即点估计 $q\left(\boldsymbol{z} \mid \boldsymbol{x}_n\right)=\delta_{\hat{\boldsymbol{z}}_n}(\boldsymbol{z})$，其中 $\hat{\boldsymbol{z}}_n=\operatorname{argmax}_{\boldsymbol{z}} p\left(\boldsymbol{z} \mid \boldsymbol{x}_n\right)$。这等价于hard EM，即在E步中忽略$\boldsymbol{z}_n$的不确定性。
+假设我们在变分EM中使用退化的后验近似，即点估计 
+$q\left(\boldsymbol{z} \mid \boldsymbol{x}_n\right)=\delta_{\hat{\boldsymbol{z}}_n}(\boldsymbol{z})$，
+其中 
+$\hat{\boldsymbol{z}}_n=\operatorname{argmax}_{\boldsymbol{z}} p\left(\boldsymbol{z} \mid \boldsymbol{x}_n\right)$。
+这等价于hard EM，即在E步中忽略
+$\boldsymbol{z}_n$
+的不确定性。
 
 这种退化方法的问题在于它极易过拟合，因为隐变量的数量与数据集的数量成正比[WCS08]。
 
@@ -1404,7 +1477,8 @@ $$
 
 #### 6.5.6.5 ECM 算法
 
-ECM算法全称为“期望条件最大化”（expectation conditional maximization），指当参数存在依赖关系时在M步中依次优化这些参数。ECME算法全称为“ECM二者选一”（ECM either）[LR95]，是ECM的一种变体，其在一个或多个条件最大化步骤中，按常规方式最大化完整数据对数似然的期望（即Q函数），或直接最大化观测数据对数似然。后者可能显著加快计算速度，因为它忽略E步的结果而直接优化目标函数。一个典型例子是拟合学生t分布时：对于固定的 $\nu$，我们可以按常规方式更新 $\Sigma$，但在更新 $\nu$ 时，我们将标准更新形式$\nu^{t+1}=\arg \max _\nu Q\left(\left(\boldsymbol{\mu}^{t+1}, \boldsymbol{\Sigma}^{t+1}, \nu\right), \boldsymbol{\theta}^t\right)$ 替换为 $\nu^{t+1}=\arg \max _\nu \log p\left(\mathcal{D} \mid \boldsymbol{\mu}^{t+1}, \mathbf{\Sigma}^{t+1}, \nu\right)$。更多细节参见[MK97]。
+ECM算法全称为“期望条件最大化”（expectation conditional maximization），指当参数存在依赖关系时在M步中依次优化这些参数。ECME算法全称为“ECM二者选一”（ECM either）[LR95]，是ECM的一种变体，其在一个或多个条件最大化步骤中，按常规方式最大化完整数据对数似然的期望（即Q函数），或直接最大化观测数据对数似然。后者可能显著加快计算速度，因为它忽略E步的结果而直接优化目标函数。一个典型例子是拟合学生t分布时：对于固定的 $\nu$，我们可以按常规方式更新 $\Sigma$，但在更新 $\nu$ 时，我们将标准更新形式
+$\nu^{t+1}=\arg \max _\nu Q\left(\left(\boldsymbol{\mu}^{t+1}, \boldsymbol{\Sigma}^{t+1}, \nu\right), \boldsymbol{\theta}^t\right)$ 替换为 $\nu^{t+1}=\arg \max _\nu \log p\left(\mathcal{D} \mid \boldsymbol{\mu}^{t+1}, \mathbf{\Sigma}^{t+1}, \nu\right)$。更多细节参见[MK97]。
 
 #### 6.5.6.6 在线 EM
 
@@ -1449,7 +1523,17 @@ ECM算法全称为“期望条件最大化”（expectation conditional maximiza
 
 #### 6.6.2.1 高斯过程
 
-在贝叶斯优化中，采用高斯过程作为代理模型是极为常见的做法。高斯过程的详细原理将在第18章阐述，其核心思想是将 $p(f(x)|\mathcal{D}_n)$ 表示为高斯分布 $ \mathcal{N}(f|\mu_n(x), \sigma_n^2(x)) $，其中均值函数 $\mu_n(x)$ 与方差函数 $\sigma_n(x)$ 可通过训练数据 $\mathcal{D}_n = {(x_i, y_i) : i = 1 : n}$ 经由闭式解析方程推导得出。高斯过程需要预设核函数 $K_\theta(x, x')$ 来衡量输入点 $x, x'$ 之间的相似度。其直观原理在于：若两个输入点相似度较高（即 $K_\theta(x, x')$ 取值较大），则对应函数值也倾向于相似，故 $f(x)$ 与 $f(x')$ 应呈正相关。这一特性使我们可以基于标注训练点对函数进行插值估计，在某些情况下还能实现函数的外推预测。
+在贝叶斯优化中，采用高斯过程作为代理模型是极为常见的做法。高斯过程的详细原理将在第18章阐述，其核心思想是将 
+$p(f(x)|\mathcal{D}_n)$ 
+表示为高斯分布 
+$ \mathcal{N}(f|\mu_n(x), \sigma_n^2(x)) $，
+其中均值函数 $\mu_n(x)$ 与方差函数 $\sigma_n(x)$ 可通过训练数据 
+$\mathcal{D}_n = {(x_i, y_i) : i = 1 : n}$ 
+经由闭式解析方程推导得出。高斯过程需要预设核函数 
+$K_\theta(x, x')$ 
+来衡量输入点 
+$x, x'$
+之间的相似度。其直观原理在于：若两个输入点相似度较高（即 $K_\theta(x, x')$ 取值较大），则对应函数值也倾向于相似，故 $f(x)$ 与 $f(x')$ 应呈正相关。这一特性使我们可以基于标注训练点对函数进行插值估计，在某些情况下还能实现函数的外推预测。
 
 高斯过程在训练数据稀缺时表现优异，且支持闭式贝叶斯更新。然而，精确更新的时间复杂度为 $O(N^3)$（$N$ 为样本量），当函数评估次数较多时计算效率会显著下降。现有多种方法（第18.5.3节）可将复杂度降至 $O(NM^2)$（$M$ 为可调参数），但会牺牲部分计算精度。
 
@@ -1465,11 +1549,25 @@ ECM算法全称为“期望条件最大化”（expectation conditional maximiza
 
 ### 6.6.3 采集函数
 
-在贝叶斯优化中，我们通过**采集函数**（亦称**评价函数**）来评估每个潜在查询点的期望效用：$\alpha\left(\boldsymbol{x} \mid \mathcal{D}_n\right)=\mathbb{E}_{p\left(y \mid \boldsymbol{x}, \mathcal{D}_n\right)}\left[U\left(\boldsymbol{x}, y ; \mathcal{D}_n\right)\right]$，其中 $ y = f(\boldsymbol{x}) $ 表示点 $\boldsymbol{x}$ 处未知的函数值，$ U() $ 为效用函数。正如后续将讨论的，不同的效用函数会衍生出不同的采集函数。我们通常选择的函数会使得已查询点的效用值较小（在无噪声观测场景下甚至为零），以此促进探索行为。
+在贝叶斯优化中，我们通过**采集函数**（亦称**评价函数**）来评估每个潜在查询点的期望效用：
+$\alpha\left(\boldsymbol{x} \mid \mathcal{D}_n\right)=\mathbb{E}_{p\left(y \mid \boldsymbol{x}, \mathcal{D}_n\right)}\left[U\left(\boldsymbol{x}, y ; \mathcal{D}_n\right)\right]$，
+其中 
+$y = f(\boldsymbol{x}) $ 表示点 $\boldsymbol{x}$ 
+处未知的函数值，$ U() $ 为效用函数。正如后续将讨论的，不同的效用函数会衍生出不同的采集函数。我们通常选择的函数会使得已查询点的效用值较小（在无噪声观测场景下甚至为零），以此促进探索行为。
 
 #### 6.6.3.1 改进的概率
 
-定义 $ M_n = \max_{i=1}^n y_i $ 为当前已观测的最优值（称为**当前最优值**）。（若观测存在噪声，采用最高均值 $ \max_i E_{p(f|D_n)} [f(x_i)] $ 是合理的替代方案 [WF16]。）随后我们通过 $ U(x, y; D_n) = I(y > M_n) $ 定义新点 $ x $ 的效用，该函数仅当新值优于当前最优值时产生奖励。相应的采集函数即为期望效用 $ \alpha_{PI}(x; D_n) = p(f(x) > M_n | D_n) $，这被称为**提升概率**[Kus64]。若 $ p(f|D_n) $ 是高斯过程，则该量值可通过以下闭式解计算：
+定义 
+$ M_n = \max_{i=1}^n y_i $ 
+为当前已观测的最优值（称为**当前最优值**）。（若观测存在噪声，采用最高均值 
+$ \max_i E_{p(f|D_n)} [f(x_i)] $ 
+是合理的替代方案 [WF16]。）随后我们通过 
+$ U(x, y; D_n) = I(y > M_n) $ 
+定义新点 $ x $ 的效用，该函数仅当新值优于当前最优值时产生奖励。相应的采集函数即为期望效用 
+$ \alpha_{PI}(x; D_n) = p(f(x) > M_n | D_n) $，
+这被称为**提升概率**[Kus64]。若 
+$ p(f|D_n) $ 
+是高斯过程，则该量值可通过以下闭式解计算：
 
 $$
 \alpha_{P I}\left(\boldsymbol{x} ; \mathcal{D}_n\right)=p\left(f(\boldsymbol{x})>M_n \mid \mathcal{D}_n\right)=\Phi\left(\gamma_n\left(\boldsymbol{x}, M_n\right)\right) \tag{6.174}
@@ -1518,7 +1616,9 @@ $$
 \alpha\left(\boldsymbol{x} ; \mathcal{D}_n\right)=\mathbb{E}_{p\left(\boldsymbol{\theta} \mid \mathcal{D}_n\right)}\left[\mathbb{I}\left(\boldsymbol{x}=\underset{\boldsymbol{x}^{\prime}}{\operatorname{argmax}} f_{\boldsymbol{\theta}}\left(\boldsymbol{x}^{\prime}\right)\right)\right] \tag{6.179}
 $$
 
-通过对 $\tilde{\theta} \sim p(\theta|D_n)$ 进行采样，可得到该积分的单样本近似。随后通过下式选择最优动作：
+通过对 
+$\tilde{\theta} \sim p(\theta|D_n)$ 
+进行采样，可得到该积分的单样本近似。随后通过下式选择最优动作：
 
 $$
 \boldsymbol{x}_{n+1}=\underset{\boldsymbol{x}}{\operatorname{argmax}} \alpha\left(\boldsymbol{x} ; \mathcal{D}_n\right)=\underset{\boldsymbol{x}}{\operatorname{argmax}} \mathbb{I}\left(\boldsymbol{x}=\underset{\boldsymbol{x}^{\prime}}{\operatorname{argmax}} f_{\hat{\theta}}\left(\boldsymbol{x}^{\prime}\right)\right)=\underset{\boldsymbol{x}}{\operatorname{argmax}} f_{\hat{\theta}}(\boldsymbol{x}) \tag{6.180}
@@ -1530,13 +1630,19 @@ $$
 
 ### 6.6.3.5 熵搜索
 
-由于贝叶斯优化的目标是找到 $ x^* = \text{argmax}_x f(x) $，直接最小化对 $ x^* $ 位置的不确定性（记为 $ p_*(x|D_n) $）是合理的。因此我们定义效用函数为：
+由于贝叶斯优化的目标是找到 
+$ x^* = \text{argmax}_x f(x) $，
+直接最小化对 $ x^* $ 位置的不确定性（记为 
+$ p_*(x|D_n) $
+）是合理的。因此我们定义效用函数为：
 
 $$
 U\left(\boldsymbol{x}, y ; \mathcal{D}_n\right)=\mathbb{H}\left(\boldsymbol{x}^* \mid \mathcal{D}_n\right)-\mathbb{H}\left(\boldsymbol{x}^* \mid \mathcal{D}_n \cup\{(\boldsymbol{x}, y)\}\right) \tag{6.181}
 $$
 
-其中 $ \mathbb{H}(x^*|D_n) = \mathbb{H}(p_*(x|D_n)) $ 是最优点位置后验分布的熵。这被称为**信息增益准则**；与主动学习目标的区别在于，此处我们希望获取关于 $ x^* $ 的信息而非所有 $ x $ 对应的 $ f $ 信息。相应采集函数为：
+其中 
+$ \mathbb{H}(x^*|D_n) = \mathbb{H}(p_*(x|D_n)) $ 
+是最优点位置后验分布的熵。这被称为**信息增益准则**；与主动学习目标的区别在于，此处我们希望获取关于 $ x^* $ 的信息而非所有 $ x $ 对应的 $ f $ 信息。相应采集函数为：
 
 $$
 \alpha_{E S}\left(\boldsymbol{x} ; \mathcal{D}_n\right)=\mathbb{E}_{p\left(y \mid \boldsymbol{x}, \mathcal{D}_n\right)}\left[U\left(\boldsymbol{x}, y ; \mathcal{D}_n\right)\right]=\mathbb{H}\left(\boldsymbol{x}^* \mid \mathcal{D}_n\right)-\mathbb{E}_{p\left\{y \mid \boldsymbol{x}, \mathcal{D}_n\right)}\left[\mathbb{H}\left(\boldsymbol{x}^* \mid \mathcal{D}_n \cup\{(\boldsymbol{x}, y)\}\right)\right] \tag{6.182}
@@ -1544,13 +1650,17 @@ $$
 
 该方法称为**熵搜索**[HS12]。
 
-遗憾的是，计算 $ \mathbb{H}(x^*|D_n) $ 非常困难，因其需要输入空间上的概率模型。幸运的是，我们可以利用互信息的对称性将式(6.182)的采集函数重写为：
+遗憾的是，计算 
+$ \mathbb{H}(x^*|D_n) $ 
+非常困难，因其需要输入空间上的概率模型。幸运的是，我们可以利用互信息的对称性将式(6.182)的采集函数重写为：
 
 $$
 \alpha_{P E S}\left(\boldsymbol{x} ; \mathcal{D}_n\right)=\mathbb{H}\left(y \mid \mathcal{D}_n, \boldsymbol{x}\right)-\mathbb{E}_{\boldsymbol{x}^* \mid \mathcal{D}_n}\left[\mathbb{H}\left(y \mid \mathcal{D}_n, \boldsymbol{x}, \boldsymbol{x}^*\right)\right] \tag{6.183}
 $$
 
-其中可通过汤普森采样近似 $ p(x^*|D_n) $ 的期望。现在只需对输出空间 $ y $ 的不确定性进行建模。该方法称为**预测熵搜索**[HLHG14]。
+其中可通过汤普森采样近似 
+$ p(x^*|D_n) $ 
+的期望。现在只需对输出空间 $ y $ 的不确定性进行建模。该方法称为**预测熵搜索**[HLHG14]。
 
 ### 6.6.3.6 知识梯度
 
@@ -1569,7 +1679,11 @@ $$
 \alpha_{K G}\left(\boldsymbol{x} ; \mathcal{D}_n\right)=\mathbb{E}_{\mathcal{D}_n}\left[\left(V_{n+1}(\boldsymbol{x})-M_n\right) \mathbb{I}\left(V_{n+1}(\boldsymbol{x})>M_n\right)\right] \tag{6.186}
 $$
 
-将此式与式(6.176)的EI函数对比可知，我们选择的点 $\boldsymbol{x}_{n+1}$ 应使得观测 $f(\boldsymbol{x}_{n+1})$ 能提供可供利用的知识，而非直接寻找具有更优 $f$ 值的点。
+将此式与式(6.176)的EI函数对比可知，我们选择的点 
+$\boldsymbol{x}_{n+1}$ 
+应使得观测 
+$f(\boldsymbol{x}_{n+1})$ 
+能提供可供利用的知识，而非直接寻找具有更优 $f$ 值的点。
 
 #### 6.6.3.7 采集函数优化
 
@@ -1599,7 +1713,13 @@ $$
 
 #### 6.6.4.4 约束优化
 
-若需要在已知约束下最大化函数，可直接将约束纳入采集函数。但若约束未知，则除估计函数外还需估计可行集的支撑域。[GSA14]提出加权EI准则 $\alpha_{wEI}(\boldsymbol{x}; \mathcal{D}_n) = \alpha_{EI}(\boldsymbol{x}; \mathcal{D}_n)h(\boldsymbol{x}; \mathcal{D}_n)$，其中 $h(\boldsymbol{x}; \mathcal{D}_n)$ 是采用伯努利观测模型的高斯过程，用于判断 $\boldsymbol{x}$ 是否可行。当然也存在其他方法，例如[HL+16b]提出了基于预测熵搜索的解决方案。
+若需要在已知约束下最大化函数，可直接将约束纳入采集函数。但若约束未知，则除估计函数外还需估计可行集的支撑域。[GSA14]提出加权EI准则 
+$\alpha_{wEI}(\boldsymbol{x}; \mathcal{D}_n) = \alpha_{EI}(\boldsymbol{x}; \mathcal{D}_n)h(\boldsymbol{x}; \mathcal{D}_n)$，
+其中 
+$h(\boldsymbol{x}; \mathcal{D}_n)$ 
+是采用伯努利观测模型的高斯过程，用于判断 
+$\boldsymbol{x}$ 
+是否可行。当然也存在其他方法，例如[HL+16b]提出了基于预测熵搜索的解决方案。
 
 ## 6.7 Derivative-free 优化
 
@@ -1631,7 +1751,13 @@ $$
 
 爬山算法一旦到达局部最优解或平台期就会停止更新。显然可以执行随机重启，但这样做会丢失此前获得的所有信息。一种更智能的替代方案称为**禁忌搜索**（Tabu search）[GL97]。该方法与爬山算法类似，但允许移动到降低（或至少不提高）目标函数的新状态——只要该状态此前未被访问过。我们可以通过维护一个记录最近 $\tau$ 个已访问状态的禁忌列表来实现这一点。这种机制强制算法探索新的状态，从而增加逃离局部最大值的概率。该过程持续进行直至达到 $c_{\max }$ 步（称为"禁忌期限"）。伪代码参考算法6.6。（若设置 $c_{\max }=1$，则退化为贪婪爬山算法。）
 
-例如，考虑当禁忌搜索到达山顶 $\boldsymbol{x}_t$ 时的情况。在下一步中，算法将移动到峰顶的某个相邻点 $\boldsymbol{x}_{t+1} \in \operatorname{nbr}\left(\boldsymbol{x}_t\right)$——该点函数值必然更低。接着它会移动到上一步的相邻点 $\boldsymbol{x}_{t+2} \in \operatorname{nbr}\left(\boldsymbol{x}_{t+1}\right)$；此时禁忌列表会阻止其返回 $\boldsymbol{x}_t$（峰顶），因此算法被迫选择同等高度或更低的相邻点。如此持续"环绕"峰顶运行，可能被迫下坡至更低水平的解的集合（类似逆向盆地淹没操作），直到发现通往新峰顶的山脊，或超过禁忌期限。
+例如，考虑当禁忌搜索到达山顶 
+$\boldsymbol{x}_t$ 
+时的情况。在下一步中，算法将移动到峰顶的某个相邻点 
+$\boldsymbol{x}_{t+1} \in \operatorname{nbr}\left(\boldsymbol{x}_t\right)$
+——该点函数值必然更低。接着它会移动到上一步的相邻点 
+$\boldsymbol{x}_{t+2} \in \operatorname{nbr}\left(\boldsymbol{x}_{t+1}\right)$；
+此时禁忌列表会阻止其返回 $\boldsymbol{x}_t$（峰顶），因此算法被迫选择同等高度或更低的相邻点。如此持续"环绕"峰顶运行，可能被迫下坡至更低水平的解的集合（类似逆向盆地淹没操作），直到发现通往新峰顶的山脊，或超过禁忌期限。
 
 根据[RN10, p.123]所述，禁忌搜索将八皇后问题的解决率从 $14\%$ 提升至 $94\%$，不过该种算法每次成功平均需要 $21$ 步，每次失败则平均需要 $64$ 步。
 
@@ -1643,7 +1769,11 @@ $$
 
 [BB12] 将这种技术（随机搜索）应用于一些机器学习模型的**超参数优化**问题，其优化目标是模型在**验证集**上的性能。在他们的例子中，搜索空间是连续的，即 $\Theta=[0,1]^D$。从这个空间中随机采样非常容易。相应的替代方法是**将空间量化为一个固定的值集，然后全部评估一遍**；这种方法被称为**网格搜索**（grid search）。（当然，这只有在维度 $D$ 较小的情况下才可行。）他们发现，**随机搜索的性能优于网格搜索**。其直观原因是，**许多超参数对目标函数（模型性能）影响甚微**，如图 6.12 所示。因此，沿着这些不重要的维度设置精细的网格是在浪费时间。
 
-随机搜索（RS）也被用于优化**马尔可夫决策过程（MDP）策略**的参数，其目标函数的形式为 $f(\boldsymbol{x})=\mathbb{E}_{\boldsymbol{\tau} \sim \pi_{\boldsymbol{x}}}[R(\boldsymbol{\tau})]$，即使用参数为 $\boldsymbol{x}$ 的策略所生成的轨迹的期望奖励。对于**自由参数较少**的策略，随机搜索的性能可以超越第35章中描述的更复杂的强化学习方法，正如 [MGR18] 中所展示的。在策略参数数量巨大的情况下，有时可以将其投影到一个更低维的随机子空间中，并在该子空间内进行优化（可以是网格搜索或随机搜索）[Li+18a]。
+随机搜索（RS）也被用于优化**马尔可夫决策过程（MDP）策略**的参数，其目标函数的形式为 
+$f(\boldsymbol{x})=\mathbb{E}_{\boldsymbol{\tau} \sim \pi_{\boldsymbol{x}}}[R(\boldsymbol{\tau})]$，
+即使用参数为 
+$\boldsymbol{x}$ 
+的策略所生成的轨迹的期望奖励。对于**自由参数较少**的策略，随机搜索的性能可以超越第35章中描述的更复杂的强化学习方法，正如 [MGR18] 中所展示的。在策略参数数量巨大的情况下，有时可以将其投影到一个更低维的随机子空间中，并在该子空间内进行优化（可以是网格搜索或随机搜索）[Li+18a]。
 
 ### 6.7.2 模拟退火
 
@@ -1672,9 +1802,21 @@ $$
 
 进化算法（EA）维护着一个由优质候选解组成的**种群**，这可以被视为对**高适应度状态**的一种**隐式的（非参数的）密度模型**。[BC95] 的研究提出了一种“**从遗传算法（GAs）中去除遗传操作**”的方法，其核心是**显式地**在配置空间上学习一个**概率模型**，该模型将其概率质量集中于**高分解**上。也就是说，种群变成了一个生成模型的参数集 $\boldsymbol{\theta}_t$。
 
-学习此类模型的一种方法如下。我们首先从当前模型中抽取 $K^{\prime}>K$ 个候选解，生成一个样本集 $\mathcal{S}_t=\left\{\boldsymbol{x}_k \sim p\left(\boldsymbol{x} \mid \boldsymbol{\theta}_t\right)\right\}$。然后，我们使用**适应度函数**对这些样本进行**排序**，并利用一个**选择算子**（这被称为**截断选择**）挑选出最具前景的、大小为 $K$ 的子集 $\mathcal{S}_t^*$。最后，我们使用**最大似然估计**，将一个新的概率模型 $p\left(\boldsymbol{x} \mid \boldsymbol{\theta}_{t+1}\right)$ **拟合**到 $\mathcal{S}_t^*$ 上。这种方法被称为**估计分布算法（EDA）**（参见例如 [LL02; PSCP06; Hau+11; PHL12; Hu+12; San17; Bal17]）。
+学习此类模型的一种方法如下。我们首先从当前模型中抽取 $K^{\prime}>K$ 个候选解，生成一个样本集 
+$\mathcal{S}_t=\left\{\boldsymbol{x}_k \sim p\left(\boldsymbol{x} \mid \boldsymbol{\theta}_t\right)\right\}$。
+然后，我们使用**适应度函数**对这些样本进行**排序**，并利用一个**选择算子**（这被称为**截断选择**）挑选出最具前景的、大小为 $K$ 的子集 $\mathcal{S}_t^*$。最后，我们使用**最大似然估计**，将一个新的概率模型 
+$p\left(\boldsymbol{x} \mid \boldsymbol{\theta}_{t+1}\right)$ 
+**拟合**到 
+$\mathcal{S}_t^*$ 
+上。这种方法被称为**估计分布算法（EDA）**（参见例如 [LL02; PSCP06; Hau+11; PHL12; Hu+12; San17; Bal17]）。
 
-请注意，EDA **等价于**最小化由 $\mathcal{S}_t^*$ 定义的**经验分布**与模型分布 $p\left(\boldsymbol{x} \mid \boldsymbol{\theta}_{t+1}\right)$ 之间的**交叉熵**。因此，EDA 与**交叉熵方法（cross entropy method, CEM）** 相关，正如第6.7.5节所述，尽管 CEM 通常假设 $p(\boldsymbol{x} \mid \boldsymbol{\theta})=\mathcal{N}(\boldsymbol{x} \mid \boldsymbol{\mu}, \mathbf{\Sigma})$（即**高斯分布**）这一特例。EDA 也与 **EM算法** 密切相关，正如 [Bro+20a] 中所讨论的。
+请注意，EDA **等价于**最小化由 
+$\mathcal{S}_t^*$ 
+定义的**经验分布**与模型分布 
+$p\left(\boldsymbol{x} \mid \boldsymbol{\theta}_{t+1}\right)$ 
+之间的**交叉熵**。因此，EDA 与**交叉熵方法（cross entropy method, CEM）** 相关，正如第6.7.5节所述，尽管 CEM 通常假设 
+$p(\boldsymbol{x} \mid \boldsymbol{\theta})=\mathcal{N}(\boldsymbol{x} \mid \boldsymbol{\mu}, \mathbf{\Sigma})$
+（即**高斯分布**）这一特例。EDA 也与 **EM算法** 密切相关，正如 [Bro+20a] 中所讨论的。
 
 举一个简单的例子，假设**配置空间**是长度为 $D$ 的**比特串**，且**适应度函数**为 $f(x)=\sum_{d=1}^D x_d$（其中 $x_d \in\{0,1\}$，这在 EA 文献中被称为 **one-max 函数**）。针对此问题，一个简单的概率模型是形式为 $p(\boldsymbol{x} \mid \boldsymbol{\theta})=\prod_{d=1}^D \operatorname{Ber}\left(x_d \mid \theta_d\right)$ 的**完全因子化模型**。在**分布式贝叶斯优化（DBO）** 中使用此模型会得到一种称为**单变量边际分布算法（UMDA）** 的方法。
 
@@ -1684,7 +1826,11 @@ $$
 \hat{\theta}_{d, t+1}=\left(1-\eta_t\right) \hat{\theta}_{d, t}+\eta_t \bar{\theta}_{d, t} \tag{6.188}
 $$
 
-其中 $\bar{\theta}_{d, t}=\frac{1}{N_t} \sum_{k=1}^K \mathbb{I}\left(x_{k, d}=1\right)$ 是从当前迭代生成的 $K=\left|\mathcal{S}_t^*\right|$ 个样本中估计出的**最大似然估计（MLE）**，而 $\eta_t$ 是一个**学习率**。
+其中 
+$\bar{\theta}_{d, t}=\frac{1}{N_t} \sum_{k=1}^K \mathbb{I}\left(x_{k, d}=1\right)$ 
+是从当前迭代生成的 
+$K=\left|\mathcal{S}_t^*\right|$ 
+个样本中估计出的**最大似然估计（MLE）**，而 $\eta_t$ 是一个**学习率**。
 
 我们可以很直接地使用**更具表达能力的概率模型**来捕捉参数之间的**依赖关系**（这些依赖关系在 EA 文献中被称为**构建块**）。例如，在**实值参数**的情况下，我们可以使用一个**多元高斯分布** $p(\boldsymbol{x})=\mathcal{N}(\boldsymbol{x} \mid \boldsymbol{\mu}, \mathbf{\Sigma})$。由此产生的方法被称为**多元正态分布估计算法（EMNA）**[LL02]。（亦可参见第 6.7.5 节。）
 
@@ -1696,7 +1842,11 @@ $$
 
 ### 6.7.6 进化策略
 
-进入策略（Evolutionary strategies）[^Wie+14] 是一种基于分布的优化算法，其中的分布表示为高斯分布 $p\left(\boldsymbol{x} \mid \boldsymbol{\theta}_t\right)$（参考 [Sal+17b]）。与 CEM 不同，参数更新的方式是使用梯度下降，而不是关于精英集合中样本的MLE。更精确地讲，考虑光滑的目标函数 $\mathcal{L}(\boldsymbol{\theta})=\mathbb{E}_{p(\boldsymbol{x} \mid \boldsymbol{\theta})}[f(\boldsymbol{x})]$。我们可以使用 REINFORCE 估计器（6.3.4节）来计算该目标函数的梯度：
+进入策略（Evolutionary strategies）[^Wie+14] 是一种基于分布的优化算法，其中的分布表示为高斯分布 
+$p\left(\boldsymbol{x} \mid \boldsymbol{\theta}_t\right)$
+（参考 [Sal+17b]）。与 CEM 不同，参数更新的方式是使用梯度下降，而不是关于精英集合中样本的MLE。更精确地讲，考虑光滑的目标函数 
+$\mathcal{L}(\boldsymbol{\theta})=\mathbb{E}_{p(\boldsymbol{x} \mid \boldsymbol{\theta})}[f(\boldsymbol{x})]$。
+我们可以使用 REINFORCE 估计器（6.3.4节）来计算该目标函数的梯度：
 
 $$
 \nabla_{\boldsymbol{\theta}} \mathcal{L}(\boldsymbol{\theta})=\mathbb{E}_{p(\boldsymbol{x} \mid \boldsymbol{\theta})}\left[f(\boldsymbol{x}) \nabla_{\boldsymbol{\theta}} \log p(\boldsymbol{x} \mid \boldsymbol{\theta})\right] \tag{6.190}
@@ -1722,15 +1872,42 @@ $$
 
 ### 6.8.1 入门示例：两个点集之间的最优匹配
 
-假设存在两个点集 $\left(\mathbf{x}_1, \ldots, \mathbf{x}_n\right)$ 和 $\left(\mathbf{y}_1, \ldots, \mathbf{y}_n\right)$，每个集合包含取自集合 $\mathcal{X}$ 的 $n>1$ 个不同点。这两个点集之间的匹配是一种双射映射（bijective mapping）——将每个点 $\mathbf{x}_i$ 对应到另一个点 $\mathbf{y}_j$。这种对应关系可通过配对索引 $(i, j) \in\{1, \ldots, n\}^2$ 来表示，这些索引定义了对称群（symmetric group） $\mathcal{S}_n$ 中的某种置换 $\sigma$。按照此约定，在给定置换 $\sigma$ 的情况下，$\mathbf{x}_i$ 将被对应到第二个点集中的第 $\sigma_i$ 个元素 $\mathbf{y}_{\sigma_i}$。
+假设存在两个点集 
+$\left(\mathbf{x}_1, \ldots, \mathbf{x}_n\right)$ 
+和 
+$\left(\mathbf{y}_1, \ldots, \mathbf{y}_n\right)$，
+每个集合包含取自集合 $\mathcal{X}$ 的 $n>1$ 个不同点。这两个点集之间的匹配是一种双射映射（bijective mapping）——将每个点 $\mathbf{x}_i$ 对应到另一个点 $\mathbf{y}_j$。这种对应关系可通过配对索引 
+$(i, j) \in\{1, \ldots, n\}^2$ 
+来表示，这些索引定义了对称群（symmetric group） $\mathcal{S}_n$ 中的某种置换 $\sigma$。按照此约定，在给定置换 $\sigma$ 的情况下，
+$\mathbf{x}_i$ 
+将被对应到第二个点集中的第 $\sigma_i$ 个元素 $\mathbf{y}_{\sigma_i}$。
 
 ```deepseek
 对称群 是一个数学概念，特指在抽象代数，特别是群论领域中，某个集合上所有可能的置换所构成的群。
 ```
 
-**匹配成本.** 在将一个点集与另一个点集进行匹配时，自然需要考虑所有可能配对 $(i, j) \in\{1, \ldots, n\}^2$ 所产生的成本。例如，$\mathbf{x}_i$ 可能表示出租车司机 $i$ 的当前位置信息，而 $\mathbf{y}_j$ 则对应刚发出用车请求的用户 $j$ 的位置；此时，$C_{i j} \in \mathbb{R}$ 可以量化司机 $i$ 前往用户 $j$ 所需耗费的时间、燃油或距离成本。另一种场景中，$\mathbf{x}_i$ 可能表示求职者 $i$ 所具备的技能向量，$\mathbf{y}_j$ 则代表胜任职位 $j$ 所需的技能向量；此时 $C_{i j}$ 可量化员工 $i$ 完成工作 $j$ 所需的时间。
+**匹配成本.** 在将一个点集与另一个点集进行匹配时，自然需要考虑所有可能配对 
+$(i, j) \in\{1, \ldots, n\}^2$ 
+所产生的成本。例如，
+$\mathbf{x}_i$ 
+可能表示出租车司机 $i$ 的当前位置信息，而 
+$\mathbf{y}_j$ 
+则对应刚发出用车请求的用户 $j$ 的位置；此时，
+$C_{i j} \in \mathbb{R}$ 
+可以量化司机 $i$ 前往用户 $j$ 所需耗费的时间、燃油或距离成本。另一种场景中，
+$\mathbf{x}_i$ 
+可能表示求职者 $i$ 所具备的技能向量，
+$\mathbf{y}_j$ 
+则代表胜任职位 $j$ 所需的技能向量；此时 $C_{i j}$ 可量化员工 $i$ 完成工作 $j$ 所需的时间。
 
-通常假设成本 $C_{i j}$ 是在点对 $\left(\mathbf{x}_i, \mathbf{y}_j\right)$ 上计算成本函数 $c: \mathcal{X} \times \mathcal{X} \rightarrow \mathbb{R}$ 得到的，即 $C_{i j}=c\left(\mathbf{x}_i, \mathbf{y}_j\right)$。在最优传输的多数应用中，成本函数通常具有几何意义，一般表现为在 $\mathcal{X}$ 上的距离函数（如图 6.18 中 $\mathcal{X}=\mathbb{R}^2$ 的情形），关于这一点，我们将在 6.8.2.4 节进一步讨论。
+通常假设成本 $C_{i j}$ 是在点对 
+$\left(\mathbf{x}_i, \mathbf{y}_j\right)$ 
+上计算成本函数 
+$c: \mathcal{X} \times \mathcal{X} \rightarrow \mathbb{R}$ 
+得到的，即 
+$C_{i j}=c\left(\mathbf{x}_i, \mathbf{y}_j\right)$。
+在最优传输的多数应用中，成本函数通常具有几何意义，一般表现为在 $\mathcal{X}$ 上的距离函数（如图 6.18 中 $\mathcal{X}=\mathbb{R}^2$ 
+的情形），关于这一点，我们将在 6.8.2.4 节进一步讨论。
 
 **最小成本匹配.** 在给定成本函数 $c$ 的前提下，最优匹配（或分配）问题旨在找到一个能使总成本最小的置换方案，该总成本由以下函数定义：
 
@@ -1746,7 +1923,17 @@ $$
 
 #### 6.8.2.1 质量分割（Mass splitting）
 
-假设点 $\mathbf{x}_i$ 和 $\mathbf{y}_j$ 表示技能向量—— $\mathbf{x}_i$ 代表工人 $i$ 掌握的技能，$\mathbf{y}_j$ 表示完成任务 $j$ 所需的技能。由于寻找匹配等价于在 $\{1, \ldots, n\}$ 中寻找某种置换，因此问题(6.191)无法处理工人数量大于（或小于）任务数量的情况。更严重的是，匹配问题假设每个任务是不可分割的，且工人只能专职于单一任务，这种设定显然不符合实际。在现实中，某些任务可能需要投入多于（或少于）一名工人的工作量，而有些工人或许只能兼职工作，或者相反愿意加班。匹配问题中的置换是刚性的，无法处理这种情况。因为根据定义，置换是一一对应的关联。Kantorovich形式允许质量可分割，即工人提供的努力或完成给定任务所需的工作量是可以被分割的。在符号表达方面，除了 $\mathbf{x}_i$ 之外，还为每名工人（共 $n$ 名）关联一个正数 $\mathbf{a}_i>0$，该数字表示工人 $i$ 能够提供的工作时间。类似地，我们引入数字 $\mathbf{b}_j>0$ 来描述完成某项任务（共 $m$ 项）所需的时间（ $n$ 和 $m$ 不一定相等）。因此，工人 $i$ 被表示为 $\left(\mathbf{a}_i, \mathbf{x}_i\right)$，在数学上等价于加权狄拉克测度 $\mathbf{a}_i \delta_{\mathbf{x}_i}$，此时工厂可用的劳动力被定义为离散测度 $\sum_i \mathbf{a}_i \delta_{\mathbf{x}_i}$，而其任务所需劳动力定义为 $\sum_j \mathbf{b}_j \delta_{\mathbf{y}_j}$。如果进一步假设工厂的工作量是平衡的，即 $\sum_i \mathbf{a}_i=\sum_j \mathbf{b}_j$，最优传输的Kantorovich[Kan42]形式为：
+假设点 
+$\mathbf{x}_i$ 和 $\mathbf{y}_j$ 
+表示技能向量—— $\mathbf{x}_i$ 代表工人 $i$ 掌握的技能，$\mathbf{y}_j$ 表示完成任务 $j$ 所需的技能。由于寻找匹配等价于在 $\{1, \ldots, n\}$ 中寻找某种置换，因此问题(6.191)无法处理工人数量大于（或小于）任务数量的情况。更严重的是，匹配问题假设每个任务是不可分割的，且工人只能专职于单一任务，这种设定显然不符合实际。在现实中，某些任务可能需要投入多于（或少于）一名工人的工作量，而有些工人或许只能兼职工作，或者相反愿意加班。匹配问题中的置换是刚性的，无法处理这种情况。因为根据定义，置换是一一对应的关联。Kantorovich形式允许质量可分割，即工人提供的努力或完成给定任务所需的工作量是可以被分割的。在符号表达方面，除了 $\mathbf{x}_i$ 之外，还为每名工人（共 $n$ 名）关联一个正数 $\mathbf{a}_i>0$，该数字表示工人 $i$ 能够提供的工作时间。类似地，我们引入数字 $\mathbf{b}_j>0$ 来描述完成某项任务（共 $m$ 项）所需的时间（ $n$ 和 $m$ 不一定相等）。因此，工人 $i$ 被表示为 $\left(\mathbf{a}_i, \mathbf{x}_i\right)$，在数学上等价于加权狄拉克测度 
+$\mathbf{a}_i \delta_{\mathbf{x}_i}$，
+此时工厂可用的劳动力被定义为离散测度 
+$\sum_i \mathbf{a}_i \delta_{\mathbf{x}_i}$，
+而其任务所需劳动力定义为 
+$\sum_j \mathbf{b}_j \delta_{\mathbf{y}_j}$。
+如果进一步假设工厂的工作量是平衡的，即 
+$\sum_i \mathbf{a}_i=\sum_j \mathbf{b}_j$，
+最优传输的Kantorovich[Kan42]形式为：
 
 $$
 \mathrm{OT}_C(\mathbf{a}, \mathbf{b}) \triangleq \min _{P \in \mathbf{R}_{+}^{n \times m}, P\textbf{1}_n=\mathbf{a}, P^T \mathbf{1}_m=\mathbf{b}}\langle P, C\rangle \triangleq \sum_{i, j} P_{i j} C_{i j} . \tag{6.192}
@@ -1770,7 +1957,7 @@ $$
 \inf _{T: T_{\sharp} \mu=\nu} \int_{\mathcal{X}} c(\mathbf{x}, T(\mathbf{x})) \mu(\mathrm{d} \mathbf{x}) . \tag{6.194}
 $$
 
-因此，$T$ 是一个将 $\mu$ 整体推进到 $\nu$ 的映射，同时能实现最小的推进成本。尽管Monge问题非常直观，但由于其非凸性，在实践中求解极为困难。事实上，容易验证，约束条件 $\left\{T_{\sharp} \mu=\nu\right\}$ 不具有凸性，因为可以轻易找到反例：即使 $T_{\sharp} \mu=\nu$ 且 $T_{\sharp}^{\prime}\mu= \nu$，也未必满足 $\left(\frac{1}{2} T+\frac{1}{2} T^{\prime}\right)_{\sharp} \mu = \nu$。幸运的是，Kantorovich的方法同样适用于连续测度，并能转化为相对简单得多的线性规划问题。
+因此，$T$ 是一个将 $\mu$ 整体推进到 $\nu$ 的映射，同时能实现最小的推进成本。尽管Monge问题非常直观，但由于其非凸性，在实践中求解极为困难。事实上，容易验证，约束条件 $\{T_{\sharp} \mu=\nu\}$ 不具有凸性，因为可以轻易找到反例：即使 $T_{\sharp} \mu=\nu$ 且 $T_{\sharp}^{\prime}\mu= \nu$，也未必满足 $\left(\frac{1}{2} T+\frac{1}{2} T^{\prime}\right)_{\sharp} \mu = \nu$。幸运的是，Kantorovich的方法同样适用于连续测度，并能转化为相对简单得多的线性规划问题。
 
 ```deepseek
 “长度”、“面积”、“体积”这些我们熟悉的概念，本质上就是测度。测度就是一个数学工具，用来给一个集合（比如线段上的点集、平面上的区域）分配一个非负的数值，来表示这个集合的“大小”。所以，最通俗的理解是：测度就是“大小”的通用说法。
@@ -1817,7 +2004,13 @@ $$
 \sup _{f \oplus g \leq c} \int_{\mathcal{X}} f \mathrm{~d} \mu+\int_{\mathcal{X}} g \mathrm{~d} \nu \tag{6.199}
 $$
 
-其中符号 $\oplus$ 表示向量之间的张量加法，$\mathbf{f} \oplus \mathbf{g}=\left[\mathbf{f}_i+\mathbf{g}_j\right]_{i j}$，或者函数 $f \oplus g: \mathbf{x}, \mathbf{y} \mapsto f(\mathbf{x})+g(\mathbf{y})$。换言之，对偶问题旨在寻找一对向量（或函数），使其在作用于 $\textbf{a}$ 和 $\textbf{b}$（或对 $\mu$ , $\nu$ 进行积分）时能获得尽可能高的期望值，但前提是这对向量（或函数）在任意两点 $\textbf{x}$, $\textbf{y}$ 之间的差异（以成本函数 $c$ 衡量）不能过大。
+其中符号 $\oplus$ 表示向量之间的张量加法，
+$\mathbf{f} \oplus \mathbf{g}=\left[\mathbf{f}_i+\mathbf{g}_j\right]_{i j}$，
+或者函数 
+$f \oplus g: \mathbf{x}, \mathbf{y} \mapsto f(\mathbf{x})+g(\mathbf{y})$。
+换言之，对偶问题旨在寻找一对向量（或函数），使其在作用于 
+$\textbf{a}$ 和 $\textbf{b}$
+（或对 $\mu$ , $\nu$ 进行积分）时能获得尽可能高的期望值，但前提是这对向量（或函数）在任意两点 $\textbf{x}$, $\textbf{y}$ 之间的差异（以成本函数 $c$ 衡量）不能过大。
 
 (6.192)和(6.196)中的对偶问题均包含两个变量。若聚焦于连续形式，经过仔细考察可以发现：在给定对应于第一个测度的函数 $f$ 后，我们能够计算出函数 $g$ 的最佳候选形式。该函数 $g$ 需在满足对所有 $\mathbf{x}$，$\mathbf{y}$ 均成立的不等式 $g(\mathbf{y}) \leq c(\mathbf{x}, \mathbf{y})-f(\mathbf{x})$ 的前提下尽可能取最大值，这使得
 
@@ -1847,7 +2040,17 @@ $$
 
 #### 6.8.3.2 Kantorovich-Rubinstein 对偶性与 Lipschitz 势函数
 
-一个能体现 c-凹性价值的重要结论出现在当 $c$ 为度量 $d$ 时，即 (6.197) 式中 $p=1$ 的情况。此时可以证明（尤其需要利用 $d$ 的三角不等式）：一个 d-凹函数 $f$ 是 1-利普希茨的（即对任意 $\mathbf{x}$, $\mathbf{y}$ 均有 $|f(\mathbf{x})-f(\mathbf{y})| \leq d(\mathbf{x}, \mathbf{y})$），且满足 $\bar{f}=-f$。这一结论可转化为如下恒等式：
+一个能体现 c-凹性价值的重要结论出现在当 
+$c$ 
+为度量 
+$d$ 
+时，即 (6.197) 式中 $p=1$ 的情况。此时可以证明（尤其需要利用 $d$ 的三角不等式）：一个 d-凹函数 $f$ 是 1-利普希茨的（即对任意 
+$\mathbf{x}$, 
+$\mathbf{y}$ 
+均有 
+$|f(\mathbf{x})-f(\mathbf{y})| \leq d(\mathbf{x}, \mathbf{y})$），且满足 
+$\bar{f}=-f$。
+这一结论可转化为如下恒等式：
 
 $$
 W_1(\mu, \nu)=\sup _{f \in 1 \text {-Lipschitz }} \int_{\mathcal{X}} f(\mathrm{~d} \mu-\mathrm{d} \nu) . \tag{6.204}
@@ -1864,9 +2067,29 @@ T^{\star}=\arg \min _{T: T_{\sharp} \mu=\nu} \int_{\mathcal{X}} \frac{1}{2}\|\ma
 \tag{6.205}
 $$
 
-存在，且是某个凸函数 $u: \mathbb{R}^d \rightarrow \mathbb{R}$ 的梯度，即 $T^{\star}=\nabla u$。反之，对任意凸函数 $u$，连接 $\mu$ 与位移测度 $\nabla u_{\#} \mu$ 的最优传输映射必等于 $\nabla u$。
+存在，且是某个凸函数 $u: \mathbb{R}^d \rightarrow \mathbb{R}$ 的梯度，即 $T^{\star}=\nabla u$。反之，对任意凸函数 $u$，连接 $\mu$ 与位移测度 $\nabla u_{#} \mu$ 的最优传输映射必等于 $\nabla u$。
 
-我们给出证明概要：对于任何合理的代价函数 $c$（例如下有界且下半连续），总可利用原始-对偶关系：考虑 (6.196) 的最优耦合  $P^*$ 以及 (6.203) 的最优 c-凹对偶函数  $f^*$。这意味着 $(f^*, g^* = \overline{f^*})$ 是 (6.199) 的最优解。该线性规划对的互补松弛条件表明：若 $\mathbf{x}_0, \mathbf{y}_0$ 位于 $P^*$ 的支撑集中，则必然（且充分）有 $f^*(\mathbf{x}_0) + \overline{f^*}(\mathbf{y}_0) = c(\mathbf{x}_0, \mathbf{y}_0)$。现假设 $\mathbf{x}_0, \mathbf{y}_0$ 确实属于 $P^*$ 的支撑集。由等式 $f^*(\mathbf{x}_0) + \overline{f^*}(\mathbf{y}_0) = c(\mathbf{x}_0, \mathbf{y}_0)$ 可直接推得 $\overline{f}^*(\mathbf{y}_0) = c(\mathbf{x}_0, \mathbf{y}_0) - f^*(\mathbf{x}_0)$。但根据定义，$\overline{f}^*(\mathbf{y}_0) = \inf_{\mathbf{x}} c(\mathbf{x}, \mathbf{y}_0) - f^*(\mathbf{x})$。因此，$\mathbf{x}_0$ 具有特殊性质：它最小化 $\mathbf{x} \to c(\mathbf{x}, \mathbf{y}_0) - f^*(\mathbf{x})$。若注意到本节假设 $c(\mathbf{x}, \mathbf{y}) = \frac{1}{2}\|\mathbf{x} - \mathbf{y}\|^2$，则 $\mathbf{x}_0$ 满足
+我们给出证明概要：对于任何合理的代价函数 $c$（例如下有界且下半连续），总可利用原始-对偶关系：考虑 (6.196) 的最优耦合  $P^*$ 以及 (6.203) 的最优 c-凹对偶函数  $f^*$。这意味着 
+$(f^*, g^* = \overline{f^*})$ 
+是 (6.199) 的最优解。该线性规划对的互补松弛条件表明：若 
+$\mathbf{x}_0, \mathbf{y}_0$ 
+位于 $P^*$ 的支撑集中，则必然（且充分）有 
+$f^*(\mathbf{x}_0) + \overline{f^*}(\mathbf{y}_0) = c(\mathbf{x}_0, \mathbf{y}_0)$。
+现假设 
+$\mathbf{x}_0, \mathbf{y}_0$ 
+确实属于 $P^*$ 的支撑集。由等式 
+$f^*(\mathbf{x}_0) + \overline{f^*}(\mathbf{y}_0) = c(\mathbf{x}_0, \mathbf{y}_0)$ 
+可直接推得 
+$\overline{f}^*(\mathbf{y}_0) = c(\mathbf{x}_0, \mathbf{y}_0) - f^*(\mathbf{x}_0)$。
+但根据定义，
+$\overline{f}^*(\mathbf{y}_0) = \inf_{\mathbf{x}} c(\mathbf{x}, \mathbf{y}_0) - f^*(\mathbf{x})$。
+因此，
+$\mathbf{x}_0$ 
+具有特殊性质：它最小化 
+$\mathbf{x} \to c(\mathbf{x}, \mathbf{y}_0) - f^*(\mathbf{x})$。
+若注意到本节假设 
+$c(\mathbf{x}, \mathbf{y}) = \frac{1}{2}\|\mathbf{x} - \mathbf{y}\|^2$，
+则 $\mathbf{x}_0$ 满足
 
 
 $$
@@ -1885,7 +2108,11 @@ $$
 P^{\star}=\left(\operatorname{Id}, \nabla\left(\frac{1}{2}\|\cdot\|^2-f^{\star}\right)\right)_{\sharp} \mu . \tag{6.208}
 $$
 
-证明的剩余部分可推导如下：对任意函数 $h : \mathcal{X} \to \mathbb{R}$，利用 c-变换和勒让德变换的定义可证明，$\frac{1}{2}\|\cdot\|^2 - h$ 是凸函数当且仅当 $h$ 是 c-凹函数。该证明的中间步骤依赖于证明 $\frac{1}{2}\|\cdot\|^2 - \overline{h}$ 等于 $\frac{1}{2}\|\cdot\|^2 - h$ 的勒让德变换。因此，由 $f^*$ 的 c-凹性可知函数 $\frac{1}{2}\|\cdot\|^2 - f^*$ 是凸函数，而最优传输映射本身即是凸函数的梯度。
+证明的剩余部分可推导如下：对任意函数 $h : \mathcal{X} \to \mathbb{R}$，利用 c-变换和勒让德变换的定义可证明，$\frac{1}{2}\|\cdot\|^2 - h$ 是凸函数当且仅当 $h$ 是 c-凹函数。该证明的中间步骤依赖于证明 $\frac{1}{2}\|\cdot\|^2 - \overline{h}$ 等于 $\frac{1}{2}\|\cdot\|^2 - h$ 的勒让德变换。因此，由 
+$f^*$ 
+的 c-凹性可知函数 
+$\frac{1}{2}\|\cdot\|^2 - f^*$ 
+是凸函数，而最优传输映射本身即是凸函数的梯度。
 
 认识到平方欧几里得代价的最优传输映射必为凸函数梯度这一事实，对求解 (6.203) 极具价值。此认知可用于将估计范围限制在相关的函数族中，例如 [AXX17] 提出的输入凸神经网络的梯度，或如 [Mak+20] 与 [Kor+20] 所建议的方法，以及具有理想光滑性和强凸性常数的任意凸函数 [PdC20]。
 
@@ -1897,7 +2124,13 @@ $$
 \mathrm{OT}_c(\mu, \nu)=\int_{[0,1]} c\left(Q_\mu(u), Q_\nu(u)\right) \mathrm{d} u \tag{6.209}
 $$
 
-特别地，当代价函数 $c$ 为 $(x,y) \mapsto |x - y|$ 时，$OT_1(\mu,\nu)$ 对应于柯尔莫哥洛夫-斯米尔诺夫统计量，即 $\mu$ 与 $\nu$ 的累积分布函数之间的面积。若 $c$ 取 $(x,y) \mapsto (x - y)^2$，我们得到的就是 $\mu$ 与 $\nu$ 的分位函数间的平方欧几里得范数。最后值得注意的是，此时蒙日映射也存在闭式解，其表达式为 $Q_\nu \circ F_\mu$。
+特别地，当代价函数 
+$c$ 
+为 
+$(x,y) \mapsto |x - y|$ 
+时，
+$OT_1(\mu,\nu)$ 
+对应于柯尔莫哥洛夫-斯米尔诺夫统计量，即 $\mu$ 与 $\nu$ 的累积分布函数之间的面积。若 $c$ 取 $(x,y) \mapsto (x - y)^2$，我们得到的就是 $\mu$ 与 $\nu$ 的分位函数间的平方欧几里得范数。最后值得注意的是，此时蒙日映射也存在闭式解，其表达式为 $Q_\nu \circ F_\mu$。
 
 第二种闭式解适用于所谓椭圆轮廓分布，其中最主要的是多元高斯分布[Gel90]。对于两个高斯分布 $\mathcal{N}(m_1, \Sigma_1)$ 和 $\mathcal{N}(m_2, \Sigma_2)$，它们的 2-瓦瑟斯坦距离可分解为：
 
@@ -1945,7 +2178,11 @@ $$
 OT_{C,\gamma}(\mathbf{a}, \mathbf{b}) = \max_{\mathbf{f} \in R^{n}, \mathbf{g} \in R^{m}} \mathbf{f}^{T} \mathbf{a} + \mathbf{g}^{T} \mathbf{b} - \gamma (e^{\mathbf{f}/\gamma})^{T} K e^{\mathbf{g}/\gamma} + \gamma (1 + \mathbb{H}(\mathbf{a}) + \mathbb{H}(\mathbf{b})) \tag{6.215}
 $$
 
-其中 $K \triangleq e^{-C/\gamma}$ 是 $-C/\gamma$ 的逐元素指数函数。这种正则化具有多重优势。原始-对偶关系揭示了（唯一）解 $P^{*}_{\gamma}$ 与最优对偶变量 $(\mathbf{f}^{*}, \mathbf{g}^{*})$ 之间的显式联系：
+其中 
+$K \triangleq e^{-C/\gamma}$ 
+是 $-C/\gamma$ 的逐元素指数函数。这种正则化具有多重优势。原始-对偶关系揭示了（唯一）解 $P^{*}_{\gamma}$ 与最优对偶变量 
+$(\mathbf{f}^{*}, \mathbf{g}^{*})$ 
+之间的显式联系：
 
 $$
 P^{*}_{\gamma} = \text{diag}(e^{\mathbf{f}/\gamma}) K \text{diag}(e^{\mathbf{g}/\gamma}) \tag{6.216}
