@@ -18,13 +18,13 @@ comments: true
 {:toc}
 ## 6.1 引言
 
-本章，我们将介绍各种**优化问题**（optimization problems）。该问题可以统一定义为：
+本章将讨论各种**优化问题**（optimization problems）。该问题可以统一定义为：
 
 $$
 \boldsymbol{\theta}^* \in \underset{\boldsymbol{\theta} \in \Theta}{\operatorname{argmin}} \mathcal{L}(\boldsymbol{\theta}) \tag{6.1}
 $$
 
-式中 $\mathcal{L}: \Theta \rightarrow \mathbb{R}$ 表示优化目标或损失函数，$\Theta$ 表示优化的参数空间。当然，上式隐藏了很多细节，比如优化问题是否包含额外的约束条件，优化空间是离散或是连续的，优化目标是凸的还是非凸的等等。本书上册讨论了机器学习中常见的一些优化算法。本章将讨论一些进阶的内容。更多细节可以参考其他文献 [KW19b; BV04; NW06; Ber15; Ber16]，以及一些综述文章 [BCN18; Sun+19b; PPS18; Pey20]。
+式中 $\mathcal{L}: \Theta \rightarrow \mathbb{R}$ 表示优化目标或损失函数，$\Theta$ 表示优化的参数空间。当然，上式隐藏了很多细节，比如优化问题是否包含额外的约束条件，优化空间是离散或是连续的，优化目标的凹凸性等等。本书上册讨论了机器学习中常见的一些优化算法。本章将讨论一些进阶的内容。更多细节可以参考其他文献 [KW19b; BV04; NW06; Ber15; Ber16]，以及一些综述文章 [BCN18; Sun+19b; PPS18; Pey20]。
 
 ## 6.2 自动微分
 
@@ -38,7 +38,7 @@ $$
 \left.\frac{\partial f}{\partial x_1}\right|_{\boldsymbol{x}=\boldsymbol{a}} \tag{6.2}
 $$
 
-这种表示方法并非完全自包含，它涉及到另一个变量 $\boldsymbol{x}=\left(x_1, x_2\right)$，这个变量可能是隐含的或从上下文中推断出来的，暗示函数 $f$ 的参数。另一种表达方式是：
+这种表示方法并非完全自包含，它涉及另一个变量 $\boldsymbol{x}=\left(x_1, x_2\right)$，该变量可能是隐含的或从上下文中推断出来的，暗示函数 $f$ 的参数。另一种表达方式是：
 
 $$
 \frac{\partial}{\partial a_1} f\left(a_1, a_2\right) \tag{6.3}
@@ -50,7 +50,7 @@ $$
 
 除了表示方法之外，我们还将依赖一些基本的多变量微积分概念。其中包括（偏）导数、函数在某求值点的微分或雅可比矩阵（Jacobian），函数在某求值点的局部线性近似等。我们将集中讨论空间维度有限的情形，并用 $\{\boldsymbol{e}_1, \ldots, \boldsymbol{e}_n\}$ 表示空间 $\mathbb{R}^n$ 中的标准基。
 
-**线性和多层线性函数** 令 $F: \mathbb{R}^n \multimap \mathbb{R}^m$ 表示线性函数 $F: \mathbb{R}^n \rightarrow \mathbb{R}^m$，并用 $F[\boldsymbol{x}]$ 表示函数作用于 $\boldsymbol{x} \in \mathbb{R}^n$。回想一下，这样的线性映射实际上对应于空间 $\mathbb{R}^{m \times n}$ 中的一个矩阵——列向量分别为 $F\left[\boldsymbol{e}_1\right], \ldots, F\left[\boldsymbol{e}_n\right]$；函数视角和矩阵视角的两种解释都是有用的。巧合的是，函数组合和矩阵乘法在表达方式上看起来是相似的：两个线性映射 $F$ 和 $G$ 的组合可以写成 $F \circ G$，或者稍微放宽符号的严格定义——考虑使用矩阵 $F G$。每个线性映射 $F: \mathbb{R}^n \multimap \mathbb{R}^m$ 都存在一个转置 $F: \mathbb{R}^m \multimap \mathbb{R}^n$，这是另一个线性映射，可以通过转置相应的矩阵来实现。
+**线性和多层线性函数** 令 $F: \mathbb{R}^n \multimap \mathbb{R}^m$ 表示线性函数 $F: \mathbb{R}^n \rightarrow \mathbb{R}^m$，并用 $F[\boldsymbol{x}]$ 表示函数作用于 $\boldsymbol{x} \in \mathbb{R}^n$。回想一下，线性映射实际上对应于空间 $\mathbb{R}^{m \times n}$ 中的一个矩阵——列向量分别为 $F\left[\boldsymbol{e}_1\right], \ldots, F\left[\boldsymbol{e}_n\right]$；函数视角和矩阵视角的两种解释都是有用的。巧合的是，函数组合和矩阵乘法在表达方式上看起来是相似的：两个线性映射 $F$ 和 $G$ 的组合可以写成 $F \circ G$，或者稍微放宽符号的严格定义——考虑使用矩阵 $F G$。每个线性映射 $F: \mathbb{R}^n \multimap \mathbb{R}^m$ 都存在一个转置 $F: \mathbb{R}^m \multimap \mathbb{R}^n$，这是另一个线性映射，可以通过转置相应的矩阵来实现。
 
 ```译者注
 函数视角和矩阵视角实际上是运动的相对性，前者是 x 的变换，后者是空间（基）的变换。
@@ -68,7 +68,7 @@ $$
 T: \underbrace{\mathbb{R}^n \times \cdots \times \mathbb{R}^n}_{k \text { times }} \rightarrow \mathbb{R}^m \tag{6.5}
 $$
 
-上式对应于一个数组（或者张量）$\mathbb{R}^{m \times n \times \cdots \times n}$。我们使用 $T\left[\boldsymbol{x}_1, \ldots, \boldsymbol{x}_k\right] \in \mathbb{R}^m$ 表示将上述的 $k-$线性映射依次作用于向量 $\boldsymbol{x}_1, \ldots, \boldsymbol{x}_k \in \mathbb{R}^n$。
+上式表示一个数组（或者张量）$\mathbb{R}^{m \times n \times \cdots \times n}$。我们使用 $T\left[\boldsymbol{x}_1, \ldots, \boldsymbol{x}_k\right] \in \mathbb{R}^m$ 表示将上述的 $k-$线性映射依次作用于向量 $\boldsymbol{x}_1, \ldots, \boldsymbol{x}_k \in \mathbb{R}^n$。
 
 **导数运算符.** 对于开集 $U \subset \mathbb{R}^n$ 和可微函数 $f: U \rightarrow \mathbb{R}^m$，令其**导函数**（derivative function）为：
 
