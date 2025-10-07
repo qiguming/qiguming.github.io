@@ -18,7 +18,7 @@ comments: true
 {:toc}
 ## 6.1 引言
 
-本章，我们将介绍各种**优化问题**（optimization problems）。优化问题可以统一定义为：
+本章，我们将介绍各种**优化问题**（optimization problems）。该问题可以统一定义为：
 
 $$
 \boldsymbol{\theta}^* \in \underset{\boldsymbol{\theta} \in \Theta}{\operatorname{argmin}} \mathcal{L}(\boldsymbol{\theta}) \tag{6.1}
@@ -30,7 +30,7 @@ $$
 
 本节将讨论一个问题——对于一个 *复杂* 的函数，如何自动地求解函数的（偏）微分。此处的“复杂”是指任意数量的基础函数的组合，比如深度神经网络。这类任务被称为**自动微分**（automatic differentiation, AD 或者 autodiff）。AD 是优化和深度学习领域的基本组成部分，在不同科学和工程领域也都有应用。 [Bay+15] 主要介绍了AD在机器学习领域的应用，更多文献可以参考 [GW08][^GW08]。
 
-### 6.2.1 函数形式的微分
+### 6.2.1 微分的函数式表达
 
 在探讨自动微分之前，需要回顾一下微分的数学原理。我们将使用一种特定的**函数式**（functional）符号来表示偏导数，而不是本书常用的表示方法——暂且称之为**命名变量**（named variable）符号表示法。命名变量符号表示法需要将函数的参数与某个变量绑定。例如，给定函数 $f: \mathbb{R}^2 \rightarrow \mathbb{R}$，在点 $\boldsymbol{a}=\left(a_1, a_2\right)$ 处，$f$ 关于第一个标量参数的偏导数为：
 
@@ -739,7 +739,7 @@ $$
 
 这样可以确保反向传播的梯度不会过大。该方法在离散自编码器中的应用详见第21.6节。
 
-## 6.4 Natural gradient descent
+## 6.4 自然梯度下降
 
 本节将讨论**自然梯度下降法**（Natural Gradient Descent, NGD）[Ama98]，这是一种用于优化（条件）概率分布 $p_{\boldsymbol{\theta}}(\boldsymbol{y} \mid \boldsymbol{x})$ 参数的二阶方法。其核心思想是：通过度量分布之间的差异（而非直接比较参数值）来计算参数的优化方向。
 
