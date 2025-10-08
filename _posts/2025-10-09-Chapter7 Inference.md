@@ -46,8 +46,8 @@ $$
 \begin{align}
 \text { mean: } & g(\boldsymbol{\theta})=\boldsymbol{\theta} \tag{7.4}\\
 \text { covariance: } & g(\boldsymbol{\theta})=(\boldsymbol{\theta}-\mathbb{E}[\boldsymbol{\theta} \mid \mathcal{D}])(\boldsymbol{\theta}-\mathbb{E}[\boldsymbol{\theta} \mid \mathcal{D}])^{\top} \tag{7.5}\\
-\text { marginals: } & g(\boldsymbol{\theta})=p\left(\theta_1=\theta_1^* \mid \boldsymbol{\theta}_{2: D}\right) \tag{7.6}\\
-\text { predictive: } & g(\boldsymbol{\theta})=p\left(\boldsymbol{y}_{N+1} \mid \boldsymbol{\theta}\right) \tag{7.7}\\
+\text { marginals: } & g(\boldsymbol{\theta})=p(\theta_1=\theta_1^* \mid \boldsymbol{\theta}_{2: D}) \tag{7.6}\\
+\text { predictive: } & g(\boldsymbol{\theta})=p(\boldsymbol{y}_{N+1} \mid \boldsymbol{\theta}) \tag{7.7}\\
 \text { expected loss: } & g(\boldsymbol{\theta})=\ell(\boldsymbol{\theta}, a) \tag{7.8}
 \end{align}
 $$
@@ -73,27 +73,27 @@ $$
 第一种模式是模型中只包含**全局隐变量**（global latent variables），比如模型的参数 $\boldsymbol{\theta}$，这些参数被 $N$ 个已观测的训练样本共享。如图7.1a所示，该模式对应于监督学习或者判别式学习的设定，对应的联合概率分布为
 
 $$
-p\left(\boldsymbol{y}_{1: N}, \boldsymbol{\theta} \mid \boldsymbol{x}_{1: N}\right)=p(\boldsymbol{\theta})\left[\prod_{n=1}^N p\left(\boldsymbol{y}_n \mid \boldsymbol{x}_n, \boldsymbol{\theta}\right)\right] \tag{7.10}
+p(\boldsymbol{y}_{1: N}, \boldsymbol{\theta} \mid \boldsymbol{x}_{1: N})=p(\boldsymbol{\theta})[\prod_{n=1}^N p(\boldsymbol{y}_n \mid \boldsymbol{x}_n, \boldsymbol{\theta})] \tag{7.10}
 $$
 
-我们的目标是计算后验分布 $p\left(\boldsymbol{\theta} \mid \boldsymbol{x}_{1: N}, \boldsymbol{y}_{1: N}\right)$。第三部分讨论的大多数贝叶斯监督学习模型都遵循这种模式。
+我们的目标是计算后验分布 $p(\boldsymbol{\theta} \mid \boldsymbol{x}_{1: N}, \boldsymbol{y}_{1: N})$。第三部分讨论的大多数贝叶斯监督学习模型都遵循这种模式。
 
 ### 7.2.2 局部隐变量（Local latents）
 
 第二种模式是模型中包含**局部隐变量**，例如当模型参数 $\boldsymbol{\theta}$ 已知时，我们需要推断隐藏状态 $\boldsymbol{z}_{1:N}$。这种情况如图7.1b所示，此时的联合分布具有如下形式：
 
 $$
-p\left(\boldsymbol{x}_{1: N}, \boldsymbol{z}_{1: N} \mid \boldsymbol{\theta}\right)=\left[\prod_{n=1}^N p\left(\boldsymbol{x}_n \mid \boldsymbol{z}_n, \boldsymbol{\theta}_x\right) p\left(\boldsymbol{z}_n \mid \boldsymbol{\theta}_z\right)\right] \tag{7.11}
+p(\boldsymbol{x}_{1: N}, \boldsymbol{z}_{1: N} \mid \boldsymbol{\theta})=[\prod_{n=1}^N p(\boldsymbol{x}_n \mid \boldsymbol{z}_n, \boldsymbol{\theta}_x) p(\boldsymbol{z}_n \mid \boldsymbol{\theta}_z)] \tag{7.11}
 $$
 
-推理的目标是对于每个 $n$ 计算后验分布 $p\left(\boldsymbol{z}_n \mid \boldsymbol{x}_n, \boldsymbol{\theta}\right)$。这是我们在第9章中考虑的大多数PGM（概率图模型）推理方法的设置。
+推理的目标是对于每个 $n$ 计算后验分布 $p(\boldsymbol{z}_n \mid \boldsymbol{x}_n, \boldsymbol{\theta})$。这是我们在第9章中考虑的大多数PGM（概率图模型）推理方法的设置。
 
-若模型参数未知（大多数隐变量模型如混合模型均属此情况），我们可选择通过某种方法（例如最大似然估计）对其进行估计，然后代入参数的点估计值。此方法的优势在于：在给定参数 $\boldsymbol{\theta}$ 的条件下，所有隐变量均条件独立，因此我们可以跨数据并行执行推断。这使得我们可以使用**期望最大化算法**（第6.5.3节）等方法——在E步中同时推断所有 $n$ 对应的 $p\left(\boldsymbol{z}_n \mid \boldsymbol{x}_n, \boldsymbol{\theta}_t\right)$，随后在M步中更新 $\boldsymbol{\theta}_t$。若对 $\boldsymbol{z}_n$ 的推断无法精确求解，可采用变分推断方法，此组合策略被称为**变分EM算法**（第6.5.6.1节）。
+若模型参数未知（大多数隐变量模型如混合模型均属此情况），我们可选择通过某种方法（例如最大似然估计）对其进行估计，然后代入参数的点估计值。此方法的优势在于：在给定参数 $\boldsymbol{\theta}$ 的条件下，所有隐变量均条件独立，因此我们可以跨数据并行执行推断。这使得我们可以使用**期望最大化算法**（第6.5.3节）等方法——在E步中同时推断所有 $n$ 对应的 $p(\boldsymbol{z}_n \mid \boldsymbol{x}_n, \boldsymbol{\theta}_t)$，随后在M步中更新 $\boldsymbol{\theta}_t$。若对 $\boldsymbol{z}_n$ 的推断无法精确求解，可采用变分推断方法，此组合策略被称为**变分EM算法**（第6.5.6.1节）。
 
 另一种方法是使用小批量数据对似然函数进行近似，通过对小批量中每个样本的隐变量 $\boldsymbol{z}_n$ 进行边缘化处理，得到：
 
 $$
-\log p\left(\mathcal{D}_t \mid \boldsymbol{\theta}_t\right)=\sum_{n \in \mathcal{D}_t} \log \left[\sum_{\boldsymbol{z}_n} p\left(\boldsymbol{x}_n, \boldsymbol{z}_n \mid \boldsymbol{\theta}_t\right)\right] \tag{7.12}
+\log p(\mathcal{D}_t \mid \boldsymbol{\theta}_t)=\sum_{n \in \mathcal{D}_t} \log [\sum_{\boldsymbol{z}_n} p(\boldsymbol{x}_n, \boldsymbol{z}_n \mid \boldsymbol{\theta}_t)] \tag{7.12}
 $$
 
 其中 $\mathcal{D}_t$ 表示第 $t$ 步的小批量数据。若无法精确计算该边缘化过程，可采用变分推断方法，此组合策略被称为**随机变分推断**（第10.1.4节）。此外，我们还可以学习一个推断网络 $q_\boldsymbol{\phi}(\boldsymbol{z} \mid \boldsymbol{x} ; \boldsymbol{\theta})$ 来替代在每个批次 $t$ 中为每个样本 $n$ 运行推断引擎的操作；学习参数 $\boldsymbol{\phi}$ 的成本可分摊到所有批次中。这种方法被称为**摊销随机变分推断**（参见第10.1.5节）。
@@ -103,7 +103,7 @@ $$
 第三种模式是模型中同时包含 **局部和全局隐变量**。如图7.1c所示，对应的联合概率分布为：
 
 $$
-p\left(\boldsymbol{x}_{1: N}, \boldsymbol{z}_{1: N}, \boldsymbol{\theta}\right)=p\left(\boldsymbol{\theta}_x\right) p\left(\boldsymbol{\theta}_z\right)\left[\prod_{n=1}^N p\left(\boldsymbol{x}_n \mid \boldsymbol{z}_n, \boldsymbol{\theta}_x\right) p\left(\boldsymbol{z}_n \mid \boldsymbol{\theta}_z\right)\right] \tag{7.13}
+p(\boldsymbol{x}_{1: N}, \boldsymbol{z}_{1: N}, \boldsymbol{\theta})=p(\boldsymbol{\theta}_x) p(\boldsymbol{\theta}_z)[\prod_{n=1}^N p(\boldsymbol{x}_n \mid \boldsymbol{z}_n, \boldsymbol{\theta}_x) p(\boldsymbol{z}_n \mid \boldsymbol{\theta}_z)] \tag{7.13}
 $$
 
 这本质上是图7.1b中隐变量模型的贝叶斯版本，其特点在于同时对局部变量 $\boldsymbol{z}_n$ 和共享全局变量 $\boldsymbol{\theta}$ 的不确定性进行建模。这种方法在机器学习社区中相对少见，因为通常认为参数 $\boldsymbol{\theta}$ 的不确定性相较于局部变量 $\boldsymbol{z}_n$ 的不确定性可以忽略不计——其根本原因在于：参数受到全部 $N$ 个数据点的共同约束，而每个局部隐变量 $\boldsymbol{z}_n$ 仅受单个数据点 $\boldsymbol{x}_n$ 的影响。然而，采用"完全贝叶斯"方法对局部与全局变量的不确定性同时建模仍具有显著优势，本书后续将呈现相关应用案例。
@@ -114,8 +114,8 @@ $$
 
 $$
 \begin{align}
-p(\boldsymbol{\theta}) & \propto \exp \left(\boldsymbol{\lambda}_0^{\top} \mathcal{T}(\boldsymbol{\theta})\right) \tag{7.14}\\
-p\left(\boldsymbol{y}_i \mid \boldsymbol{\theta}\right) & \propto \exp \left(\tilde{\boldsymbol{\lambda}}_i\left(\boldsymbol{y}_i\right)^{\top} \mathcal{T}(\boldsymbol{\theta})\right) \tag{7.15}
+p(\boldsymbol{\theta}) & \propto \exp (\boldsymbol{\lambda}_0^{\top} \mathcal{T}(\boldsymbol{\theta})) \tag{7.14}\\
+p(\boldsymbol{y}_i \mid \boldsymbol{\theta}) & \propto \exp (\tilde{\boldsymbol{\lambda}}_i(\boldsymbol{y}_i)^{\top} \mathcal{T}(\boldsymbol{\theta})) \tag{7.15}
 \end{align}
 $$
 
@@ -123,8 +123,8 @@ $$
 
 $$
 \begin{align}
-p\left(\boldsymbol{\theta} \mid \boldsymbol{y}_{1: N}\right) & =\exp \left(\boldsymbol{\lambda}_*^{\top} \mathcal{T}(\boldsymbol{\theta})\right)  \tag{7.16}\\
-\boldsymbol{\lambda}_* & =\boldsymbol{\lambda}_0+\sum_{n=1}^N \tilde{\boldsymbol{\lambda}}_n\left(\boldsymbol{y}_n\right) \tag{7.17}
+p(\boldsymbol{\theta} \mid \boldsymbol{y}_{1: N}) & =\exp (\boldsymbol{\lambda}_*^{\top} \mathcal{T}(\boldsymbol{\theta}))  \tag{7.16}\\
+\boldsymbol{\lambda}_* & =\boldsymbol{\lambda}_0+\sum_{n=1}^N \tilde{\boldsymbol{\lambda}}_n(\boldsymbol{y}_n) \tag{7.17}
 \end{align}
 $$
 
@@ -178,12 +178,12 @@ MAP估计还存在一个更微妙的问题：其结果依赖于概率分布的�
 
 ### 7.4.2 网格近似
 
-若要刻画不确定性，就需要考虑参数 $\boldsymbol{\theta}$ 可能取一系列数值（每个取值都具有非零概率）的情况。实现这一特性的最简单方法是将参数的可能取值空间划分为有限个区域 $\boldsymbol{r}_1, \ldots, \boldsymbol{r}_K$，每个区域代表参数空间中一个以 $\boldsymbol{\theta}_k$ 为中心、体积为 $\Delta$ 的子空间。这种方法称为**网格近似法**。参数落在每个区域的概率由 $p\left(\boldsymbol{\theta} \in \boldsymbol{r}_k \mid \mathcal{D}\right) \approx p_k \Delta$ 给出，其中：
+若要刻画不确定性，就需要考虑参数 $\boldsymbol{\theta}$ 可能取一系列数值（每个取值都具有非零概率）的情况。实现这一特性的最简单方法是将参数的可能取值空间划分为有限个区域 $\boldsymbol{r}_1, \ldots, \boldsymbol{r}_K$，每个区域代表参数空间中一个以 $\boldsymbol{\theta}_k$ 为中心、体积为 $\Delta$ 的子空间。这种方法称为**网格近似法**。参数落在每个区域的概率由 $p(\boldsymbol{\theta} \in \boldsymbol{r}_k \mid \mathcal{D}) \approx p_k \Delta$ 给出，其中：
 
 $$
 \begin{align}
 & p_k=\frac{\tilde{p}_k}{\sum_{k^{\prime}=1}^K \tilde{p}_{k^{\prime}}}  \tag{7.20}\\
-& \tilde{p}_k=p\left(\mathcal{D} \mid \boldsymbol{\theta}_k\right) p\left(\boldsymbol{\theta}_k\right) \tag{7.21}
+& \tilde{p}_k=p(\mathcal{D} \mid \boldsymbol{\theta}_k) p(\boldsymbol{\theta}_k) \tag{7.21}
 \end{align}
 $$
 
@@ -196,7 +196,7 @@ $$
 作为一个简单的例子，我们将使用近似贝塔-伯努利模型后验值的问题。具体来说，目标是近似
 
 $$
-p(\theta \mid \mathcal{D}) \propto\left[\prod_{n=1}^N \operatorname{Ber}\left(y_n \mid \theta\right)\right] \operatorname{Beta}(1,1) \tag{7.23}
+p(\theta \mid \mathcal{D}) \propto[\prod_{n=1}^N \operatorname{Ber}(y_n \mid \theta)] \operatorname{Beta}(1,1) \tag{7.23}
 $$
 
 该例中数据集 $\mathcal{D}$ 包含10次正面与1次反面（观测总数 $N = 11$），并采用均匀先验分布。尽管我们可以通过第3.4.1节的方法精确计算此后验分布，但本例仍具有教学示范价值——我们可以将近似结果与精确解进行对比。此外，由于目标分布仅为一维，结果可视化也更为便捷。
@@ -223,8 +223,8 @@ $$
 
 $$
 \begin{align}
-\hat{p}(\boldsymbol{\theta}, \mathcal{D}) & =e^{-\mathcal{E}(\hat{\boldsymbol{\theta}})} \exp \left[-\frac{1}{2}(\boldsymbol{\theta}-\hat{\boldsymbol{\theta}})^{\top} \mathbf{H}(\boldsymbol{\theta}-\hat{\boldsymbol{\theta}})\right] \tag{7.26} \\
-\hat{p}(\boldsymbol{\theta} \mid \mathcal{D}) & =\frac{1}{Z} \hat{p}(\boldsymbol{\theta}, \mathcal{D})=\mathcal{N}\left(\boldsymbol{\theta} \mid \hat{\boldsymbol{\theta}}, \mathbf{H}^{-1}\right) \tag{7.27}\\
+\hat{p}(\boldsymbol{\theta}, \mathcal{D}) & =e^{-\mathcal{E}(\hat{\boldsymbol{\theta}})} \exp [-\frac{1}{2}(\boldsymbol{\theta}-\hat{\boldsymbol{\theta}})^{\top} \mathbf{H}(\boldsymbol{\theta}-\hat{\boldsymbol{\theta}})] \tag{7.26} \\
+\hat{p}(\boldsymbol{\theta} \mid \mathcal{D}) & =\frac{1}{Z} \hat{p}(\boldsymbol{\theta}, \mathcal{D})=\mathcal{N}(\boldsymbol{\theta} \mid \hat{\boldsymbol{\theta}}, \mathbf{H}^{-1}) \tag{7.27}\\
 Z & =e^{-\mathcal{E}(\hat{\boldsymbol{\theta}})}(2 \pi)^{D / 2}\mid\mathbf{H}\mid^{-\frac{1}{2}} \tag{7.28}
 \end{align}
 $$
@@ -261,8 +261,8 @@ $$
 
 $$
 \begin{align}
-\boldsymbol{\psi}^* & =\underset{\boldsymbol{\psi}}{\operatorname{argmin}} D_{\mathbb{KL}}(q(\boldsymbol{\theta} \mid \boldsymbol{\psi}) \\mid p(\boldsymbol{\theta} \mid \mathcal{D})) \tag{7.31}\\
-& =\underset{\boldsymbol{\psi}}{\operatorname{argmin}} \mathbb{E}_{q(\boldsymbol{\theta} \mid \boldsymbol{\psi})}\left[\log q(\boldsymbol{\theta} \mid \boldsymbol{\psi})-\log \left(\frac{p(\mathcal{D} \mid \boldsymbol{\theta}) p(\boldsymbol{\theta})}{p(\mathcal{D})}\right)\right] \tag{7.32}\\
+\boldsymbol{\psi}^* & =\underset{\boldsymbol{\psi}}{\operatorname{argmin}} D_{\mathbb{KL}}(q(\boldsymbol{\theta} \mid \boldsymbol{\psi}) \mid p(\boldsymbol{\theta} \mid \mathcal{D})) \tag{7.31}\\
+& =\underset{\boldsymbol{\psi}}{\operatorname{argmin}} \mathbb{E}_{q(\boldsymbol{\theta} \mid \boldsymbol{\psi})}[\log q(\boldsymbol{\theta} \mid \boldsymbol{\psi})-\log (\frac{p(\mathcal{D} \mid \boldsymbol{\theta}) p(\boldsymbol{\theta})}{p(\mathcal{D})})] \tag{7.32}\\
 & =\underset{\boldsymbol{\psi}}{\operatorname{argmin}} \underbrace{\mathbb{E}_{q(\boldsymbol{\theta} \mid \boldsymbol{\psi})}[-\log p(\mathcal{D} \mid \boldsymbol{\theta})-\log p(\boldsymbol{\theta})+\log q(\boldsymbol{\theta} \mid \boldsymbol{\psi})]}_{-\mathbf{Ł}(\boldsymbol{\psi})}+\log p(\mathcal{D}) \tag{7.33}
 \end{align}
 $$
@@ -277,7 +277,7 @@ $$
 
 我们可以自由选择任何形式的近似后验分布。例如，可采用高斯分布 $q(\theta\mid\boldsymbol{\psi}) = \mathcal{N}(\boldsymbol{\theta}\mid\boldsymbol{\mu}, \boldsymbol{\Sigma})$。这与拉普拉斯近似不同——在变分推断中，我们需要优化协方差矩阵 $\boldsymbol{\Sigma}$，而非将其等同于海森矩阵。若 $\boldsymbol{\Sigma}$ 为对角矩阵，则意味着后验分布可完全因子化，这被称为**平均场**（mean field）近似。
 
-高斯近似并非适用于所有参数类型。例如在我们的一维示例中，参数存在 $\theta\in[0,1]$ 的约束条件。此时可采用 $q(\theta\mid\boldsymbol{\psi})=\text{Beta}(\theta\mida,b)$ 形式的变分近似，其中 $\boldsymbol{\psi}=(a,b)$。然而，选择合适的变分分布形式需要相当的专业经验。为创建适用范围更广、更易于使用的“即插即用”方法，可采用**自动微分变分推断**（automatic differentiation variational inference，ADVI）[Kuc+16]。该方法通过变量变换将参数转换为无约束形式，再施以高斯变分近似，并利用自动微分技术推导变换变量密度所需的雅可比项（详见第10.2.2节）。
+高斯近似并非适用于所有参数类型。例如在我们的一维示例中，参数存在 $\theta\in[0,1]$ 的约束条件。此时可采用 $q(\theta\mid\boldsymbol{\psi})=\text{Beta}(\theta\mid a,b)$ 形式的变分近似，其中 $\boldsymbol{\psi}=(a,b)$。然而，选择合适的变分分布形式需要相当的专业经验。为创建适用范围更广、更易于使用的“即插即用”方法，可采用**自动微分变分推断**（automatic differentiation variational inference，ADVI）[Kuc+16]。该方法通过变量变换将参数转换为无约束形式，再施以高斯变分近似，并利用自动微分技术推导变换变量密度所需的雅可比项（详见第10.2.2节）。
 
 现将ADVI应用于我们的一维Beta-伯努利模型：令 $\theta=\sigma(z)$，将 $p(\theta\mid\mathcal{D})$ 替换为 $q(z\mid\boldsymbol{\psi})=\mathcal{N}(z\mid\mu,\sigma)$，其中 $\boldsymbol{\psi}=(\mu,\sigma)$。通过随机梯度下降优化ELBO的随机近似，结果如图7.4所示，其近似效果较为合理。
 
@@ -289,19 +289,19 @@ $$
 
 针对低维场景，我们可以使用**重要性采样**（importance sampling）等方法（第11.5节将详细讨论）。然而对于高维问题，更常用的方法是**马尔可夫链蒙特卡洛**（Markov chain Monte Carlo，MCMC）。我们将在第12章详细展开，此处先作简要介绍。
 
-最常用的MCMC方法是**Metropolis-Hastings算法**。其基本思想是：从参数空间的随机点出发，通过从**提议分布**（proposal distribution） $q\left(\boldsymbol{\theta}^{\prime} \mid \boldsymbol{\theta}\right)$ 中采样新状态（参数）来执行随机游走。若 $ q $ 经过恰当选择，所得马尔可夫链的平稳分布将满足：在空间中访问到每个点的时间占比与该点的后验概率成正比。
+最常用的MCMC方法是**Metropolis-Hastings算法**。其基本思想是：从参数空间的随机点出发，通过从**提议分布**（proposal distribution） $q(\boldsymbol{\theta}^{\prime} \mid \boldsymbol{\theta})$ 中采样新状态（参数）来执行随机游走。若 $ q $ 经过恰当选择，所得马尔可夫链的平稳分布将满足：在空间中访问到每个点的时间占比与该点的后验概率成正比。
 
 其核心要点在于：决定是转移到新提议点 $\boldsymbol{\theta}'$ 还是停留在当前点 $\boldsymbol{\theta}$ 时，我们仅需计算未归一化的密度比：
 
 $$
-\frac{p(\boldsymbol{\theta} \mid \mathcal{D})}{p\left(\boldsymbol{\theta}^{\prime} \mid \mathcal{D}\right)}=\frac{p(\mathcal{D} \mid \boldsymbol{\theta}) p(\boldsymbol{\theta}) / p(\mathcal{D})}{p\left(\mathcal{D} \mid \boldsymbol{\theta}^{\prime}\right) p\left(\boldsymbol{\theta}^{\prime}\right) / p(\mathcal{D})}=\frac{p(\mathcal{D}, \boldsymbol{\theta})}{p\left(\mathcal{D}, \boldsymbol{\theta}^{\prime}\right)} \tag{7.35}
+\frac{p(\boldsymbol{\theta} \mid \mathcal{D})}{p(\boldsymbol{\theta}^{\prime} \mid \mathcal{D})}=\frac{p(\mathcal{D} \mid \boldsymbol{\theta}) p(\boldsymbol{\theta}) / p(\mathcal{D})}{p(\mathcal{D} \mid \boldsymbol{\theta}^{\prime}) p(\boldsymbol{\theta}^{\prime}) / p(\mathcal{D})}=\frac{p(\mathcal{D}, \boldsymbol{\theta})}{p(\mathcal{D}, \boldsymbol{\theta}^{\prime})} \tag{7.35}
 $$
 
 这种方法避免了计算归一化常数 $ p(\mathcal{D}) $ 的需求（实践中通常使用对数概率替代联合概率以避免数值问题）。
 
-可见，该算法的输入仅需一个计算对数联合密度 $\log p(\boldsymbol{\theta}, \mathcal{D})$ 的函数，以及一个用于决定下一步状态转移的提议分布 $q\left(\boldsymbol{\theta}^{\prime} \mid \boldsymbol{\theta}\right)$。通常采用高斯分布作为提议分布 $q\left(\boldsymbol{\theta}^{\prime} \mid \boldsymbol{\theta}\right)=\mathcal{N}\left(\boldsymbol{\theta}^{\prime} \mid \boldsymbol{\theta}, \sigma \mathbf{I}\right)$，这被称为**随机游走Metropolis算法**（random walk Metropolis）。但该方法效率可能较低，因为其本质是在参数空间中盲目游走以寻找高概率区域。
+可见，该算法的输入仅需一个计算对数联合密度 $\log p(\boldsymbol{\theta}, \mathcal{D})$ 的函数，以及一个用于决定下一步状态转移的提议分布 $q(\boldsymbol{\theta}^{\prime} \mid \boldsymbol{\theta})$。通常采用高斯分布作为提议分布 $q(\boldsymbol{\theta}^{\prime} \mid \boldsymbol{\theta})=\mathcal{N}(\boldsymbol{\theta}^{\prime} \mid \boldsymbol{\theta}, \sigma \mathbf{I})$，这被称为**随机游走Metropolis算法**（random walk Metropolis）。但该方法效率可能较低，因为其本质是在参数空间中盲目游走以寻找高概率区域。
 
-对于具有条件独立结构的模型，通常可以逐个变量地计算其全条件分布 $p\left(\boldsymbol{\theta}_d \mid \boldsymbol{\theta}_{-d}, \mathcal{D}\right)$并进行采样。这类似于坐标上升法的随机版本，被称为**吉布斯采样**（Gibbs sampling）（详见第12.3节）。
+对于具有条件独立结构的模型，通常可以逐个变量地计算其全条件分布 $p(\boldsymbol{\theta}_d \mid \boldsymbol{\theta}_{-d}, \mathcal{D})$并进行采样。这类似于坐标上升法的随机版本，被称为**吉布斯采样**（Gibbs sampling）（详见第12.3节）。
 
 当所有未知变量均为连续变量时，我们通常可以计算对数联合密度的梯度 $\nabla_{\boldsymbol{\theta}} \log p(\boldsymbol{\theta}, \mathcal{D})$。利用该梯度信息可引导提议分布向更高概率区域移动，该方法被称为**哈密尔顿蒙特卡洛**（Hamiltonian Monte Carlo, HMC）。由于其高效性，HMC已成为目前最广泛使用的MCMC算法之一（详见第12.5节）。
 
@@ -311,7 +311,7 @@ $$
 
 MCMC类似于一种随机局部搜索算法，它通过在后验分布的状态空间中移动，不断比较当前值与邻近提议值。另一种方法则是使用一系列从简单到复杂的分布序列进行推断，最终分布即为目标后验分布，这被称为**序贯蒙特卡洛**（sequential Monte Carlo，SMC）。该方法更类似于树搜索而非局部搜索，相对MCMC具有多种优势（第13章将详细讨论）。
 
-SMC的典型应用场景是**序贯贝叶斯推断**（sequential Bayesian inference），即以前馈方式递归计算后验分布 $p\left(\boldsymbol{\theta}_t \mid \mathcal{D}_{1: t}\right)$，其中 $\mathcal{D}_{1: t}=\left\{\left(\boldsymbol{x}_n, y_n\right): n=1: t\right\}$ 表示截至当前时刻观测到的所有数据。该分布序列在接收全部数据后将收敛于完整批处理后验 $ p(\boldsymbol{\theta}\mid\mathcal{D}) $。此外，该方法同样适用于数据持续不断到达的场景（如状态空间模型，参见第29章）。SMC在此类动态模型中的应用被称为**粒子滤波**（particle filtering），具体原理详见第13.2节。
+SMC的典型应用场景是**序贯贝叶斯推断**（sequential Bayesian inference），即以前馈方式递归计算后验分布 $p(\boldsymbol{\theta}_t \mid \mathcal{D}_{1: t})$，其中 $\mathcal{D}_{1: t}=\{(\boldsymbol{x}_n, y_n): n=1: t\}$ 表示截至当前时刻观测到的所有数据。该分布序列在接收全部数据后将收敛于完整批处理后验 $ p(\boldsymbol{\theta}\mid\mathcal{D}) $。此外，该方法同样适用于数据持续不断到达的场景（如状态空间模型，参见第29章）。SMC在此类动态模型中的应用被称为**粒子滤波**（particle filtering），具体原理详见第13.2节。
 
 ![image-20251008200334679](/assets/img/figures/book2/7.6.png)
 
@@ -323,7 +323,7 @@ SMC的典型应用场景是**序贯贝叶斯推断**（sequential Bayesian infer
 
 现有多种不同的近似推断算法，它们在速度、精度、通用性、简洁性等维度各有权衡，这使得公平比较变得困难。
 
-一种评估思路是通过与“真实”后验 $ p(\boldsymbol{\theta}\mid\mathcal{D}) $（通过离线“精确”方法计算）对比来衡量近似分布 $ q(\boldsymbol{\theta}) $ 的精度。我们通常关注精度与速度的权衡关系，可通过计算 $D_{\mathbb{KL}}\left(p(\boldsymbol{\theta} \mid \mathcal{D}) \\mid q_t(\boldsymbol{\theta})\right)$ 来量化（其中 $ q_t(\boldsymbol{\theta}) $ 表示经过 $ t $ 单位计算时间后的近似后验）。当然，也可采用其他分布相似性度量指标，如瓦瑟斯坦距离。
+一种评估思路是通过与“真实”后验 $ p(\boldsymbol{\theta}\mid\mathcal{D}) $（通过离线“精确”方法计算）对比来衡量近似分布 $ q(\boldsymbol{\theta}) $ 的精度。我们通常关注精度与速度的权衡关系，可通过计算 $D_{\mathbb{KL}}(p(\boldsymbol{\theta} \mid \mathcal{D}) \\mid q_t(\boldsymbol{\theta}))$ 来量化（其中 $ q_t(\boldsymbol{\theta}) $ 表示经过 $ t $ 单位计算时间后的近似后验）。当然，也可采用其他分布相似性度量指标，如瓦瑟斯坦距离。
 
 然而，真实后验 $ p(\boldsymbol{\theta}\mid\mathcal{D}) $ 通常无法计算。一种简单的替代方案是通过模型在未观测样本数据上的预测能力进行评估（类似于交叉验证）。更一般性地，如[KPS98; KPS99]所提出，我们可以比较不同后验分布的期望损失或贝叶斯风险（第34.1.3节）：
 
