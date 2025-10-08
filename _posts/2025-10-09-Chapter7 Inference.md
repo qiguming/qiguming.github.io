@@ -76,7 +76,9 @@ $$
 p(\boldsymbol{y}_{1: N}, \boldsymbol{\theta} \mid \boldsymbol{x}_{1: N})=p(\boldsymbol{\theta})[\prod_{n=1}^N p(\boldsymbol{y}_n \mid \boldsymbol{x}_n, \boldsymbol{\theta})] \tag{7.10}
 $$
 
-我们的目标是计算后验分布 $p(\boldsymbol{\theta} \mid \boldsymbol{x}_{1: N}, \boldsymbol{y}_{1: N})$。第三部分讨论的大多数贝叶斯监督学习模型都遵循这种模式。
+我们的目标是计算后验分布 
+$$p(\boldsymbol{\theta} \mid \boldsymbol{x}_{1: N}, \boldsymbol{y}_{1: N})$$。
+第三部分讨论的大多数贝叶斯监督学习模型都遵循这种模式。
 
 ### 7.2.2 局部隐变量（Local latents）
 
@@ -96,7 +98,9 @@ $$
 \log p(\mathcal{D}_t \mid \boldsymbol{\theta}_t)=\sum_{n \in \mathcal{D}_t} \log [\sum_{\boldsymbol{z}_n} p(\boldsymbol{x}_n, \boldsymbol{z}_n \mid \boldsymbol{\theta}_t)] \tag{7.12}
 $$
 
-其中 $\mathcal{D}_t$ 表示第 $t$ 步的小批量数据。若无法精确计算该边缘化过程，可采用变分推断方法，此组合策略被称为**随机变分推断**（第10.1.4节）。此外，我们还可以学习一个推断网络 $q_\boldsymbol{\phi}(\boldsymbol{z} \mid \boldsymbol{x} ; \boldsymbol{\theta})$ 来替代在每个批次 $t$ 中为每个样本 $n$ 运行推断引擎的操作；学习参数 $\boldsymbol{\phi}$ 的成本可分摊到所有批次中。这种方法被称为**摊销随机变分推断**（参见第10.1.5节）。
+其中 $$\mathcal{D}_t $$
+表示第 $t$ 步的小批量数据。若无法精确计算该边缘化过程，可采用变分推断方法，此组合策略被称为**随机变分推断**（第10.1.4节）。此外，我们还可以学习一个推断网络 $$q_\boldsymbol{\phi}(\boldsymbol{z} \mid \boldsymbol{x} ; \boldsymbol{\theta})$$ 
+来替代在每个批次 $t$ 中为每个样本 $n$ 运行推断引擎的操作；学习参数 $\boldsymbol{\phi}$ 的成本可分摊到所有批次中。这种方法被称为**摊销随机变分推断**（参见第10.1.5节）。
 
 ### 7.2.3 全局和局部隐变量
 
@@ -170,7 +174,16 @@ $$
 
 MAP估计还存在一个更微妙的问题：其结果依赖于概率分布的参数化方式，而这是非常不可取的。例如，在表示伯努利分布时，我们应当能够使用成功概率或对数几率进行参数化，且这种选择不应影响我们的实际认知。
 
-假设 $\hat{x}=\operatorname{argmax}_x p_x(x)$ 是 $x$ 的 MAP 估计。现令 $y = f(x)$ 为 $x$ 的一个变换。一般而言，$\hat{y}=\operatorname{argmax}_y p_y(y)$ 并不等于 $f(\hat{x})$。例如，设 $x \sim \mathcal{N}(6,1)$ 且 $y = f(x)$，其中 $f(x) = \frac{1}{1+\exp(-x+5)}$。我们可以利用变量变换公式（第2.5.1节）得到 $p_{y}(y) = p_{x}(f^{-1}(y))\mid\frac{df^{-1}(y)}{dy}\mid$，或采用蒙特卡洛近似法。结果显示在图2.12中：原始高斯分布 $p(x)$ 被S型非线性函数“挤压”变形，且变换后分布的众数不等于原分布众数的变换结果。
+假设 $$\hat{x}=\operatorname{argmax}_x p_x(x)$$
+是 $x$ 的 MAP 估计。现令 $y = f(x)$ 为 $x$ 的一个变换。一般而言，
+$$\hat{y}=\operatorname{argmax}_y p_y(y)$$ 
+并不等于 $f(\hat{x})$。例如，设 
+$$x \sim \mathcal{N}(6,1)$ 且 $y = f(x)$$，
+其中 
+$$f(x) = \frac{1}{1+\exp(-x+5)}$$。
+我们可以利用变量变换公式（第2.5.1节）得到 
+$$p_{y}(y) = p_{x}(f^{-1}(y))\mid\frac{df^{-1}(y)}{dy}\mid$$，
+或采用蒙特卡洛近似法。结果显示在图2.12中：原始高斯分布 $p(x)$ 被S型非线性函数“挤压”变形，且变换后分布的众数不等于原分布众数的变换结果。
 
 由此可见，MAP估计依赖于参数化选择。最大似然估计不受此影响，因为似然是函数而非概率密度；贝叶斯推断也不存在此问题，因为在参数空间积分时已考虑了测度变换。
 
