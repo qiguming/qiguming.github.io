@@ -11,7 +11,7 @@ comments: true
 
 ---
 
-> 本章将系统介绍关于优化的不同方向。
+> 本章将开启 推理 这一部分的内容。
 >
 
 * TOC
@@ -21,20 +21,27 @@ comments: true
 在机器学习的概率论视角下，所有的未知量——关于未来的预测，系统中的隐变量，或者模型的参数——被作为随机变量，且对应概率分布。**推理**（inference）过程就是计算这些未知量的后验分布，并以任意可获得的数据为条件。
 
 进一步讲，令 $\boldsymbol{\theta}$ 表示未知变量，$\mathcal{D}$ 表示已知变量。已知似然 $p(\mathcal{D}|\boldsymbol{\theta})$ 和先验 $p(\boldsymbol{\theta})$ ，可以使用贝叶斯定理计算后验 $p(\boldsymbol{\theta} \mid \mathcal{D})$：
+
 $$
 p(\boldsymbol{\theta} \mid \mathcal{D})=\frac{p(\boldsymbol{\theta}) p(\mathcal{D} \mid \boldsymbol{\theta})}{p(\mathcal{D})} \tag{7.1}
 $$
+
 上式的主要计算瓶颈是分母部分的归一化常数，该常数需要求解下面的高维积分：
+
 $$
 p(\mathcal{D})=\int p(\mathcal{D} \mid \boldsymbol{\theta}) p(\boldsymbol{\theta}) d \boldsymbol{\theta} \tag{7.2}
 $$
+
 这是为了将非归一化联合概率 $p(\boldsymbol{\theta}, \mathcal{D})$ 转换为归一化概率 $p(\boldsymbol{\theta}|\mathcal{D})$，该转换过程需考虑参数 $\boldsymbol{\theta}$ 所有可能的合理取值。
 
 一旦得到后验概率，我们可以使用它计算某些函数的后验期望：
+
 $$
 \mathbb{E}[g(\boldsymbol{\theta}) \mid \mathcal{D}]=\int g(\boldsymbol{\theta}) p(\boldsymbol{\theta} \mid \mathcal{D}) d \boldsymbol{\theta} \tag{7.3}
 $$
+
 通过定义不同的函数 $g$，我们可以计算很多感兴趣的量，比如：
+
 $$
 \begin{align}
 \text { mean: } & g(\boldsymbol{\theta})=\boldsymbol{\theta} \tag{7.4}\\
@@ -44,10 +51,13 @@ $$
 \text { expected loss: } & g(\boldsymbol{\theta})=\ell(\boldsymbol{\theta}, a) \tag{7.8}
 \end{align}
 $$
+
 其中 $\boldsymbol{y}_{N+1}$ 表示在看到 $N$ 个样本后的下一次预测，后验期望损失使用损失函数 $\ell$ 和行为 $a$（34.1.3节）表示。最后，如果我们针对模型 $M$ 定义 $g(\boldsymbol{\theta})=p(\mathcal{D} \mid \boldsymbol{\theta}, M)$，我们还可以将边际似然（第3.8.3节）表述为关于先验的期望：
+
 $$
 \mathbb{E}[g(\boldsymbol{\theta}) \mid M]=\int g(\boldsymbol{\theta}) p(\boldsymbol{\theta} \mid M) d \boldsymbol{\theta}=\int p(\mathcal{D} \mid \boldsymbol{\theta}, M) p(\boldsymbol{\theta} \mid M) d \boldsymbol{\theta}=p(\mathcal{D} \mid M) \tag{7.9}
 $$
+
 由此可见，积分（及计算期望）是贝叶斯推断的核心，而微分则是优化过程的核心。
 
 本章我们将对计算（近似）后验分布及其对应期望值的算法技术进行提纲挈领地概述，后续章节将展开更详细的讨论。需要强调的是，这些方法大多独立于具体模型——这使得问题解决者能够专注于为任务构建最优模型，而后依赖相应的推断算法完成剩余工作，这一过程常被称为“转动贝叶斯曲柄”。关于贝叶斯计算的更多细节，可参阅 [Gel+14a; MKL21; MFR20] 等文献。
@@ -61,51 +71,63 @@ $$
 ### 7.2.1 全局隐变量（Global latents）
 
 第一种模式是模型中只包含**全局隐变量**（global latent variables），比如模型的参数 $\boldsymbol{\theta}$，这些参数被 $N$ 个已观测的训练样本共享。如图7.1a所示，该模式对应于监督学习或者判别式学习的设定，对应的联合概率分布为
+
 $$
 p\left(\boldsymbol{y}_{1: N}, \boldsymbol{\theta} \mid \boldsymbol{x}_{1: N}\right)=p(\boldsymbol{\theta})\left[\prod_{n=1}^N p\left(\boldsymbol{y}_n \mid \boldsymbol{x}_n, \boldsymbol{\theta}\right)\right] \tag{7.10}
 $$
+
 我们的目标是计算后验分布 $p\left(\boldsymbol{\theta} \mid \boldsymbol{x}_{1: N}, \boldsymbol{y}_{1: N}\right)$。第三部分讨论的大多数贝叶斯监督学习模型都遵循这种模式。
 
 ### 7.2.2 局部隐变量（Local latents）
 
 第二种模式是模型中包含**局部隐变量**，例如当模型参数 $\boldsymbol{\theta}$ 已知时，我们需要推断隐藏状态 $\boldsymbol{z}_{1:N}$。这种情况如图7.1b所示，此时的联合分布具有如下形式：
+
 $$
 p\left(\boldsymbol{x}_{1: N}, \boldsymbol{z}_{1: N} \mid \boldsymbol{\theta}\right)=\left[\prod_{n=1}^N p\left(\boldsymbol{x}_n \mid \boldsymbol{z}_n, \boldsymbol{\theta}_x\right) p\left(\boldsymbol{z}_n \mid \boldsymbol{\theta}_z\right)\right] \tag{7.11}
 $$
+
 推理的目标是对于每个 $n$ 计算后验分布 $p\left(\boldsymbol{z}_n \mid \boldsymbol{x}_n, \boldsymbol{\theta}\right)$。这是我们在第9章中考虑的大多数PGM（概率图模型）推理方法的设置。
 
 若模型参数未知（大多数隐变量模型如混合模型均属此情况），我们可选择通过某种方法（例如最大似然估计）对其进行估计，然后代入参数的点估计值。此方法的优势在于：在给定参数 $\boldsymbol{\theta}$ 的条件下，所有隐变量均条件独立，因此我们可以跨数据并行执行推断。这使得我们可以使用**期望最大化算法**（第6.5.3节）等方法——在E步中同时推断所有 $n$ 对应的 $p\left(\boldsymbol{z}_n \mid \boldsymbol{x}_n, \boldsymbol{\theta}_t\right)$，随后在M步中更新 $\boldsymbol{\theta}_t$。若对 $\boldsymbol{z}_n$ 的推断无法精确求解，可采用变分推断方法，此组合策略被称为**变分EM算法**（第6.5.6.1节）。
 
 另一种方法是使用小批量数据对似然函数进行近似，通过对小批量中每个样本的隐变量 $\boldsymbol{z}_n$ 进行边缘化处理，得到：
+
 $$
 \log p\left(\mathcal{D}_t \mid \boldsymbol{\theta}_t\right)=\sum_{n \in \mathcal{D}_t} \log \left[\sum_{\boldsymbol{z}_n} p\left(\boldsymbol{x}_n, \boldsymbol{z}_n \mid \boldsymbol{\theta}_t\right)\right] \tag{7.12}
 $$
+
 其中 $\mathcal{D}_t$ 表示第 $t$ 步的小批量数据。若无法精确计算该边缘化过程，可采用变分推断方法，此组合策略被称为**随机变分推断**（第10.1.4节）。此外，我们还可以学习一个推断网络 $q_\boldsymbol{\phi}(\boldsymbol{z} \mid \boldsymbol{x} ; \boldsymbol{\theta})$ 来替代在每个批次 $t$ 中为每个样本 $n$ 运行推断引擎的操作；学习参数 $\boldsymbol{\phi}$ 的成本可分摊到所有批次中。这种方法被称为**摊销随机变分推断**（参见第10.1.5节）。
 
 ### 7.2.3 全局和局部隐变量
 
 第三种模式是模型中同时包含 **局部和全局隐变量**。如图7.1c所示，对应的联合概率分布为：
+
 $$
 p\left(\boldsymbol{x}_{1: N}, \boldsymbol{z}_{1: N}, \boldsymbol{\theta}\right)=p\left(\boldsymbol{\theta}_x\right) p\left(\boldsymbol{\theta}_z\right)\left[\prod_{n=1}^N p\left(\boldsymbol{x}_n \mid \boldsymbol{z}_n, \boldsymbol{\theta}_x\right) p\left(\boldsymbol{z}_n \mid \boldsymbol{\theta}_z\right)\right] \tag{7.13}
 $$
+
 这本质上是图7.1b中隐变量模型的贝叶斯版本，其特点在于同时对局部变量 $\boldsymbol{z}_n$ 和共享全局变量 $\boldsymbol{\theta}$ 的不确定性进行建模。这种方法在机器学习社区中相对少见，因为通常认为参数 $\boldsymbol{\theta}$ 的不确定性相较于局部变量 $\boldsymbol{z}_n$ 的不确定性可以忽略不计——其根本原因在于：参数受到全部 $N$ 个数据点的共同约束，而每个局部隐变量 $\boldsymbol{z}_n$ 仅受单个数据点 $\boldsymbol{x}_n$ 的影响。然而，采用"完全贝叶斯"方法对局部与全局变量的不确定性同时建模仍具有显著优势，本书后续将呈现相关应用案例。
 
 ## 7.3 精确推理算法
 
 在某些情况下，我们可以通过可处理的方式执行精确后验推断。具体而言，若**先验分布与似然函数共轭**，则后验分布将具有解析可解性。一般而言，当先验与似然同属指数族分布时（第2.4节），即可满足该条件。特别地，若未知变量由 $\boldsymbol{\theta}$ 表示，则我们假设：
+
 $$
 \begin{align}
 p(\boldsymbol{\theta}) & \propto \exp \left(\boldsymbol{\lambda}_0^{\top} \mathcal{T}(\boldsymbol{\theta})\right) \tag{7.14}\\
 p\left(\boldsymbol{y}_i \mid \boldsymbol{\theta}\right) & \propto \exp \left(\tilde{\boldsymbol{\lambda}}_i\left(\boldsymbol{y}_i\right)^{\top} \mathcal{T}(\boldsymbol{\theta})\right) \tag{7.15}
 \end{align}
 $$
+
 其中 $\mathcal{T}(\boldsymbol{\theta})$ 表示充分统计量，$\boldsymbol{\lambda}$ 表示自然参数。只需要将自然参数相加，我们便可以计算后验分布：
+
 $$
 \begin{align}
 p\left(\boldsymbol{\theta} \mid \boldsymbol{y}_{1: N}\right) & =\exp \left(\boldsymbol{\lambda}_*^{\top} \mathcal{T}(\boldsymbol{\theta})\right)  \tag{7.16}\\
 \boldsymbol{\lambda}_* & =\boldsymbol{\lambda}_0+\sum_{n=1}^N \tilde{\boldsymbol{\lambda}}_n\left(\boldsymbol{y}_n\right) \tag{7.17}
 \end{align}
 $$
+
 更多细节，参考3.4节。
 
 另一种能精确计算后验分布的情形是：当所有 $D$ 个未知变量均为离散变量，且每个变量具有 $K$ 个状态时，归一化常数中的积分将转化为包含 $K^D$ 个项的求和运算。然而在多数情况下，$K^D$ 的规模会超出可计算范围。但若该概率分布满足特定的条件独立性性质（通过概率图模型表述），则我们可以将联合分布表示为若干局部项的乘积（参见第4章）。这使得我们可以运用动态规划方法实现高效计算（参见第9章）。
@@ -117,13 +139,17 @@ $$
 ### 7.4.1 MAP近似
 
 最简单的近似推断方法是计算最大后验（MAP）估计
+
 $$
 \hat{\boldsymbol{\theta}}=\operatorname{argmax} p(\boldsymbol{\theta} \mid \mathcal{D})=\operatorname{argmax} \log p(\boldsymbol{\theta})+\log p(\mathcal{D} \mid \boldsymbol{\theta}) \tag{7.18}
 $$
+
 然后假设后验分布将全部概率质量归于MAP估计：
+
 $$
 p(\boldsymbol{\theta} \mid \mathcal{D}) \approx \delta(\boldsymbol{\theta}-\hat{\boldsymbol{\theta}}) \tag{7.19}
 $$
+
 这种方法的优势在于，我们可以利用多种优化算法来计算 MAP 估计，这些算法将在第 6 章讨论。然而，MAP 估计也存在一些缺陷，部分问题我们将在下文探讨。
 
 #### 7.4.1.1 MAP无法给出不确定性
@@ -153,20 +179,26 @@ MAP估计还存在一个更微妙的问题：其结果依赖于概率分布的�
 ### 7.4.2 网格近似
 
 若要刻画不确定性，就需要考虑参数 $\boldsymbol{\theta}$ 可能取一系列数值（每个取值都具有非零概率）的情况。实现这一特性的最简单方法是将参数的可能取值空间划分为有限个区域 $\boldsymbol{r}_1, \ldots, \boldsymbol{r}_K$，每个区域代表参数空间中一个以 $\boldsymbol{\theta}_k$ 为中心、体积为 $\Delta$ 的子空间。这种方法称为**网格近似法**。参数落在每个区域的概率由 $p\left(\boldsymbol{\theta} \in \boldsymbol{r}_k \mid \mathcal{D}\right) \approx p_k \Delta$ 给出，其中：
+
 $$
 \begin{align}
 & p_k=\frac{\tilde{p}_k}{\sum_{k^{\prime}=1}^K \tilde{p}_{k^{\prime}}}  \tag{7.20}\\
 & \tilde{p}_k=p\left(\mathcal{D} \mid \boldsymbol{\theta}_k\right) p\left(\boldsymbol{\theta}_k\right) \tag{7.21}
 \end{align}
 $$
+
 随着 $K$ 的增加，每个网格的尺寸变小。上式的分母趋向于积分的一种简单的数值近似
+
 $$
 p(\mathcal{D})=\int p(\mathcal{D} \mid \boldsymbol{\theta}) p(\boldsymbol{\theta}) d \boldsymbol{\theta} \approx \sum_{k=1}^K \Delta \tilde{p}_k \tag{7.22}
 $$
+
 作为一个简单的例子，我们将使用近似贝塔-伯努利模型后验值的问题。具体来说，目标是近似
+
 $$
 p(\theta \mid \mathcal{D}) \propto\left[\prod_{n=1}^N \operatorname{Ber}\left(y_n \mid \theta\right)\right] \operatorname{Beta}(1,1) \tag{7.23}
 $$
+
 该例中数据集 $\mathcal{D}$ 包含10次正面与1次反面（观测总数 $N = 11$），并采用均匀先验分布。尽管我们可以通过第3.4.1节的方法精确计算此后验分布，但本例仍具有教学示范价值——我们可以将近似结果与精确解进行对比。此外，由于目标分布仅为一维，结果可视化也更为便捷。
 
 图7.3a展示了网格近似法在我们的一维问题中的应用。可见该方法能有效捕捉后验分布的偏态特征（这源于10正1反的不平衡样本数据）。然而遗憾的是，该方法难以推广至超过2维或3维的问题，因为网格点的数量会随维度增加呈指数级增长。
@@ -176,14 +208,19 @@ $$
 本节讨论使用一个多变量高斯分布来近似后验分布；这被称为 **拉普拉斯近似**（Laplace）或者**二次近似**（参考 [TK86;RMC09]）。
 
 假设后验分布可以写成：
+
 $$
 p(\boldsymbol{\theta} \mid \mathcal{D})=\frac{1}{Z} e^{-\mathcal{E}(\boldsymbol{\theta})} \tag{7.24}
 $$
+
 其中 $\mathcal{E}(\boldsymbol{\theta})=-\log p(\boldsymbol{\theta}, \mathcal{D})$ 被称为能量函数，$Z=p(\mathcal{D})$ 被称为归一化常数。在众数 $\hat{\boldsymbol{\theta}}$ 周边进行泰勒展开，我们有
+
 $$
 \mathcal{E}(\boldsymbol{\theta}) \approx \mathcal{E}(\hat{\boldsymbol{\theta}})+(\boldsymbol{\theta}-\hat{\boldsymbol{\theta}})^{\top} \boldsymbol{g}+\frac{1}{2}(\boldsymbol{\theta}-\hat{\boldsymbol{\theta}})^{\top} \mathbf{H}(\boldsymbol{\theta}-\hat{\boldsymbol{\theta}}) \tag{7.25}
 $$
+
 其中 $\boldsymbol{g}$ 表示在众数处的梯度，$\mathbf{H}$ 为对应的海森矩阵。考虑到 $\hat{\boldsymbol{\theta}}$ 是众数，所以梯度项等于0。所以
+
 $$
 \begin{align}
 \hat{p}(\boldsymbol{\theta}, \mathcal{D}) & =e^{-\mathcal{E}(\hat{\boldsymbol{\theta}})} \exp \left[-\frac{1}{2}(\boldsymbol{\theta}-\hat{\boldsymbol{\theta}})^{\top} \mathbf{H}(\boldsymbol{\theta}-\hat{\boldsymbol{\theta}})\right] \tag{7.26} \\
@@ -191,6 +228,7 @@ $$
 Z & =e^{-\mathcal{E}(\hat{\boldsymbol{\theta}})}(2 \pi)^{D / 2}|\mathbf{H}|^{-\frac{1}{2}} \tag{7.28}
 \end{align}
 $$
+
 最后一行推导源于多元高斯分布的归一化常数。
 
 拉普拉斯近似法易于实现，因为我们可以利用现有的优化算法计算 MAP 估计，随后只需计算该众数处的海森矩阵（在高维空间中可采用对角近似）。
@@ -206,16 +244,21 @@ $$
 在第7.4.3节，我们讨论了Laplace近似，其中我们首先使用优化算法找到MAP估计，然后在该点使用海森矩阵近似后验分布的曲率。本节，我们讨论 **变分推断**（variational inference，VI），又被称为**变分贝叶斯**（variational Bayes，VB）。这是另一种基于优化的后验推断方法，但具有更大的建模灵活性（因此精度更高）。
 
 VI 试图使用一个易处理的分布 $q(\boldsymbol{\theta})$ 来近似一个不易处理的概率分布 $p(\boldsymbol{\theta} \mid \mathcal{D})$，所以优化过程需要最小化两个分布之间的分歧 $D$：
+
 $$
 q^*=\underset{q \in \mathcal{Q}}{\operatorname{argmin}} D(q, p) \tag{7.29}
 $$
+
 其中 $\mathcal{Q}$ 表示易处理的概率分布族（如可完全因式分解的分布）。在具体实践中，我们并不是直接优化函数 $q$ 本身，而是优化函数 $q$ 的参数；我们称之为 **变分参数**（variational parameters）$\boldsymbol{\psi}$。
 
 通常使用 KL 散度作为分歧的度量
+
 $$
 D(q, p)=D_{\mathrm{KL}}(q(\boldsymbol{\theta} \mid \boldsymbol{\psi}) \| p(\boldsymbol{\theta} \mid \mathcal{D}))=\int q(\boldsymbol{\theta} \mid \boldsymbol{\psi}) \log \frac{q(\boldsymbol{\theta} \mid \boldsymbol{\psi})}{p(\boldsymbol{\theta} \mid \mathcal{D})} d \boldsymbol{\theta} \tag{7.30}
 $$
+
 其中 $p(\boldsymbol{\theta} \mid \mathcal{D})=p(\mathcal{D} \mid \boldsymbol{\theta}) p(\boldsymbol{\theta}) / p(\mathcal{D})$。如此，推断问题退化成了如下的优化问题：
+
 $$
 \begin{align}
 \boldsymbol{\psi}^* & =\underset{\boldsymbol{\psi}}{\operatorname{argmin}} D_{\mathbb{KL}}(q(\boldsymbol{\theta} \mid \boldsymbol{\psi}) \| p(\boldsymbol{\theta} \mid \mathcal{D})) \tag{7.31}\\
@@ -223,10 +266,13 @@ $$
 & =\underset{\boldsymbol{\psi}}{\operatorname{argmin}} \underbrace{\mathbb{E}_{q(\boldsymbol{\theta} \mid \boldsymbol{\psi})}[-\log p(\mathcal{D} \mid \boldsymbol{\theta})-\log p(\boldsymbol{\theta})+\log q(\boldsymbol{\theta} \mid \boldsymbol{\psi})]}_{-\mathbf{Ł}(\boldsymbol{\psi})}+\log p(\mathcal{D}) \tag{7.33}
 \end{align}
 $$
+
 考虑到 $\log p(\mathcal{D})$ 与 $\psi$ 无关，所以我们可以忽略它并聚焦到最大化
+
 $$
 \mathrm{Ł}(\boldsymbol{\psi}) \triangleq \mathbb{E}_{q(\boldsymbol{\theta} \mid \boldsymbol{\psi})}[\log p(\mathcal{D} \mid \boldsymbol{\theta})+\log p(\boldsymbol{\theta})-\log q(\boldsymbol{\theta} \mid \boldsymbol{\psi})] \tag{7.34}
 $$
+
 由于 $D_{\mathbb{KL}}(q | p) > 0$，我们有 $\mathrm{Ł}(\boldsymbol{\lambda}) \le \log p(\mathcal{D})$。其中 $\log p(\mathcal{D})$ 作为对数边际似然，亦被称为**证据**（evidence）。因此 $\mathrm{Ł}(\boldsymbol{\lambda})$ 被称为**证据下界**。通过最大化该下界，我们可以使变分后验逐渐逼近真实后验分布（详见第10.1节）。
 
 我们可以自由选择任何形式的近似后验分布。例如，可采用高斯分布 $q(\theta|\boldsymbol{\psi}) = \mathcal{N}(\boldsymbol{\theta}|\boldsymbol{\mu}, \boldsymbol{\Sigma})$。这与拉普拉斯近似不同——在变分推断中，我们需要优化协方差矩阵 $\boldsymbol{\Sigma}$，而非将其等同于海森矩阵。若 $\boldsymbol{\Sigma}$ 为对角矩阵，则意味着后验分布可完全因子化，这被称为**平均场**（mean field）近似。
@@ -246,9 +292,11 @@ $$
 最常用的MCMC方法是**Metropolis-Hastings算法**。其基本思想是：从参数空间的随机点出发，通过从**提议分布**（proposal distribution） $q\left(\boldsymbol{\theta}^{\prime} \mid \boldsymbol{\theta}\right)$ 中采样新状态（参数）来执行随机游走。若 $ q $ 经过恰当选择，所得马尔可夫链的平稳分布将满足：在空间中访问到每个点的时间占比与该点的后验概率成正比。
 
 其核心要点在于：决定是转移到新提议点 $\boldsymbol{\theta}'$ 还是停留在当前点 $\boldsymbol{\theta}$ 时，我们仅需计算未归一化的密度比：
+
 $$
 \frac{p(\boldsymbol{\theta} \mid \mathcal{D})}{p\left(\boldsymbol{\theta}^{\prime} \mid \mathcal{D}\right)}=\frac{p(\mathcal{D} \mid \boldsymbol{\theta}) p(\boldsymbol{\theta}) / p(\mathcal{D})}{p\left(\mathcal{D} \mid \boldsymbol{\theta}^{\prime}\right) p\left(\boldsymbol{\theta}^{\prime}\right) / p(\mathcal{D})}=\frac{p(\mathcal{D}, \boldsymbol{\theta})}{p\left(\mathcal{D}, \boldsymbol{\theta}^{\prime}\right)} \tag{7.35}
 $$
+
 这种方法避免了计算归一化常数 $ p(\mathcal{D}) $ 的需求（实践中通常使用对数概率替代联合概率以避免数值问题）。
 
 可见，该算法的输入仅需一个计算对数联合密度 $\log p(\boldsymbol{\theta}, \mathcal{D})$ 的函数，以及一个用于决定下一步状态转移的提议分布 $q\left(\boldsymbol{\theta}^{\prime} \mid \boldsymbol{\theta}\right)$。通常采用高斯分布作为提议分布 $q\left(\boldsymbol{\theta}^{\prime} \mid \boldsymbol{\theta}\right)=\mathcal{N}\left(\boldsymbol{\theta}^{\prime} \mid \boldsymbol{\theta}, \sigma \mathbf{I}\right)$，这被称为**随机游走Metropolis算法**（random walk Metropolis）。但该方法效率可能较低，因为其本质是在参数空间中盲目游走以寻找高概率区域。
@@ -278,9 +326,11 @@ SMC的典型应用场景是**序贯贝叶斯推断**（sequential Bayesian infer
 一种评估思路是通过与“真实”后验 $ p(\boldsymbol{\theta}|\mathcal{D}) $（通过离线“精确”方法计算）对比来衡量近似分布 $ q(\boldsymbol{\theta}) $ 的精度。我们通常关注精度与速度的权衡关系，可通过计算 $D_{\mathbb{KL}}\left(p(\boldsymbol{\theta} \mid \mathcal{D}) \| q_t(\boldsymbol{\theta})\right)$ 来量化（其中 $ q_t(\boldsymbol{\theta}) $ 表示经过 $ t $ 单位计算时间后的近似后验）。当然，也可采用其他分布相似性度量指标，如瓦瑟斯坦距离。
 
 然而，真实后验 $ p(\boldsymbol{\theta}|\mathcal{D}) $ 通常无法计算。一种简单的替代方案是通过模型在未观测样本数据上的预测能力进行评估（类似于交叉验证）。更一般性地，如[KPS98; KPS99]所提出，我们可以比较不同后验分布的期望损失或贝叶斯风险（第34.1.3节）：
+
 $$
 R=\mathbb{E}_{p^*(\boldsymbol{x}, \boldsymbol{y})}[\ell(\boldsymbol{y}, q(\boldsymbol{y} \mid \boldsymbol{x}, \mathcal{D}))] \text { where } q(\boldsymbol{y} \mid \boldsymbol{x}, \mathcal{D})=\int p(\boldsymbol{y} \mid \boldsymbol{x}, \boldsymbol{\theta}) q(\boldsymbol{\theta} \mid \mathcal{D}) d \boldsymbol{\theta} \tag{7.36}
 $$
+
 其中 $\ell(\boldsymbol{y}, q(\boldsymbol{y}))$ 为某种损失函数（例如对数损失）。或者，我们也可以按照[Far22]的建议，通过后验分布在特定下游任务（如持续学习或主动学习）中的表现来衡量其性能。
 
 关于变分推断的专项评估方法可参阅[Yao+18b; Hug+20]，蒙特卡洛方法的评估准则参见[CGR06; CTM17; GAR16]。
