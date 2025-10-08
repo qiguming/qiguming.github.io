@@ -20,7 +20,7 @@ comments: true
 
 在机器学习的概率论视角下，所有的未知量——关于未来的预测，系统中的隐变量，或者模型的参数——被作为随机变量，且对应概率分布。**推理**（inference）过程就是计算这些未知量的后验分布，并以任意可获得的数据为条件。
 
-进一步讲，令 $\boldsymbol{\theta}$ 表示未知变量，$\mathcal{D}$ 表示已知变量。已知似然 $p(\mathcal{D}|\boldsymbol{\theta})$ 和先验 $p(\boldsymbol{\theta})$ ，可以使用贝叶斯定理计算后验 $p(\boldsymbol{\theta} \mid \mathcal{D})$：
+进一步讲，令 $\boldsymbol{\theta}$ 表示未知变量，$\mathcal{D}$ 表示已知变量。已知似然 $p(\mathcal{D}\mid\boldsymbol{\theta})$ 和先验 $p(\boldsymbol{\theta})$ ，可以使用贝叶斯定理计算后验 $p(\boldsymbol{\theta} \mid \mathcal{D})$：
 
 $$
 p(\boldsymbol{\theta} \mid \mathcal{D})=\frac{p(\boldsymbol{\theta}) p(\mathcal{D} \mid \boldsymbol{\theta})}{p(\mathcal{D})} \tag{7.1}
@@ -32,7 +32,7 @@ $$
 p(\mathcal{D})=\int p(\mathcal{D} \mid \boldsymbol{\theta}) p(\boldsymbol{\theta}) d \boldsymbol{\theta} \tag{7.2}
 $$
 
-这是为了将非归一化联合概率 $p(\boldsymbol{\theta}, \mathcal{D})$ 转换为归一化概率 $p(\boldsymbol{\theta}|\mathcal{D})$，该转换过程需考虑参数 $\boldsymbol{\theta}$ 所有可能的合理取值。
+这是为了将非归一化联合概率 $p(\boldsymbol{\theta}, \mathcal{D})$ 转换为归一化概率 $p(\boldsymbol{\theta}\mid\mathcal{D})$，该转换过程需考虑参数 $\boldsymbol{\theta}$ 所有可能的合理取值。
 
 一旦得到后验概率，我们可以使用它计算某些函数的后验期望：
 
@@ -170,7 +170,7 @@ $$
 
 MAP估计还存在一个更微妙的问题：其结果依赖于概率分布的参数化方式，而这是非常不可取的。例如，在表示伯努利分布时，我们应当能够使用成功概率或对数几率进行参数化，且这种选择不应影响我们的实际认知。
 
-假设 $\hat{x}=\operatorname{argmax}_x p_x(x)$ 是 $x$ 的 MAP 估计。现令 $y = f(x)$ 为 $x$ 的一个变换。一般而言，$\hat{y}=\operatorname{argmax}_y p_y(y)$ 并不等于 $f(\hat{x})$。例如，设 $x \sim \mathcal{N}(6,1)$ 且 $y = f(x)$，其中 $f(x) = \frac{1}{1+\exp(-x+5)}$。我们可以利用变量变换公式（第2.5.1节）得到 $p_{y}(y) = p_{x}(f^{-1}(y))|\frac{df^{-1}(y)}{dy}|$，或采用蒙特卡洛近似法。结果显示在图2.12中：原始高斯分布 $p(x)$ 被S型非线性函数“挤压”变形，且变换后分布的众数不等于原分布众数的变换结果。
+假设 $\hat{x}=\operatorname{argmax}_x p_x(x)$ 是 $x$ 的 MAP 估计。现令 $y = f(x)$ 为 $x$ 的一个变换。一般而言，$\hat{y}=\operatorname{argmax}_y p_y(y)$ 并不等于 $f(\hat{x})$。例如，设 $x \sim \mathcal{N}(6,1)$ 且 $y = f(x)$，其中 $f(x) = \frac{1}{1+\exp(-x+5)}$。我们可以利用变量变换公式（第2.5.1节）得到 $p_{y}(y) = p_{x}(f^{-1}(y))\mid\frac{df^{-1}(y)}{dy}\mid$，或采用蒙特卡洛近似法。结果显示在图2.12中：原始高斯分布 $p(x)$ 被S型非线性函数“挤压”变形，且变换后分布的众数不等于原分布众数的变换结果。
 
 由此可见，MAP估计依赖于参数化选择。最大似然估计不受此影响，因为似然是函数而非概率密度；贝叶斯推断也不存在此问题，因为在参数空间积分时已考虑了测度变换。
 
@@ -225,7 +225,7 @@ $$
 \begin{align}
 \hat{p}(\boldsymbol{\theta}, \mathcal{D}) & =e^{-\mathcal{E}(\hat{\boldsymbol{\theta}})} \exp \left[-\frac{1}{2}(\boldsymbol{\theta}-\hat{\boldsymbol{\theta}})^{\top} \mathbf{H}(\boldsymbol{\theta}-\hat{\boldsymbol{\theta}})\right] \tag{7.26} \\
 \hat{p}(\boldsymbol{\theta} \mid \mathcal{D}) & =\frac{1}{Z} \hat{p}(\boldsymbol{\theta}, \mathcal{D})=\mathcal{N}\left(\boldsymbol{\theta} \mid \hat{\boldsymbol{\theta}}, \mathbf{H}^{-1}\right) \tag{7.27}\\
-Z & =e^{-\mathcal{E}(\hat{\boldsymbol{\theta}})}(2 \pi)^{D / 2}|\mathbf{H}|^{-\frac{1}{2}} \tag{7.28}
+Z & =e^{-\mathcal{E}(\hat{\boldsymbol{\theta}})}(2 \pi)^{D / 2}\mid\mathbf{H}\mid^{-\frac{1}{2}} \tag{7.28}
 \end{align}
 $$
 
@@ -254,14 +254,14 @@ $$
 通常使用 KL 散度作为分歧的度量
 
 $$
-D(q, p)=D_{\mathrm{KL}}(q(\boldsymbol{\theta} \mid \boldsymbol{\psi}) \| p(\boldsymbol{\theta} \mid \mathcal{D}))=\int q(\boldsymbol{\theta} \mid \boldsymbol{\psi}) \log \frac{q(\boldsymbol{\theta} \mid \boldsymbol{\psi})}{p(\boldsymbol{\theta} \mid \mathcal{D})} d \boldsymbol{\theta} \tag{7.30}
+D(q, p)=D_{\mathrm{KL}}(q(\boldsymbol{\theta} \mid \boldsymbol{\psi}) \\mid p(\boldsymbol{\theta} \mid \mathcal{D}))=\int q(\boldsymbol{\theta} \mid \boldsymbol{\psi}) \log \frac{q(\boldsymbol{\theta} \mid \boldsymbol{\psi})}{p(\boldsymbol{\theta} \mid \mathcal{D})} d \boldsymbol{\theta} \tag{7.30}
 $$
 
 其中 $p(\boldsymbol{\theta} \mid \mathcal{D})=p(\mathcal{D} \mid \boldsymbol{\theta}) p(\boldsymbol{\theta}) / p(\mathcal{D})$。如此，推断问题退化成了如下的优化问题：
 
 $$
 \begin{align}
-\boldsymbol{\psi}^* & =\underset{\boldsymbol{\psi}}{\operatorname{argmin}} D_{\mathbb{KL}}(q(\boldsymbol{\theta} \mid \boldsymbol{\psi}) \| p(\boldsymbol{\theta} \mid \mathcal{D})) \tag{7.31}\\
+\boldsymbol{\psi}^* & =\underset{\boldsymbol{\psi}}{\operatorname{argmin}} D_{\mathbb{KL}}(q(\boldsymbol{\theta} \mid \boldsymbol{\psi}) \\mid p(\boldsymbol{\theta} \mid \mathcal{D})) \tag{7.31}\\
 & =\underset{\boldsymbol{\psi}}{\operatorname{argmin}} \mathbb{E}_{q(\boldsymbol{\theta} \mid \boldsymbol{\psi})}\left[\log q(\boldsymbol{\theta} \mid \boldsymbol{\psi})-\log \left(\frac{p(\mathcal{D} \mid \boldsymbol{\theta}) p(\boldsymbol{\theta})}{p(\mathcal{D})}\right)\right] \tag{7.32}\\
 & =\underset{\boldsymbol{\psi}}{\operatorname{argmin}} \underbrace{\mathbb{E}_{q(\boldsymbol{\theta} \mid \boldsymbol{\psi})}[-\log p(\mathcal{D} \mid \boldsymbol{\theta})-\log p(\boldsymbol{\theta})+\log q(\boldsymbol{\theta} \mid \boldsymbol{\psi})]}_{-\mathbf{Ł}(\boldsymbol{\psi})}+\log p(\mathcal{D}) \tag{7.33}
 \end{align}
@@ -273,19 +273,19 @@ $$
 \mathrm{Ł}(\boldsymbol{\psi}) \triangleq \mathbb{E}_{q(\boldsymbol{\theta} \mid \boldsymbol{\psi})}[\log p(\mathcal{D} \mid \boldsymbol{\theta})+\log p(\boldsymbol{\theta})-\log q(\boldsymbol{\theta} \mid \boldsymbol{\psi})] \tag{7.34}
 $$
 
-由于 $D_{\mathbb{KL}}(q | p) > 0$，我们有 $\mathrm{Ł}(\boldsymbol{\lambda}) \le \log p(\mathcal{D})$。其中 $\log p(\mathcal{D})$ 作为对数边际似然，亦被称为**证据**（evidence）。因此 $\mathrm{Ł}(\boldsymbol{\lambda})$ 被称为**证据下界**。通过最大化该下界，我们可以使变分后验逐渐逼近真实后验分布（详见第10.1节）。
+由于 $D_{\mathbb{KL}}(q \mid p) > 0$，我们有 $\mathrm{Ł}(\boldsymbol{\lambda}) \le \log p(\mathcal{D})$。其中 $\log p(\mathcal{D})$ 作为对数边际似然，亦被称为**证据**（evidence）。因此 $\mathrm{Ł}(\boldsymbol{\lambda})$ 被称为**证据下界**。通过最大化该下界，我们可以使变分后验逐渐逼近真实后验分布（详见第10.1节）。
 
-我们可以自由选择任何形式的近似后验分布。例如，可采用高斯分布 $q(\theta|\boldsymbol{\psi}) = \mathcal{N}(\boldsymbol{\theta}|\boldsymbol{\mu}, \boldsymbol{\Sigma})$。这与拉普拉斯近似不同——在变分推断中，我们需要优化协方差矩阵 $\boldsymbol{\Sigma}$，而非将其等同于海森矩阵。若 $\boldsymbol{\Sigma}$ 为对角矩阵，则意味着后验分布可完全因子化，这被称为**平均场**（mean field）近似。
+我们可以自由选择任何形式的近似后验分布。例如，可采用高斯分布 $q(\theta\mid\boldsymbol{\psi}) = \mathcal{N}(\boldsymbol{\theta}\mid\boldsymbol{\mu}, \boldsymbol{\Sigma})$。这与拉普拉斯近似不同——在变分推断中，我们需要优化协方差矩阵 $\boldsymbol{\Sigma}$，而非将其等同于海森矩阵。若 $\boldsymbol{\Sigma}$ 为对角矩阵，则意味着后验分布可完全因子化，这被称为**平均场**（mean field）近似。
 
-高斯近似并非适用于所有参数类型。例如在我们的一维示例中，参数存在 $\theta\in[0,1]$ 的约束条件。此时可采用 $q(\theta|\boldsymbol{\psi})=\text{Beta}(\theta|a,b)$ 形式的变分近似，其中 $\boldsymbol{\psi}=(a,b)$。然而，选择合适的变分分布形式需要相当的专业经验。为创建适用范围更广、更易于使用的“即插即用”方法，可采用**自动微分变分推断**（automatic differentiation variational inference，ADVI）[Kuc+16]。该方法通过变量变换将参数转换为无约束形式，再施以高斯变分近似，并利用自动微分技术推导变换变量密度所需的雅可比项（详见第10.2.2节）。
+高斯近似并非适用于所有参数类型。例如在我们的一维示例中，参数存在 $\theta\in[0,1]$ 的约束条件。此时可采用 $q(\theta\mid\boldsymbol{\psi})=\text{Beta}(\theta\mida,b)$ 形式的变分近似，其中 $\boldsymbol{\psi}=(a,b)$。然而，选择合适的变分分布形式需要相当的专业经验。为创建适用范围更广、更易于使用的“即插即用”方法，可采用**自动微分变分推断**（automatic differentiation variational inference，ADVI）[Kuc+16]。该方法通过变量变换将参数转换为无约束形式，再施以高斯变分近似，并利用自动微分技术推导变换变量密度所需的雅可比项（详见第10.2.2节）。
 
-现将ADVI应用于我们的一维Beta-伯努利模型：令 $\theta=\sigma(z)$，将 $p(\theta|\mathcal{D})$ 替换为 $q(z|\boldsymbol{\psi})=\mathcal{N}(z|\mu,\sigma)$，其中 $\boldsymbol{\psi}=(\mu,\sigma)$。通过随机梯度下降优化ELBO的随机近似，结果如图7.4所示，其近似效果较为合理。
+现将ADVI应用于我们的一维Beta-伯努利模型：令 $\theta=\sigma(z)$，将 $p(\theta\mid\mathcal{D})$ 替换为 $q(z\mid\boldsymbol{\psi})=\mathcal{N}(z\mid\mu,\sigma)$，其中 $\boldsymbol{\psi}=(\mu,\sigma)$。通过随机梯度下降优化ELBO的随机近似，结果如图7.4所示，其近似效果较为合理。
 
 ![image-20251008195357471](/assets/img/figures/book2/7.5.png)
 
 ### 7.4.5 马尔可夫链蒙特卡洛（MCMC）
 
-尽管变分推断速度较快，但由于其被限制在特定的函数形式 $ q \in \mathcal{Q} $ 中，可能会对后验分布产生有偏近似。一种更灵活的方法是使用基于样本集的非参数近似：$ q(\boldsymbol{\theta}) \approx \frac{1}{S} \sum_{s=1}^{S} \delta(\boldsymbol{\theta} - \boldsymbol{\theta}^s) $，这被称为**蒙特卡洛近似**（Monte Carlo approximation）。其中的关键问题在于如何高效生成后验样本 $ \boldsymbol{\theta}^s \sim p(\boldsymbol{\theta}|\mathcal{D}) $，而无需计算归一化常数 $p(\mathcal{D})=\int p(\boldsymbol{\theta}, \mathcal{D}) d \boldsymbol{\theta}$。
+尽管变分推断速度较快，但由于其被限制在特定的函数形式 $ q \in \mathcal{Q} $ 中，可能会对后验分布产生有偏近似。一种更灵活的方法是使用基于样本集的非参数近似：$ q(\boldsymbol{\theta}) \approx \frac{1}{S} \sum_{s=1}^{S} \delta(\boldsymbol{\theta} - \boldsymbol{\theta}^s) $，这被称为**蒙特卡洛近似**（Monte Carlo approximation）。其中的关键问题在于如何高效生成后验样本 $ \boldsymbol{\theta}^s \sim p(\boldsymbol{\theta}\mid\mathcal{D}) $，而无需计算归一化常数 $p(\mathcal{D})=\int p(\boldsymbol{\theta}, \mathcal{D}) d \boldsymbol{\theta}$。
 
 针对低维场景，我们可以使用**重要性采样**（importance sampling）等方法（第11.5节将详细讨论）。然而对于高维问题，更常用的方法是**马尔可夫链蒙特卡洛**（Markov chain Monte Carlo，MCMC）。我们将在第12章详细展开，此处先作简要介绍。
 
@@ -311,7 +311,7 @@ $$
 
 MCMC类似于一种随机局部搜索算法，它通过在后验分布的状态空间中移动，不断比较当前值与邻近提议值。另一种方法则是使用一系列从简单到复杂的分布序列进行推断，最终分布即为目标后验分布，这被称为**序贯蒙特卡洛**（sequential Monte Carlo，SMC）。该方法更类似于树搜索而非局部搜索，相对MCMC具有多种优势（第13章将详细讨论）。
 
-SMC的典型应用场景是**序贯贝叶斯推断**（sequential Bayesian inference），即以前馈方式递归计算后验分布 $p\left(\boldsymbol{\theta}_t \mid \mathcal{D}_{1: t}\right)$，其中 $\mathcal{D}_{1: t}=\left\{\left(\boldsymbol{x}_n, y_n\right): n=1: t\right\}$ 表示截至当前时刻观测到的所有数据。该分布序列在接收全部数据后将收敛于完整批处理后验 $ p(\boldsymbol{\theta}|\mathcal{D}) $。此外，该方法同样适用于数据持续不断到达的场景（如状态空间模型，参见第29章）。SMC在此类动态模型中的应用被称为**粒子滤波**（particle filtering），具体原理详见第13.2节。
+SMC的典型应用场景是**序贯贝叶斯推断**（sequential Bayesian inference），即以前馈方式递归计算后验分布 $p\left(\boldsymbol{\theta}_t \mid \mathcal{D}_{1: t}\right)$，其中 $\mathcal{D}_{1: t}=\left\{\left(\boldsymbol{x}_n, y_n\right): n=1: t\right\}$ 表示截至当前时刻观测到的所有数据。该分布序列在接收全部数据后将收敛于完整批处理后验 $ p(\boldsymbol{\theta}\mid\mathcal{D}) $。此外，该方法同样适用于数据持续不断到达的场景（如状态空间模型，参见第29章）。SMC在此类动态模型中的应用被称为**粒子滤波**（particle filtering），具体原理详见第13.2节。
 
 ![image-20251008200334679](/assets/img/figures/book2/7.6.png)
 
@@ -323,9 +323,9 @@ SMC的典型应用场景是**序贯贝叶斯推断**（sequential Bayesian infer
 
 现有多种不同的近似推断算法，它们在速度、精度、通用性、简洁性等维度各有权衡，这使得公平比较变得困难。
 
-一种评估思路是通过与“真实”后验 $ p(\boldsymbol{\theta}|\mathcal{D}) $（通过离线“精确”方法计算）对比来衡量近似分布 $ q(\boldsymbol{\theta}) $ 的精度。我们通常关注精度与速度的权衡关系，可通过计算 $D_{\mathbb{KL}}\left(p(\boldsymbol{\theta} \mid \mathcal{D}) \| q_t(\boldsymbol{\theta})\right)$ 来量化（其中 $ q_t(\boldsymbol{\theta}) $ 表示经过 $ t $ 单位计算时间后的近似后验）。当然，也可采用其他分布相似性度量指标，如瓦瑟斯坦距离。
+一种评估思路是通过与“真实”后验 $ p(\boldsymbol{\theta}\mid\mathcal{D}) $（通过离线“精确”方法计算）对比来衡量近似分布 $ q(\boldsymbol{\theta}) $ 的精度。我们通常关注精度与速度的权衡关系，可通过计算 $D_{\mathbb{KL}}\left(p(\boldsymbol{\theta} \mid \mathcal{D}) \\mid q_t(\boldsymbol{\theta})\right)$ 来量化（其中 $ q_t(\boldsymbol{\theta}) $ 表示经过 $ t $ 单位计算时间后的近似后验）。当然，也可采用其他分布相似性度量指标，如瓦瑟斯坦距离。
 
-然而，真实后验 $ p(\boldsymbol{\theta}|\mathcal{D}) $ 通常无法计算。一种简单的替代方案是通过模型在未观测样本数据上的预测能力进行评估（类似于交叉验证）。更一般性地，如[KPS98; KPS99]所提出，我们可以比较不同后验分布的期望损失或贝叶斯风险（第34.1.3节）：
+然而，真实后验 $ p(\boldsymbol{\theta}\mid\mathcal{D}) $ 通常无法计算。一种简单的替代方案是通过模型在未观测样本数据上的预测能力进行评估（类似于交叉验证）。更一般性地，如[KPS98; KPS99]所提出，我们可以比较不同后验分布的期望损失或贝叶斯风险（第34.1.3节）：
 
 $$
 R=\mathbb{E}_{p^*(\boldsymbol{x}, \boldsymbol{y})}[\ell(\boldsymbol{y}, q(\boldsymbol{y} \mid \boldsymbol{x}, \mathcal{D}))] \text { where } q(\boldsymbol{y} \mid \boldsymbol{x}, \mathcal{D})=\int p(\boldsymbol{y} \mid \boldsymbol{x}, \boldsymbol{\theta}) q(\boldsymbol{\theta} \mid \mathcal{D}) d \boldsymbol{\theta} \tag{7.36}
