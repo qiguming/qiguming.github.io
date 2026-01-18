@@ -14,7 +14,7 @@ comments: true
 >
 > 本章实质上构成了强化学习的基础，具有承上启下的关键作用，乘上是指，它继承于AI算法对外部世界的感知推断，启下是指，它需要根据推断的结论进行决策（即选择具体的行动），以实现外部世界奖励的最大化。
 >
-> 我们将理清一些重要的基本概念，譬如智能体，策略行动等。
+> 我们将理清一些重要的基本概念，譬如智能体，策略,行动等。
 >
 > 限于本人能力，目前只翻译了本章大约9成的核心内容。同时感谢 deepseek 的鼎力相助。
 >
@@ -330,7 +330,11 @@ A/B 测试的关键问题之一是，在获得可能带有噪声的测试结果�
 
 #### 34.3.1.1 最优策略
 
-首先假设实验的样本量（处理组的 $n_1$ 和对照组的 $n_0$ ）已知。我们的目标是计算最优策略或决策规则 $\pi(\boldsymbol{y}_1, \boldsymbol{y}_0)$，用于指定应部署哪个动作，其中 $\boldsymbol{y}_j = (y_{1j}, \ldots, y_{n_j, j})$ 表示来自动作 $j$ 的数据。
+首先假设实验的样本量（处理组的 $n_1$ 和对照组的 $n_0$ ）已知。我们的目标是计算最优策略或决策规则 
+$\pi(\boldsymbol{y}_1, \boldsymbol{y}_0)$，
+用于指定应部署哪个动作，其中 
+$\boldsymbol{y}_j = (y_{1j}, \ldots, y_{n_j, j})$ 
+表示来自动作 $j$ 的数据。
 
 最优策略很简单：选择具有更大后验期望奖励的动作：
 
@@ -412,7 +416,11 @@ $$
 
 （非对称情况下的方程见 [FB19]。）
 
-通过最大化公式 (34.42) 的期望奖励，以找到测试阶段的最优样本量。根据对称性，最优解满足 $n_1^* = n_2^* = n^*$，并且由 $\frac{d}{dn} \mathbb{E}[R] = 0$ 推断 $n^*$ 满足：
+通过最大化公式 (34.42) 的期望奖励，以找到测试阶段的最优样本量。根据对称性，最优解满足
+$n_1^* = n_2^* = n^*$，
+并且由 
+$\frac{d}{dn} \mathbb{E}[R] = 0$ 
+推断 $n^*$ 满足：
 
 $$
 n^* = \sqrt{\frac{N}{4}u^2 + \left(\frac{3}{4}u^2\right)^2 - \frac{3}{4}u^2} \leq \sqrt{N}\frac{\sigma}{2\tau} \tag{34.43}
@@ -448,9 +456,16 @@ $$
 X_1=\frac{\mu_1-m}{\tau}, \quad X_2=\frac{\mu_2-m}{\tau} \tag{a}
 $$
 
-则 $X_1, X_2 \stackrel{\text { i.i.d. }}{\sim} \mathcal{N}(0,1)$ 是两个独立的标准正态分布。
+则 $X_1, X_2 \stackrel{\text { i.i.d. }}{\sim} \mathcal{N}(0,1)$ 
+是两个独立的标准正态分布。
 
-已知 $\max \left(X_1, X_2\right)=\frac{X_1+X_2}{2}+\frac{\left|X_1-X_2\right|}{2}$，设 $Z=X_1-X_2$，则 $Z \sim \mathcal{N}(0,2)$，我们有：$\mathbb{E}\left[X_1+X_2\right]=0$，$\mathbb{E}[|Z|]=\sqrt{\frac{2}{\pi}} \cdot \sqrt{2}=\frac{2}{\sqrt{\pi}}$。因此
+已知 
+$\max \left(X_1, X_2\right)=\frac{X_1+X_2}{2}+\frac{\left|X_1-X_2\right|}{2}$
+，设 
+$Z=X_1-X_2$，则 $Z \sim \mathcal{N}(0,2)$，
+我们有：
+$\mathbb{E}\left[X_1+X_2\right]=0$，$\mathbb{E}[|Z|]=\sqrt{\frac{2}{\pi}} \cdot \sqrt{2}=\frac{2}{\sqrt{\pi}}$。
+因此
 
 $$
 \mathbb{E}\left[\max \left(X_1, X_2\right)\right]=0+\frac{1}{2} \cdot \frac{2}{\sqrt{\pi}}=\frac{1}{\sqrt{\pi}} \tag{b}
@@ -480,7 +495,11 @@ $$
 \Pr(\pi(y_1, y_0) = 1 | \mu_1 < \mu_0) = \Pr(Y_1 - Y_0 > 0 | \mu_1 < \mu_0) = 1 - \Phi \left( \frac{\mu_1 - \mu_0}{\sigma \sqrt{\frac{1}{n_1} + \frac{1}{n_0}}} \right) \tag{34.46}
 $$
 
-上式假设 $\mu_j$ 已知。由于它们实际上未知，我们可以使用 $\mathbb{E}[\Pr(\pi(y_1, y_0) = 1 | \mu_1 < \mu_0)]$ 来计算期望错误率。根据对称性，量 $\mathbb{E}[\Pr(\pi(y_1, y_0) = 0 | \mu_1 > \mu_0)]$ 相同。可以证明，这两个量由下式给出：
+上式假设 $\mu_j$ 已知。由于它们实际上未知，我们可以使用 
+$\mathbb{E}[\Pr(\pi(y_1, y_0) = 1 | \mu_1 < \mu_0)]$ 
+来计算期望错误率。根据对称性，量 
+$\mathbb{E}[\Pr(\pi(y_1, y_0) = 0 | \mu_1 > \mu_0)]$ 
+相同。可以证明，这两个量由下式给出：
 
 $$
 \text{错误概率} = \frac{1}{4} - \frac{1}{2\pi} \arctan \left( \frac{\sqrt{2\pi}}{\sigma} \sqrt{\frac{n_1 n_0}{n_1 + n_0}} \right) \tag{34.47}
@@ -494,7 +513,11 @@ $$
 
 本节介绍满足上述框架的一个简单示例。目标是进行**网站测试**（website testing）——比较两个不同版本网页的**点击率**（click through rate）。此时的观测数据是一个二元随机变量 $y_{ij} \sim \text{Ber}(\mu_j)$，因此自然地选择 Beta分布作为先验 $\mu_j \sim \text{Beta}(\alpha, \beta)$（见第 3.4.1 节）。然而，在这种情况下，最优样本量和决策规则更难计算（详情见 [FB19; Sta+17]）。作为一个简单的近似，可以假设 $\overline{y}_{ij} \sim \mathcal{N}(\mu_j, \sigma^2)$，其中 $\mu_j \sim \mathcal{N}(m, \tau^2)$，$m = \frac{\alpha}{\alpha + \beta}$，$\tau^2 = \frac{\alpha \beta}{(\alpha + \beta)^2 (\alpha + \beta + 1)}$，且 $\sigma^2 = m(1 - m)$。
 
-为了设置高斯先验，[FB19] 使用了约 2000 个先前 A/B 测试的经验数据。对于每个测试，他们观察了每个版本页面被展示的次数，以及用户点击每个版本的总次数。基于这些数据，他们使用分层贝叶斯模型推断出 $\mu_j \sim \mathcal{N}(m = 0.68, \tau = 0.03)$。这个先验意味着期望效应大小相当小：$\mathbb{E}[|\mu_1 - \mu_0|] = 0.023$，（这与 [Aze+20] 的结果一致，他们发现对 Microsoft Bing EXP 平台的大多数更改效果可以忽略不计，尽管偶尔会有一些“大成功”。）
+为了设置高斯先验，[FB19] 使用了约 2000 个先前 A/B 测试的经验数据。对于每个测试，他们观察了每个版本页面被展示的次数，以及用户点击每个版本的总次数。基于这些数据，他们使用分层贝叶斯模型推断出 
+$\mu_j \sim \mathcal{N}(m = 0.68, \tau = 0.03)$。
+这个先验意味着期望效应大小相当小：
+$\mathbb{E}[|\mu_1 - \mu_0|] = 0.023$，
+（这与 [Aze+20] 的结果一致，他们发现对 Microsoft Bing EXP 平台的大多数更改效果可以忽略不计，尽管偶尔会有一些“大成功”。）
 
 在这个先验下，并假设总体 $N = 100,000$，公式 (34.43) 表明最优试验次数为 $n_1^* = n_0^* = 2284$。测试阶段的期望奖励（点击次数或**转化次数**）为：$\mathbb{E}[R_{\text{test}}] = 3106$，而部署阶段的期望奖励为：$\mathbb{E}[R_{\text{roll}}] = 66,430$，总奖励为 $69,536$。期望错误率为 $10\%$。
 
@@ -590,7 +613,11 @@ $$
 \boldsymbol{b}_t=\operatorname{BayesRule}\left(\boldsymbol{b}_{t-1}, a_t, r_t\right) \tag{34.55}
 $$
 
-例如，考虑与上下文无关的**伯努利赌博机**（Bernoulli bandit），其中 $p_R(r|a) = \text{Ber}(r|\mu_a)$，并且 $\mu_a = p_R(r = 1|a) = R(a)$ 是采取动作 $a$ 的期望奖励。假设使用一个因式分解的 Beta 先验
+例如，考虑与上下文无关的**伯努利赌博机**（Bernoulli bandit），其中 
+$p_R(r|a) = \text{Ber}(r|\mu_a)$，
+并且 
+$\mu_a = p_R(r = 1|a) = R(a)$ 
+是采取动作 $a$ 的期望奖励。假设使用一个因式分解的 Beta 先验
 
 $$
 p_0(\boldsymbol{\theta})=\prod_a \operatorname{Beta}\left(\mu_a \mid \alpha_0^a, \beta_0^a\right) \tag{34.56}
@@ -610,7 +637,19 @@ $$
 
 图 34.8 展示了一个双臂伯努利赌博机的情况。
 
-我们可以使用类似的方法处理**高斯赌博机**（Gaussian bandit），其中 $p_R(r|a) = \mathcal{N}(r|\mu_a, \sigma^2_a)$，利用第 3.4.3 节的结果。对于上下文老虎机，问题变得更加复杂。如果我们假设是一个**线性回归赌博机**（linear regression bandit）$p_R(r \mid s, a ; \boldsymbol{\theta})=\mathcal{N}\left(r \mid \boldsymbol{\phi}(s, a)^{\top} \boldsymbol{\theta}, \sigma^2\right)$，我们可以使用贝叶斯线性回归来计算闭式解下的 $p\left(\boldsymbol{\theta} \mid \mathcal{D}_t\right)$，正如第 15.2 节所讨论的。如果我们假设是一个**逻辑回归赌博机**（logistic regression bandit）$p_R(r|s, a; \boldsymbol{\theta}) = \text{Ber}(r|\sigma(\boldsymbol{\phi}(s, a)^T\boldsymbol{\theta}))$，我们可以使用贝叶斯逻辑回归来计算 $p(\boldsymbol{\theta}|\mathcal{D}_t)$，正如第 15.3.5 节所讨论的。如果我们有一个形式为 $p_R(r|s, a; \boldsymbol{\theta}) = \text{GLM}(r|f(s, a; \boldsymbol{\theta}))$ 的**神经网络赌博机**（neural bandit），其中 $f$ 是一个非线性函数，那么后验推断会变得更具挑战性，正如我们在第 17 章讨论的。不过，标准的技术，例如扩展卡尔曼滤波器（第 17.5.2 节），仍然可以应用。（关于如何将此方法扩展到大型 DNN，参见 [DMKM22] 的“子空间神经老虎机”方法。）
+我们可以使用类似的方法处理**高斯赌博机**（Gaussian bandit），其中 
+$p_R(r|a) = \mathcal{N}(r|\mu_a, \sigma^2_a)$
+，利用第 3.4.3 节的结果。对于上下文老虎机，问题变得更加复杂。如果我们假设是一个**线性回归赌博机**（linear regression bandit）
+$p_R(r \mid s, a ; \boldsymbol{\theta})=\mathcal{N}\left(r \mid \boldsymbol{\phi}(s, a)^{\top} \boldsymbol{\theta}, \sigma^2\right)$
+，我们可以使用贝叶斯线性回归来计算闭式解下的 
+$p\left(\boldsymbol{\theta} \mid \mathcal{D}_t\right)$
+，正如第 15.2 节所讨论的。如果我们假设是一个**逻辑回归赌博机**（logistic regression bandit）
+$p_R(r|s, a; \boldsymbol{\theta}) = \text{Ber}(r|\sigma(\boldsymbol{\phi}(s, a)^T\boldsymbol{\theta}))$
+，我们可以使用贝叶斯逻辑回归来计算 
+$p(\boldsymbol{\theta}|\mathcal{D}_t)$
+，正如第 15.3.5 节所讨论的。如果我们有一个形式为 
+$p_R(r|s, a; \boldsymbol{\theta}) = \text{GLM}(r|f(s, a; \boldsymbol{\theta}))$ 
+的**神经网络赌博机**（neural bandit），其中 $f$ 是一个非线性函数，那么后验推断会变得更具挑战性，正如我们在第 17 章讨论的。不过，标准的技术，例如扩展卡尔曼滤波器（第 17.5.2 节），仍然可以应用。（关于如何将此方法扩展到大型 DNN，参见 [DMKM22] 的“子空间神经老虎机”方法。）
 
 无论算法细节如何，我们可以将信念状态的更新表示为：
 
@@ -642,7 +681,13 @@ UCB可以被视为一种**探索奖励**（exploration bonus）的形式，其�
 
 #### 34.4.5.1 频率学派方法
 
-一种方法是使用**集中不等式**（concentration inequality） [BLM16] 来推导估计误差的高概率上界：$|\hat{R}_t(s, a) - R_t(s, a)| \leq \delta_t(s, a)$，其中 $\hat{R}_t$ 是 $R$ 的通常估计（一般是极大似然估计，MLE），$\delta_t$ 是适当选择的函数。然后通过设定 $\tilde{R}_t(s, a) = \hat{R}_t(s, a) + \delta_t(s, a)$得到**乐观奖励估计**。
+一种方法是使用**集中不等式**（concentration inequality） [BLM16] 来推导估计误差的高概率上界：
+$|\hat{R}_t(s, a) - R_t(s, a)| \leq \delta_t(s, a)$
+，其中 
+$\hat{R}_t$ 
+是 $R$ 的通常估计（一般是极大似然估计，MLE），$\delta_t$ 是适当选择的函数。然后通过设定 
+$\tilde{R}_t(s, a) = \hat{R}_t(s, a) + \delta_t(s, a)$
+得到**乐观奖励估计**。
 
 作为示例，再次考虑上下文无关的伯努利多臂赌博机，$R(a) \sim \text{Ber}(\mu(a))$。其极大似然估计 $\hat{R}_t(a)=\hat{\mu}_t(a)$ 由执行行动 $a$ 后的观测奖励的经验均值给定：
 
@@ -749,11 +794,18 @@ $$
 A_\pi(s, a) \triangleq Q_\pi(s, a)-V_\pi(s) \tag{34.81}
 $$
 
-这告诉我们在状态 $s$ 下选择行动 $a$ 然后切换到策略 $\pi$（相对于始终遵循 $\pi$ 的基线回报）所带来的收益。请注意，$A_\pi(s, a)$ 既可以是正数也可以是负数，并且由于一个有用的等式$V_\pi(s)=\mathbb{E}_{\pi(a \mid s)}\left[Q_\pi(s, a)\right]$，我们有 $\mathbb{E}_{\pi(a \mid s)}\left[A_\pi(s, a)\right]=0$。
+这告诉我们在状态 $s$ 下选择行动 $a$ 然后切换到策略 $\pi$（相对于始终遵循 $\pi$ 的基线回报）所带来的收益。请注意，$A_\pi(s, a)$ 既可以是正数也可以是负数，并且由于一个有用的等式
+$V_\pi(s)=\mathbb{E}_{\pi(a \mid s)}\left[Q_\pi(s, a)\right]$
+，我们有 
+$\mathbb{E}_{\pi(a \mid s)}\left[A_\pi(s, a)\right]=0$。
 
 ### 34.5.5 最优价值函数和策略
 
-假设 $\pi_*$ 是某个策略，使得对于所有状态 $s \in \mathcal{S}$ 和所有策略 $\pi$，都有 $V_{\pi_*} \geq V_\pi$，那么它就是一个**最优策略**（optimal policy）。同一个 MDP 可能有多个最优策略，但根据定义，它们的价值函数必须相同，分别 $V_*$ 和 $Q_*$。我们称 $V_*$ 为**最优状态价值函数**（optimal state-value function），称 $Q_*$ 为**最优行动价值函数**（optimal action-value function）。此外，任何有限 MDP 都至少存在一个确定性的最优策略 [Put94]。
+假设 $\pi_*$ 是某个策略，使得对于所有状态 
+$s \in \mathcal{S}$ 
+和所有策略 $\pi$，都有 
+$V_{\pi_*} \geq V_\pi$，
+那么它就是一个**最优策略**（optimal policy）。同一个 MDP 可能有多个最优策略，但根据定义，它们的价值函数必须相同，分别 $V_*$ 和 $Q_*$。我们称 $V_*$ 为**最优状态价值函数**（optimal state-value function），称 $Q_*$ 为**最优行动价值函数**（optimal action-value function）。此外，任何有限 MDP 都至少存在一个确定性的最优策略 [Put94]。
 
 最优价值函数的一个基本结果是**贝尔曼最优性方程**（Bellman’s optimality equations）：
 
@@ -785,9 +837,16 @@ $$
 
 在本节中，我们通过一个简单示例来让价值函数等概念更加具体化。考虑如图34.13(a)所示的**一维网格世界**（grid world）。其中存在5个可能的状态，$S_{T1}$ 与 $S_{T2}$ 属于吸收状态，因为智能体一旦进入这些状态，交互即告终止。系统设置两个动作：向上（↑）与向下（↓）。奖励函数在除目标状态 $S_{T2}$ 外的所有位置均为零；进入 $S_{T2}$ 时可获得奖励 1。因此，在每个状态下的最优动作都是向下移动。
 
-图34.13(b)展示了当 $\gamma = 0$ 时的$Q_*$函数。注意，我们只显示了非吸收状态下的函数值，因为根据定义，吸收状态中的最优$Q$值均为 0。可以看到，$Q_*(s_3, \downarrow) = 1.0$，这是因为如果智能体从 $s_3$ 向下移动，将在下一步获得奖励 1.0；然而，对于所有其他状态‑动作对，$Q_*(s,a) = 0 $，因为它们不会提供非零的即时奖励。这一最优 $Q$ 函数反映出：使用 $ \gamma = 0 $ 意味着完全短视，完全忽略了未来收益。
+图34.13(b)展示了当 $\gamma = 0$ 时的 
+$Q_*$ 
+函数。注意，我们只显示了非吸收状态下的函数值，因为根据定义，吸收状态中的最优$Q$值均为 0。可以看到，
+$Q_*(s_3, \downarrow) = 1.0$，
+这是因为如果智能体从 $s_3$ 向下移动，将在下一步获得奖励 1.0；然而，对于所有其他状态‑动作对，$Q_*(s,a) = 0 $，因为它们不会提供非零的即时奖励。这一最优 $Q$ 函数反映出：使用 $ \gamma = 0 $ 意味着完全短视，完全忽略了未来收益。
 
-图34.13(c)展示了当 $\gamma = 1$ 时的 $Q_*$。在这种情况下，我们对所有未来奖励赋予同等权重。因此，对于所有状态‑动作对，$ Q_*(s,a) = 1$，因为智能体最终总能到达目标。这是无限远视的视角。然而，它并未给智能体提供任何关于如何行动的短期指导。例如，在状态 $s_2$ 中，由于向上和向下两个动作最终都能以相同的 $ Q_* $ 值到达目标，因此无法明确应该选择向上还是向下。
+图34.13(c)展示了当 
+$\gamma = 1$ 
+时的 $Q_*$。在这种情况下，我们对所有未来奖励赋予同等权重。因此，对于所有状态‑动作对，$ Q_*(s,a) = 1$，
+因为智能体最终总能到达目标。这是无限远视的视角。然而，它并未给智能体提供任何关于如何行动的短期指导。例如，在状态 $s_2$ 中，由于向上和向下两个动作最终都能以相同的 $ Q_* $ 值到达目标，因此无法明确应该选择向上还是向下。
 
 图34.13(d)展示了当 $ \gamma = 0.9$ 时的$Q_*$。这体现了一种偏好近期奖励，同时也考虑未来奖励的折中。这会激励智能体寻找到达目标的最短路径，而这通常是我们期望的行为。合适的 $\gamma$ 值需要由智能体设计者决定，就像奖励函数的设计一样，它必须反映出智能体的期望行为模式。
 
