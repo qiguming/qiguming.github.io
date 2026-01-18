@@ -29,57 +29,77 @@ comments: true
 ### 34.1.1 基础知识
 
 在**统计决策理论**（statistical deciosn theory）中，我们有一个**智能体**（agent）或者决策者，它需要在一系列可选决策 $a\in\mathcal{A}$ 中选择一个**行动**（action），作为应对某个观测或数据 $\boldsymbol{x}$ 的回应。假设数据来自智能体外部的某个环境；我们将该环境的状态表示为某个隐变量或者未知变量 $h\in\mathcal{H}$ ——即**本质状态**（state of nature）。最后，假设存在某个**损失函数**（loss function）$\ell(h, a)$，它反应了本质状态为 $h$ 时执行行动 $a$ 所导致的损失。我们的目标是定义一种**策略**（policy）$a=\delta(\boldsymbol{x})$——又被称为**估计量**（estimator）或**决策程序**（decision procedure），它决定了每种观测下需要采取的行动，从而最小化期望损失——又被称为**风险**（risk）：
+
 $$
 \delta^*(\cdot)=\underset{\delta}{\operatorname{argmin}} R(\delta) \tag{34.1}
 $$
+
 其中风险定义为：
+
 $$
 R(\delta)=\mathbb{E}[\ell(h, \delta(\mathbf{X}))] \tag{34.2}
 $$
+
 上式的关键在于如何定义期望。接下来我们将介绍频率学派和贝叶斯学派两种定义视角。
 
 ### 34.1.2 频率学派决策理论
 
 **频率学派决策理论**（frequentist decision theory）假设本质状态 $h$ 是固定但未知的量，并将数据 $\mathbf{X}$ 视为随机变量。所以，我们需要关于数据计算期望，即考虑**频率风险**（frequentist risk）：
+
 $$
 r(\delta \mid h)=\mathbb{E}_{p(\boldsymbol{x} \mid h)}[\ell(h, \delta(\boldsymbol{x}))]=\int p(\boldsymbol{x} \mid h) \ell(h, \delta(\boldsymbol{x})) d \boldsymbol{x} \tag{34.3}
 $$
+
 其背后思想是一个好的策略在不同的数据集上都应该表现为低风险。
 
 遗憾的是，本质状态 $h$ 是未知的，所以上式无法计算。存在一些解决方案，一种思路是假设 $h$ 服从某种先验分布，然后计算**贝叶斯风险**（Bayes risk），又被称为 **综合风险**（integrated risk）:
+
 $$
 R_B(\delta) \triangleq \mathbb{E}_{p(h)}[r(\delta \mid h)]=\int p(h) p(\boldsymbol{x} \mid h) \ell(h, \delta(\boldsymbol{x})) d h d \boldsymbol{x} \tag{34.4}
 $$
+
 最小化贝叶斯风险的决策规则被称为 **贝叶斯估计量**（Bayes estimator）。
 
 当然，引入先验分布的做法似乎与频率学派是不相容的。因此，我们可以使用**最大风险**（maximum risk）替代。定义为：
+
 $$
 R_{\max }(\delta)=\max _h r(\delta \mid h) \tag{34.5}
 $$
+
 使最大风险最小的决策规则称为**minimax 估计量**：
+
 $$
 \delta^*=\min _\delta \max _h r_h(\delta) \tag{34.6}
 $$
+
 Minimax估计量具有一定的吸引力。然而，计算该估计量可能非常困难。此外，该思想的基础是悲观的（因为它只考虑极端情况）。事实上，可以证明，所有minimax估计量都等价于**最不利先验**（least favorable prior）下得到的贝叶斯估计量。在多数情境下（博弈论除外），将自然界作为对手的假设并不合理。有关该观点的进一步讨论，请参考 [BS94, p449]。
 
 ### 34.1.3 贝叶斯学派决策理论
 
 **贝叶斯学派决策理论**（Bayesian decision theory）将数据作为可观测常量 $\boldsymbol{x}$，而本质状态作为一个未知的随机变量。行动 $a$的**后验期望损失**（posterior expected loss）定义为：
+
 $$
 \rho(a \mid \boldsymbol{x}) \triangleq \mathbb{E}_{p(h \mid \boldsymbol{x})}[\ell(h, a)]=\int \ell(h, a) p(h \mid \boldsymbol{x}) d h \tag{34.7}
 $$
+
 对于某个估计量，可以定义后验期望损失或者**贝叶斯式风险**（Bayesian risk）
+
 $$
 \rho(\delta \mid \boldsymbol{x})=\rho(\delta(\boldsymbol{x}) \mid \boldsymbol{x}) \tag{34.8}
 $$
+
 **最优策略**（optimal policy）决定如何采取行动以最小化期望损失，即
+
 $$
 \delta^*(\boldsymbol{x})=\underset{a \in \mathcal{A}}{\operatorname{argmin}} \mathbb{E}_{p(h \mid \boldsymbol{x})}[\ell(h, a)] \tag{34.9}
 $$
+
 另一种等效表述如下：定义**效用函数**（utility function）$U(h, a)$，用以衡量在每个可能状态下采取每种可能行动的满意度。如果令 $U(h, a)=-\ell(h, a)$，最优策略可以定义为：
+
 $$
 \delta^*(\boldsymbol{x})=\underset{a \in \mathcal{A}}{\operatorname{argmax}} \mathbb{E}_h[U(h, a)] \tag{34.10}
 $$
+
 这被称为**最大期望效用原则**（maximum expected utility principle）。
 
 ![image-20260102103414285](/assets/img/figures/book2/34.1.png)
@@ -87,12 +107,14 @@ $$
 ### 34.1.4 贝叶斯方法的频率学派最优
 
 我们发现式（34.9）中定义的贝叶斯方法——对每个观测值 $\boldsymbol{x}$ 选择的最优行动，同时使式 （34.4）定义的贝叶斯式风险达到最优——对所有可能的观测选择的最优行动。根据**富比尼定理**（Fubini’s theorem），该定理允许在二重积分中交换积分顺序（等价于**迭代期望法则**（law of iterated expectation））:
+
 $$
 \begin{align}
 R_B(\delta) & =\mathbb{E}_{p(\boldsymbol{x})}[\rho(\delta \mid \boldsymbol{x})]=\mathbb{E}_{p(h \mid \boldsymbol{x}) p(\boldsymbol{x})}[\ell(h, \delta(\boldsymbol{x}))] \tag{34.11}\\
 & =\mathbb{E}_{p(h)}[r(\delta \mid h)]=\mathbb{E}_{p(h) p(\boldsymbol{x} \mid h)}[\ell(h, \delta(\boldsymbol{x}))] \tag{34.12}
 \end{align}
 $$
+
 如图34.1所示。上式说明贝叶斯学派下的最优策略在频率学派下一样是最优的。
 
 更一般地，可以证明，任何一个**可接受的策略**（admissable policy）¹ 都等价于基于某个（可能为非正常）先验分布的贝叶斯策略，这一结果被称为**瓦尔德定理**（Wald’s theorem）[Wal47]。（该定理更通用的版本可参见[DR21]。）**贝叶斯框架在理论上已经足够广泛，足以涵盖所有“好”的决策策略。**因此，可以说，我们“局限于”贝叶斯方法并不会损失任何可能性（尽管我们仍需检验模型的假设是否充分，这是我们在第3.9节讨论的主题）。关于这一点的进一步讨论，请参见[BS94, p448]。
@@ -870,7 +892,9 @@ $$
 \boldsymbol{v}=\boldsymbol{r}+\gamma \mathbf{T} \boldsymbol{v} \tag{34.88}
 $$
 
-这是一个包含 $$|\mathcal{S}|$$ 个未知数的线性方程组。我们可以使用矩阵求逆来求解它：$$\boldsymbol{v}=(\mathbf{I}-\gamma \mathbf{T})^{-1} \boldsymbol{r}$$。或者，我们可以使用价值迭代，通过计算 $$\boldsymbol{v}_{t+1}=\boldsymbol{r}+\gamma \mathbf{T} \boldsymbol{v}_t$$ 直至接近收敛，或者使用某种计算上更高效的异步变体。
+这是一个包含 $$|\mathcal{S}|$$ 个未知数的线性方程组。我们可以使用矩阵求逆来求解它：$$\boldsymbol{v}=(\mathbf{I}-\gamma \mathbf{T})^{-1} \boldsymbol{r}$$。或者，我们可以使用价值迭代，通过计算 
+$$\boldsymbol{v}_{t+1}=\boldsymbol{r}+\gamma \mathbf{T} \boldsymbol{v}_t$$
+直至接近收敛，或者使用某种计算上更高效的异步变体。
 
 一旦我们评估了当前策略 $$\pi$$ 的 $$V_\pi$$，我们就可以用它来推导出一个更好的策略 $$\pi^{\prime}$$，因此得名策略改进。为此，我们只需计算一个确定性策略 $$\pi^{\prime}$$，该策略在每个状态下都相对于 $V_\pi$ 贪婪地行动；即 $$\pi^{\prime}(s)=\operatorname{argmax}_a\left\{R(s, a)+\gamma \mathbb{E}\left[V_\pi\left(s^{\prime}\right)\right]\right\}$$。我们可以保证 $$V_{\pi^{\prime}} \geq V_\pi$$。为了理解这一点，如前所述定义 $$\boldsymbol{r}^{\prime}$，$\mathbf{T}^{\prime}$$和 $$\boldsymbol{v}^{\prime}$$ ，但针对新策略 $$\pi^{\prime}$$。$$\pi^{\prime}$$ 的定义意味着 $$\boldsymbol{r}^{\prime}+\gamma \mathbf{T}^{\prime} \boldsymbol{v} \geq \boldsymbol{r}+\gamma \mathbf{T} \boldsymbol{v}=\boldsymbol{v}$$，其中的等式源于贝尔曼方程。重复相同的等式，我们有
 
