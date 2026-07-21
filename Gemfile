@@ -14,3 +14,5 @@ gem "jekyll-theme-chirpy", "~> 7.0"
 
 # 开发工具
 gem "webrick"
+
+ruby "3.1.2"
