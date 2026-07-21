@@ -52,7 +52,7 @@ jobs:
 
       - name: Test site
         run: |
-          bundle exec htmlproofer _site --disable-external --checks --html --allow_hash_href
+          bundle exec htmlproofer _site --disable-external --checks-to-run Html --allow_hash_href
 
 
       # - name: Upload site artifact
