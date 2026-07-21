@@ -16,3 +16,5 @@ gem "jekyll-theme-chirpy", "~> 7.0"
 gem "webrick"
 
 ruby "3.3.6"
+
+gem "html-proofer", "~> 5.0", group: :development
